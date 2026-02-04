@@ -88,13 +88,16 @@ export default function Home() {
             </motion.div>
 
             {/* Logo smaller */}
-            <motion.img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ChatGPT%20Image%20Feb%202%2C%202026%2C%2011_18_06%20AM-DKlnAmqTLVr3Xut7NnhBBOfuFBksue.png"
-              alt="Growi Logo"
-              className="w-32 sm:w-40 h-auto"
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-            />
+            >
+              <img
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ChatGPT%20Image%20Feb%202%2C%202026%2C%2011_18_06%20AM-DKlnAmqTLVr3Xut7NnhBBOfuFBksue.png"
+                alt="Growi Logo"
+                className="w-32 sm:w-40 h-auto"
+              />
+            </motion.div>
 
             {/* Question */}
             <motion.h2
