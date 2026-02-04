@@ -105,4 +105,5 @@ enum CampaignStatus {
   ACTIVE
   PAUSED
   DEPLETED
+  DELETED
 }

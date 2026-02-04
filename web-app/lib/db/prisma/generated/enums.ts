@@ -22,7 +22,8 @@ export type EventType = (typeof EventType)[keyof typeof EventType]
 export const CampaignStatus = {
   ACTIVE: 'ACTIVE',
   PAUSED: 'PAUSED',
-  DEPLETED: 'DEPLETED'
+  DEPLETED: 'DEPLETED',
+  DELETED: 'DELETED'
 } as const
 
 export type CampaignStatus = (typeof CampaignStatus)[keyof typeof CampaignStatus]
