@@ -13,15 +13,19 @@
     "db:push": "npx prisma db push"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.25",
+    "@ai-sdk/react": "^3.0.71",
     "@prisma/adapter-neon": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@scalar/nextjs-api-reference": "^0.9.18",
+    "ai": "^6.0.69",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.31.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
