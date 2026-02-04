@@ -1,6 +1,6 @@
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
-import { UserModel } from '@/lib/db/prisma/generated/models/User';
+import { User } from '@/lib/db/prisma/generated';
 import { ApiDataResponse, ApiListResponse, CreateUserDTO } from '@/types';
 
 export async function GET(req: Request) {
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
       prisma.user.count(),
     ]);
     
-    const response: ApiListResponse<UserModel> = {
+    const response: ApiListResponse<User> = {
       success: true,
       data: users,
       meta: { total, page, limit },
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       data: validatedData,
     });
     
-    const response: ApiDataResponse<UserModel> = {
+    const response: ApiDataResponse<User> = {
       success: true,
       data: user,
     };

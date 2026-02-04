@@ -1,21 +1,15 @@
+import { getCampaignById } from '@/app/api/campaigns/services';
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
-import { CampaignStatus } from '@/lib/db/prisma/generated/enums';
-import { CampaignModel } from '@/lib/db/prisma/generated/models/Campaign';
-import { ApiDataResponse, ApiErrorResponse, UpdateCampaignDTO } from '@/types/dto';
+import { Campaign, CampaignStatus } from '@/lib/db/prisma/generated';
+import { ApiDataResponse, ApiErrorResponse, UpdateCampaignDTO } from '@/types';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   return safeRoute(async () => {
     
     const { id } = await params;
     
-    const campaign = await prisma.campaign.findUnique({
-      where: {
-        id,
-        status: { not: CampaignStatus.DELETED },
-      },
-      include: { payoutRates: true },
-    });
+    const campaign = await getCampaignById(id);
     
     if (!campaign) {
       const response: ApiErrorResponse = {
@@ -25,7 +19,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return { response, status: 404 };
     }
     
-    const response: ApiDataResponse<CampaignModel> = {
+    const response: ApiDataResponse<Campaign> = {
       success: true,
       data: campaign,
     };
@@ -40,26 +34,38 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const { id } = await params;
     
     const validatedData = UpdateCampaignDTO.parse(body);
+    
     const updated = await prisma.$transaction(async (tx) => {
-      await tx.payoutRate.deleteMany({
+      await tx.rewardEvent.deleteMany({
         where: { campaignId: id },
       });
       
-      return tx.campaign.update({
+      const { rewardEvents, ...campaignData } = validatedData;
+      
+      await tx.campaign.update({
         where: { id },
-        data: {
-          ...validatedData,
-          payoutRates: {
-            create: validatedData.payoutRates,
-          },
-        },
-        include: { payoutRates: true },
+        data: campaignData,
+        include: { rewardEvents: true },
+      });
+      
+      if (rewardEvents && rewardEvents.length > 0) {
+        await tx.rewardEvent.createMany({
+          data: rewardEvents.map((event) => ({
+            ...event,
+            campaignId: id,
+          })),
+        });
+      }
+      
+      return tx.campaign.findUnique({
+        where: { id },
+        include: { rewardEvents: true },
       });
     });
     
-    const response: ApiDataResponse<CampaignModel> = {
+    const response: ApiDataResponse<Campaign> = {
       success: true,
-      data: updated,
+      data: updated!,
     };
     
     return { response };
