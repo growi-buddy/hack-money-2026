@@ -1,11 +1,25 @@
 'use client';
 
+import { mapCampaignFormToAPI, validateCampaignForm } from '@/helpers/campaign-mapper';
+import { CampaignFormData } from '@/types/campaign-form';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
-import { useState, useEffect, useRef } from 'react';
-import { CampaignFormData } from '@/types/campaign-form';
-import { CheckCircle2, Send, Sparkles, Loader2, Bot, User, AlertCircle, Calendar, Users, Globe, Target, DollarSign, Zap } from 'lucide-react';
-import { mapCampaignFormToAPI, validateCampaignForm } from '@/helpers/campaign-mapper';
+import {
+  AlertCircle,
+  Bot,
+  Calendar,
+  CheckCircle2,
+  DollarSign,
+  Globe,
+  Loader2,
+  Send,
+  Sparkles,
+  Target,
+  User,
+  Users,
+  Zap,
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
   name: '',
@@ -34,13 +48,13 @@ const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
 };
 
 export default function AgentAIPage() {
-  const [campaignData, setCampaignData] = useState<CampaignFormData>(INITIAL_CAMPAIGN_DATA);
-  const [isCreating, setIsCreating] = useState(false);
-  const [creationError, setCreationError] = useState<string | null>(null);
-  const [input, setInput] = useState('');
-  const [lastUpdatedField, setLastUpdatedField] = useState<string | null>(null);
+  const [ campaignData, setCampaignData ] = useState<CampaignFormData>(INITIAL_CAMPAIGN_DATA);
+  const [ isCreating, setIsCreating ] = useState(false);
+  const [ creationError, setCreationError ] = useState<string | null>(null);
+  const [ input, setInput ] = useState('');
+  const [ lastUpdatedField, setLastUpdatedField ] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: '/api/chat/campaign-creator',
@@ -111,13 +125,13 @@ export default function AgentAIPage() {
       }
     },
   });
-
+  
   const isLoading = status === 'streaming' || status === 'submitted';
-
+  
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
+  }, [ messages ]);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -125,16 +139,16 @@ export default function AgentAIPage() {
     const userMessage = input;
     setInput('');
     
-    await sendMessage({ 
-      role: 'user', 
-      parts: [{ type: 'text', text: userMessage }] 
+    await sendMessage({
+      role: 'user',
+      parts: [ { type: 'text', text: userMessage } ],
     });
   };
-
+  
   const calculateCompleteness = () => {
     let filled = 0;
     const total = 13; // número de campos principales
-
+    
     if (campaignData.name) filled++;
     if (campaignData.description) filled++;
     if (campaignData.duration) filled++;
@@ -151,10 +165,10 @@ export default function AgentAIPage() {
     // Contar rewards habilitados
     const rewardsEnabled = Object.values(campaignData.rewards || {}).filter(r => r?.enabled).length;
     if (rewardsEnabled > 0) filled++;
-
+    
     return Math.round((filled / total) * 100);
   };
-
+  
   const handleCreateCampaign = async () => {
     setCreationError(null);
     
@@ -164,21 +178,17 @@ export default function AgentAIPage() {
       setCreationError(validation.errors.join(', '));
       return;
     }
-
+    
     setIsCreating(true);
-
+    
     try {
-      // NOTA: Estos valores deben venir del contexto de usuario/sesión
-      // Por ahora usamos valores de ejemplo
-      const brandId = 'REPLACE_WITH_USER_ID'; // TODO: Obtener del contexto de autenticación
-      const escrowAddress = '0x0000000000000000000000000000000000000000'; // TODO: Generar o solicitar
-
+      const walletAddress = '0x522E878Bf98CA82f45704F3BaFf762b6a9e071c7';
+      
       const campaignInput = mapCampaignFormToAPI(
         campaignData,
-        brandId,
-        escrowAddress
+        walletAddress,
       );
-
+      
       const response = await fetch('/api/campaigns', {
         method: 'POST',
         headers: {
@@ -186,12 +196,12 @@ export default function AgentAIPage() {
         },
         body: JSON.stringify(campaignInput),
       });
-
+      
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error?.message || 'Error al crear la campaña');
       }
-
+      
       const result = await response.json();
       
       // Éxito
@@ -206,15 +216,15 @@ export default function AgentAIPage() {
     } catch (error) {
       console.error('Error al crear campaña:', error);
       setCreationError(
-        error instanceof Error ? error.message : 'Error desconocido al crear la campaña'
+        error instanceof Error ? error.message : 'Error desconocido al crear la campaña',
       );
     } finally {
       setIsCreating(false);
     }
   };
-
+  
   const completeness = calculateCompleteness();
-
+  
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
@@ -227,17 +237,20 @@ export default function AgentAIPage() {
             Deja que nuestro agente AI te ayude a configurar tu campaña de marketing
           </p>
         </div>
-
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
           {/* Panel de Chat */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden flex flex-col" style={{ height: '600px' }}>
+          <div
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden flex flex-col"
+            style={{ height: '600px' }}
+          >
             <div className="bg-linear-to-r from-purple-600 to-blue-600 text-white p-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
                 <Bot className="w-6 h-6" />
                 Chat con AI
               </h2>
             </div>
-
+            
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 && (
                 <div className="text-center text-gray-500 dark:text-gray-400 py-8">
@@ -276,7 +289,7 @@ export default function AgentAIPage() {
                   </div>
                 </div>
               )}
-
+              
               {messages.map((message) => {
                 const textParts = message.parts?.filter(p => p.type === 'text') || [];
                 const toolParts = message.parts?.filter(p => p.type?.startsWith('tool-')) || [];
@@ -316,7 +329,7 @@ export default function AgentAIPage() {
                         </div>
                       )}
                     </div>
-
+                    
                     {message.role === 'user' && (
                       <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                         <User className="w-5 h-5 text-white" />
@@ -325,7 +338,7 @@ export default function AgentAIPage() {
                   </div>
                 );
               })}
-
+              
               {isLoading && (
                 <div className="flex gap-3 justify-start">
                   <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center shrink-0">
@@ -336,10 +349,10 @@ export default function AgentAIPage() {
                   </div>
                 </div>
               )}
-
+              
               <div ref={messagesEndRef} />
             </div>
-
+            
             <form onSubmit={handleSubmit} className="p-4 border-t dark:border-gray-700">
               <div className="flex gap-2">
                 <input
@@ -361,9 +374,12 @@ export default function AgentAIPage() {
               </div>
             </form>
           </div>
-
+          
           {/* Panel de Vista Previa */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden flex flex-col" style={{ height: '600px' }}>
+          <div
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden flex flex-col"
+            style={{ height: '600px' }}
+          >
             <div className="bg-linear-to-r from-blue-600 to-purple-600 text-white p-4">
               <h2 className="text-xl font-semibold flex items-center justify-between">
                 <span>Vista Previa de Campaña</span>
@@ -383,57 +399,60 @@ export default function AgentAIPage() {
                 </div>
               )}
             </div>
-
+            
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {/* Información Básica */}
-              <InfoCard 
+              <InfoCard
                 icon={<Sparkles className="w-5 h-5" />}
                 title="Información Básica"
                 color="purple"
               >
-                <Field 
-                  label="Nombre (ENS)" 
-                  value={campaignData.name} 
+                <Field
+                  label="Nombre (ENS)"
+                  value={campaignData.name}
                   onChange={(value) => setCampaignData(prev => ({ ...prev, name: value }))}
                 />
-                <Field 
-                  label="Descripción" 
-                  value={campaignData.description} 
+                <Field
+                  label="Descripción"
+                  value={campaignData.description}
                   onChange={(value) => setCampaignData(prev => ({ ...prev, description: value }))}
-                  multiline 
+                  multiline
                 />
               </InfoCard>
-
+              
               {/* Duración */}
-              <InfoCard 
+              <InfoCard
                 icon={<Calendar className="w-5 h-5" />}
                 title="Duración"
                 color="blue"
               >
-                <Field 
-                  label="Duración (días)" 
-                  value={campaignData.duration?.toString()} 
+                <Field
+                  label="Duración (días)"
+                  value={campaignData.duration?.toString()}
                   type="number"
-                  onChange={(value) => setCampaignData(prev => ({ ...prev, duration: value ? parseInt(value) : undefined }))}
+                  onChange={(value) => setCampaignData(prev => ({
+                    ...prev,
+                    duration: value ? parseInt(value) : undefined,
+                  }))}
                 />
                 <div className="grid grid-cols-2 gap-2">
-                  <Field 
-                    label="Inicio" 
-                    value={campaignData.startDate} 
+                  <Field
+                    label="Inicio"
+                    value={campaignData.startDate}
                     type="date"
                     onChange={(value) => setCampaignData(prev => ({ ...prev, startDate: value }))}
                   />
-                  <Field 
-                    label="Fin" 
-                    value={campaignData.endDate} 
+                  <Field
+                    label="Fin"
+                    value={campaignData.endDate}
                     type="date"
                     onChange={(value) => setCampaignData(prev => ({ ...prev, endDate: value }))}
                   />
                 </div>
               </InfoCard>
-
+              
               {/* Público Objetivo */}
-              <InfoCard 
+              <InfoCard
                 icon={<Users className="w-5 h-5" />}
                 title="Público Objetivo"
                 color="green"
@@ -441,44 +460,44 @@ export default function AgentAIPage() {
                 <Field
                   label="Género"
                   value={campaignData.targetAudience?.gender?.join(', ')}
-                  onChange={(value) => setCampaignData(prev => ({ 
-                    ...prev, 
-                    targetAudience: { 
-                      ...prev.targetAudience, 
-                      gender: value.split(',').map(g => g.trim()).filter(Boolean) as ('male' | 'female' | 'non-binary' | 'all')[]
-                    }
+                  onChange={(value) => setCampaignData(prev => ({
+                    ...prev,
+                    targetAudience: {
+                      ...prev.targetAudience,
+                      gender: value.split(',').map(g => g.trim()).filter(Boolean) as ('male' | 'female' | 'non-binary' | 'all')[],
+                    },
                   }))}
                 />
                 <div className="grid grid-cols-2 gap-2">
-                  <Field 
-                    label="Edad mín" 
-                    value={campaignData.targetAudience?.ageMin?.toString()} 
+                  <Field
+                    label="Edad mín"
+                    value={campaignData.targetAudience?.ageMin?.toString()}
                     type="number"
-                    onChange={(value) => setCampaignData(prev => ({ 
-                      ...prev, 
-                      targetAudience: { 
-                        ...prev.targetAudience, 
-                        ageMin: value ? parseInt(value) : undefined
-                      }
+                    onChange={(value) => setCampaignData(prev => ({
+                      ...prev,
+                      targetAudience: {
+                        ...prev.targetAudience,
+                        ageMin: value ? parseInt(value) : undefined,
+                      },
                     }))}
                   />
-                  <Field 
-                    label="Edad máx" 
-                    value={campaignData.targetAudience?.ageMax?.toString()} 
+                  <Field
+                    label="Edad máx"
+                    value={campaignData.targetAudience?.ageMax?.toString()}
                     type="number"
-                    onChange={(value) => setCampaignData(prev => ({ 
-                      ...prev, 
-                      targetAudience: { 
-                        ...prev.targetAudience, 
-                        ageMax: value ? parseInt(value) : undefined
-                      }
+                    onChange={(value) => setCampaignData(prev => ({
+                      ...prev,
+                      targetAudience: {
+                        ...prev.targetAudience,
+                        ageMax: value ? parseInt(value) : undefined,
+                      },
                     }))}
                   />
                 </div>
               </InfoCard>
-
+              
               {/* Geográfico */}
-              <InfoCard 
+              <InfoCard
                 icon={<Globe className="w-5 h-5" />}
                 title="Geográfico"
                 color="indigo"
@@ -486,29 +505,29 @@ export default function AgentAIPage() {
                 <Field
                   label="Regiones"
                   value={campaignData.geographic?.regions?.join(', ')}
-                  onChange={(value) => setCampaignData(prev => ({ 
-                    ...prev, 
-                    geographic: { 
-                      ...prev.geographic, 
-                      regions: value.split(',').map(r => r.trim()).filter(Boolean)
-                    }
+                  onChange={(value) => setCampaignData(prev => ({
+                    ...prev,
+                    geographic: {
+                      ...prev.geographic,
+                      regions: value.split(',').map(r => r.trim()).filter(Boolean),
+                    },
                   }))}
                 />
                 <Field
                   label="Países"
                   value={campaignData.geographic?.countries?.join(', ')}
-                  onChange={(value) => setCampaignData(prev => ({ 
-                    ...prev, 
-                    geographic: { 
-                      ...prev.geographic, 
-                      countries: value.split(',').map(c => c.trim()).filter(Boolean)
-                    }
+                  onChange={(value) => setCampaignData(prev => ({
+                    ...prev,
+                    geographic: {
+                      ...prev.geographic,
+                      countries: value.split(',').map(c => c.trim()).filter(Boolean),
+                    },
                   }))}
                 />
               </InfoCard>
-
+              
               {/* Intereses */}
-              <InfoCard 
+              <InfoCard
                 icon={<Target className="w-5 h-5" />}
                 title="Intereses"
                 color="pink"
@@ -516,15 +535,15 @@ export default function AgentAIPage() {
                 <Field
                   label="Tags"
                   value={campaignData.interests?.join(', ')}
-                  onChange={(value) => setCampaignData(prev => ({ 
-                    ...prev, 
-                    interests: value.split(',').map(i => i.trim()).filter(Boolean)
+                  onChange={(value) => setCampaignData(prev => ({
+                    ...prev,
+                    interests: value.split(',').map(i => i.trim()).filter(Boolean),
                   }))}
                 />
               </InfoCard>
-
+              
               {/* Presupuesto */}
-              <InfoCard 
+              <InfoCard
                 icon={<DollarSign className="w-5 h-5" />}
                 title="Presupuesto"
                 color="emerald"
@@ -533,15 +552,15 @@ export default function AgentAIPage() {
                   label="Budget Total"
                   value={campaignData.budget?.toString()}
                   type="number"
-                  onChange={(value) => setCampaignData(prev => ({ 
-                    ...prev, 
-                    budget: value ? parseFloat(value) : undefined
+                  onChange={(value) => setCampaignData(prev => ({
+                    ...prev,
+                    budget: value ? parseFloat(value) : undefined,
                   }))}
                 />
               </InfoCard>
-
+              
               {/* Rewards */}
-              <InfoCard 
+              <InfoCard
                 icon={<Zap className="w-5 h-5" />}
                 title="Recompensas"
                 color="amber"
@@ -554,15 +573,15 @@ export default function AgentAIPage() {
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      landingPageView: { ...prev.rewards?.landingPageView, enabled }
-                    }
+                      landingPageView: { ...prev.rewards?.landingPageView, enabled },
+                    },
                   }))}
                   onPriceChange={(price) => setCampaignData(prev => ({
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      landingPageView: { ...prev.rewards?.landingPageView, pricePerView: price }
-                    }
+                      landingPageView: { ...prev.rewards?.landingPageView, pricePerView: price },
+                    },
                   }))}
                 />
                 <RewardField
@@ -573,15 +592,15 @@ export default function AgentAIPage() {
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      itemView: { ...prev.rewards?.itemView, enabled }
-                    }
+                      itemView: { ...prev.rewards?.itemView, enabled },
+                    },
                   }))}
                   onPriceChange={(price) => setCampaignData(prev => ({
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      itemView: { ...prev.rewards?.itemView, pricePerClick: price }
-                    }
+                      itemView: { ...prev.rewards?.itemView, pricePerClick: price },
+                    },
                   }))}
                 />
                 <RewardField
@@ -592,15 +611,15 @@ export default function AgentAIPage() {
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      addToCart: { ...prev.rewards?.addToCart, enabled }
-                    }
+                      addToCart: { ...prev.rewards?.addToCart, enabled },
+                    },
                   }))}
                   onPriceChange={(price) => setCampaignData(prev => ({
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      addToCart: { ...prev.rewards?.addToCart, pricePerClick: price }
-                    }
+                      addToCart: { ...prev.rewards?.addToCart, pricePerClick: price },
+                    },
                   }))}
                 />
                 <RewardField
@@ -611,15 +630,15 @@ export default function AgentAIPage() {
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      checkout: { ...prev.rewards?.checkout, enabled }
-                    }
+                      checkout: { ...prev.rewards?.checkout, enabled },
+                    },
                   }))}
                   onPriceChange={(price) => setCampaignData(prev => ({
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      checkout: { ...prev.rewards?.checkout, pricePerClick: price }
-                    }
+                      checkout: { ...prev.rewards?.checkout, pricePerClick: price },
+                    },
                   }))}
                 />
                 <RewardField
@@ -630,20 +649,20 @@ export default function AgentAIPage() {
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      thankYouView: { ...prev.rewards?.thankYouView, enabled }
-                    }
+                      thankYouView: { ...prev.rewards?.thankYouView, enabled },
+                    },
                   }))}
                   onPriceChange={(price) => setCampaignData(prev => ({
                     ...prev,
                     rewards: {
                       ...prev.rewards,
-                      thankYouView: { ...prev.rewards?.thankYouView, pricePerView: price }
-                    }
+                      thankYouView: { ...prev.rewards?.thankYouView, pricePerView: price },
+                    },
                   }))}
                 />
               </InfoCard>
             </div>
-
+            
             <div className="p-4 border-t dark:border-gray-700 space-y-2">
               {creationError && (
                 <div className="flex items-start gap-2 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm">
@@ -680,15 +699,15 @@ export default function AgentAIPage() {
   );
 }
 
-function InfoCard({ 
-  icon, 
-  title, 
-  children, 
-  color = 'blue' 
-}: { 
-  icon: React.ReactNode; 
-  title: string; 
-  children: React.ReactNode; 
+function InfoCard({
+                    icon,
+                    title,
+                    children,
+                    color = 'blue',
+                  }: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
   color?: 'purple' | 'blue' | 'green' | 'indigo' | 'pink' | 'emerald' | 'amber';
 }) {
   const colorClasses = {
@@ -700,7 +719,7 @@ function InfoCard({
     emerald: 'from-emerald-500 to-emerald-600',
     amber: 'from-amber-500 to-amber-600',
   };
-
+  
   return (
     <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all">
       <div className={`flex items-center gap-2 mb-3 pb-2 border-b border-gray-200 dark:border-gray-600`}>
@@ -717,12 +736,12 @@ function InfoCard({
 }
 
 function Field({
-  label,
-  value,
-  onChange,
-  multiline = false,
-  type = 'text',
-}: {
+                 label,
+                 value,
+                 onChange,
+                 multiline = false,
+                 type = 'text',
+               }: {
   label: string;
   value?: string;
   onChange?: (value: string) => void;
@@ -740,7 +759,7 @@ function Field({
           onChange={(e) => onChange?.(e.target.value)}
           placeholder="No especificado"
           className={`w-full mt-1 px-2.5 py-1.5 rounded-lg border text-sm min-h-[50px] focus:outline-none focus:ring-2 transition-all ${
-            hasValue 
+            hasValue
               ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20 text-gray-900 dark:text-white focus:ring-green-500'
               : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 focus:ring-blue-500'
           }`}
@@ -752,7 +771,7 @@ function Field({
           onChange={(e) => onChange?.(e.target.value)}
           placeholder="No especificado"
           className={`w-full mt-1 px-2.5 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-all ${
-            hasValue 
+            hasValue
               ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20 text-gray-900 dark:text-white focus:ring-green-500'
               : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 focus:ring-blue-500'
           }`}
@@ -763,12 +782,12 @@ function Field({
 }
 
 function RewardField({
-  label,
-  enabled,
-  price,
-  onToggle,
-  onPriceChange,
-}: {
+                       label,
+                       enabled,
+                       price,
+                       onToggle,
+                       onPriceChange,
+                     }: {
   label: string;
   enabled?: boolean;
   price?: number;
@@ -776,11 +795,13 @@ function RewardField({
   onPriceChange?: (price: number) => void;
 }) {
   return (
-    <div className={`flex items-center gap-3 px-2.5 py-2 rounded-lg border transition-all ${
-      enabled 
-        ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20' 
-        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
-    }`}>
+    <div
+      className={`flex items-center gap-3 px-2.5 py-2 rounded-lg border transition-all ${
+        enabled
+          ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20'
+          : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+      }`}
+    >
       <label className="flex items-center gap-2 cursor-pointer flex-1">
         <input
           type="checkbox"

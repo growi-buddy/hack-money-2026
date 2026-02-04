@@ -34,7 +34,6 @@ export async function GET(req: Request) {
   
   script = metaComment + script.replace('{{SITE_ID}}', id);
   
-  // Set proper headers for script
   return new NextResponse(script, {
     status: 200,
     headers: {

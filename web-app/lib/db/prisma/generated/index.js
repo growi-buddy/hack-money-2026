@@ -104,7 +104,7 @@ exports.Prisma.UserScalarFieldEnum = {
 
 exports.Prisma.CampaignScalarFieldEnum = {
   id: 'id',
-  brandId: 'brandId',
+  ownerId: 'ownerId',
   title: 'title',
   escrowAddress: 'escrowAddress',
   budgetTotal: 'budgetTotal',
@@ -114,20 +114,33 @@ exports.Prisma.CampaignScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.PayoutRateScalarFieldEnum = {
+exports.Prisma.RewardEventScalarFieldEnum = {
   id: 'id',
   campaignId: 'campaignId',
   eventType: 'eventType',
   amount: 'amount',
   volumeStep: 'volumeStep',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SelectorScalarFieldEnum = {
+  id: 'id',
+  rewardEventId: 'rewardEventId',
+  selector: 'selector',
+  eventType: 'eventType',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ParticipationScalarFieldEnum = {
   id: 'id',
   influencerId: 'influencerId',
   campaignId: 'campaignId',
-  currentBalance: 'currentBalance'
+  currentBalance: 'currentBalance',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.TrackingLinkScalarFieldEnum = {
@@ -147,7 +160,8 @@ exports.Prisma.AnalyticsEventScalarFieldEnum = {
   externalTxId: 'externalTxId',
   metadata: 'metadata',
   payoutGenerated: 'payoutGenerated',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -182,7 +196,14 @@ exports.EventType = exports.$Enums.EventType = {
   SIGNUP: 'SIGNUP'
 };
 
+exports.SelectorEventType = exports.$Enums.SelectorEventType = {
+  ONCLICK: 'ONCLICK',
+  HOVER: 'HOVER',
+  DOUBLE_CLICK: 'DOUBLE_CLICK'
+};
+
 exports.CampaignStatus = exports.$Enums.CampaignStatus = {
+  DRAFT: 'DRAFT',
   ACTIVE: 'ACTIVE',
   PAUSED: 'PAUSED',
   DEPLETED: 'DEPLETED',
@@ -192,7 +213,8 @@ exports.CampaignStatus = exports.$Enums.CampaignStatus = {
 exports.Prisma.ModelName = {
   User: 'User',
   Campaign: 'Campaign',
-  PayoutRate: 'PayoutRate',
+  RewardEvent: 'RewardEvent',
+  Selector: 'Selector',
   Participation: 'Participation',
   TrackingLink: 'TrackingLink',
   AnalyticsEvent: 'AnalyticsEvent'
@@ -205,10 +227,10 @@ const config = {
   "clientVersion": "7.3.0",
   "engineVersion": "9d6ad21cbbceab97458517b147a6a09ff43aa735",
   "activeProvider": "postgresql",
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n}\n\ngenerator client {\n  provider   = \"prisma-client-js\"\n  output     = \"../prisma/generated\"\n  engineType = \"client\"\n}\n\nmodel User {\n  id            String  @id @default(cuid())\n  walletAddress String  @unique\n  name          String?\n  email         String? @unique\n\n  campaignsCreated Campaign[]      @relation(\"BrandCampaigns\")\n  participations   Participation[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Campaign {\n  id      String @id @default(cuid())\n  brandId String\n  brand   User   @relation(\"BrandCampaigns\", fields: [brandId], references: [id])\n\n  title         String\n  escrowAddress String\n  budgetTotal   Decimal\n\n  payoutRates PayoutRate[]\n\n  yellowChannelId String?\n  status          CampaignStatus  @default(ACTIVE)\n  participations  Participation[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel PayoutRate {\n  id         String   @id @default(cuid())\n  campaignId String\n  campaign   Campaign @relation(fields: [campaignId], references: [id])\n\n  eventType  EventType\n  amount     Decimal\n  volumeStep Int       @default(1)\n\n  createdAt DateTime @default(now())\n}\n\nmodel Participation {\n  id           String   @id @default(cuid())\n  influencerId String\n  influencer   User     @relation(fields: [influencerId], references: [id])\n  campaignId   String\n  campaign     Campaign @relation(fields: [campaignId], references: [id])\n\n  links          TrackingLink[]\n  currentBalance Decimal        @default(0)\n\n  events AnalyticsEvent[]\n\n  @@unique([influencerId, campaignId])\n}\n\nmodel TrackingLink {\n  id              String        @id @default(cuid())\n  url             String        @unique\n  participationId String\n  participation   Participation @relation(fields: [participationId], references: [id])\n\n  isActive  Boolean   @default(true)\n  expiresAt DateTime?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel AnalyticsEvent {\n  id   String    @id @default(cuid())\n  type EventType\n\n  participationId String\n  participation   Participation @relation(fields: [participationId], references: [id])\n\n  externalTxId    String? @unique\n  metadata        Json?\n  payoutGenerated Decimal @default(0)\n\n  createdAt DateTime @default(now())\n}\n\nenum EventType {\n  VISIT_PAGE\n  ADD_CART\n  BUY_PRODUCT\n  SIGNUP\n}\n\nenum CampaignStatus {\n  ACTIVE\n  PAUSED\n  DEPLETED\n  DELETED\n}\n"
+  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n}\n\ngenerator client {\n  provider   = \"prisma-client-js\"\n  output     = \"../prisma/generated\"\n  engineType = \"client\"\n}\n\nmodel User {\n  id            String  @id @default(cuid())\n  walletAddress String  @unique\n  name          String?\n  email         String? @unique\n\n  campaignsCreated Campaign[]      @relation(\"UserCampaigns\")\n  participations   Participation[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Campaign {\n  id String @id @default(cuid())\n\n  ownerId String\n  owner   User   @relation(\"UserCampaigns\", fields: [ownerId], references: [id])\n\n  title         String\n  escrowAddress String\n  budgetTotal   Decimal\n\n  rewardEvents RewardEvent[]\n\n  yellowChannelId String?\n  status          CampaignStatus  @default(ACTIVE)\n  participations  Participation[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel RewardEvent {\n  id         String   @id @default(cuid())\n  campaignId String\n  campaign   Campaign @relation(fields: [campaignId], references: [id])\n\n  eventType  EventType\n  amount     Decimal\n  volumeStep Int       @default(1)\n\n  selectors Selector[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Selector {\n  id            String      @id @default(cuid())\n  rewardEventId String\n  rewardEvent   RewardEvent @relation(fields: [rewardEventId], references: [id])\n\n  selector  String\n  eventType SelectorEventType\n  isActive  Boolean           @default(true)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@unique([rewardEventId, selector])\n}\n\nmodel Participation {\n  id           String   @id @default(cuid())\n  influencerId String\n  influencer   User     @relation(fields: [influencerId], references: [id])\n  campaignId   String\n  campaign     Campaign @relation(fields: [campaignId], references: [id])\n\n  links          TrackingLink[]\n  currentBalance Decimal        @default(0)\n\n  events AnalyticsEvent[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@unique([influencerId, campaignId])\n}\n\nmodel TrackingLink {\n  id              String        @id @default(cuid())\n  url             String        @unique\n  participationId String\n  participation   Participation @relation(fields: [participationId], references: [id])\n\n  isActive  Boolean   @default(true)\n  expiresAt DateTime?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel AnalyticsEvent {\n  id   String    @id @default(cuid())\n  type EventType\n\n  participationId String\n  participation   Participation @relation(fields: [participationId], references: [id])\n\n  externalTxId    String? @unique\n  metadata        Json?\n  payoutGenerated Decimal @default(0)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nenum EventType {\n  VISIT_PAGE\n  ADD_CART\n  BUY_PRODUCT\n  SIGNUP\n}\n\nenum SelectorEventType {\n  ONCLICK\n  HOVER\n  DOUBLE_CLICK\n}\n\nenum CampaignStatus {\n  DRAFT\n  ACTIVE\n  PAUSED\n  DEPLETED\n  DELETED\n}\n"
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"walletAddress\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"campaignsCreated\",\"kind\":\"object\",\"type\":\"Campaign\",\"relationName\":\"BrandCampaigns\"},{\"name\":\"participations\",\"kind\":\"object\",\"type\":\"Participation\",\"relationName\":\"ParticipationToUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Campaign\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"brandId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"brand\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"BrandCampaigns\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"escrowAddress\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"budgetTotal\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"payoutRates\",\"kind\":\"object\",\"type\":\"PayoutRate\",\"relationName\":\"CampaignToPayoutRate\"},{\"name\":\"yellowChannelId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"CampaignStatus\"},{\"name\":\"participations\",\"kind\":\"object\",\"type\":\"Participation\",\"relationName\":\"CampaignToParticipation\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"PayoutRate\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"campaignId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"campaign\",\"kind\":\"object\",\"type\":\"Campaign\",\"relationName\":\"CampaignToPayoutRate\"},{\"name\":\"eventType\",\"kind\":\"enum\",\"type\":\"EventType\"},{\"name\":\"amount\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"volumeStep\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Participation\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"influencerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"influencer\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ParticipationToUser\"},{\"name\":\"campaignId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"campaign\",\"kind\":\"object\",\"type\":\"Campaign\",\"relationName\":\"CampaignToParticipation\"},{\"name\":\"links\",\"kind\":\"object\",\"type\":\"TrackingLink\",\"relationName\":\"ParticipationToTrackingLink\"},{\"name\":\"currentBalance\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"events\",\"kind\":\"object\",\"type\":\"AnalyticsEvent\",\"relationName\":\"AnalyticsEventToParticipation\"}],\"dbName\":null},\"TrackingLink\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"participationId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"participation\",\"kind\":\"object\",\"type\":\"Participation\",\"relationName\":\"ParticipationToTrackingLink\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"expiresAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"AnalyticsEvent\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"EventType\"},{\"name\":\"participationId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"participation\",\"kind\":\"object\",\"type\":\"Participation\",\"relationName\":\"AnalyticsEventToParticipation\"},{\"name\":\"externalTxId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"metadata\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"payoutGenerated\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"walletAddress\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"campaignsCreated\",\"kind\":\"object\",\"type\":\"Campaign\",\"relationName\":\"UserCampaigns\"},{\"name\":\"participations\",\"kind\":\"object\",\"type\":\"Participation\",\"relationName\":\"ParticipationToUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Campaign\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ownerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"owner\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserCampaigns\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"escrowAddress\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"budgetTotal\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"rewardEvents\",\"kind\":\"object\",\"type\":\"RewardEvent\",\"relationName\":\"CampaignToRewardEvent\"},{\"name\":\"yellowChannelId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"CampaignStatus\"},{\"name\":\"participations\",\"kind\":\"object\",\"type\":\"Participation\",\"relationName\":\"CampaignToParticipation\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"RewardEvent\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"campaignId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"campaign\",\"kind\":\"object\",\"type\":\"Campaign\",\"relationName\":\"CampaignToRewardEvent\"},{\"name\":\"eventType\",\"kind\":\"enum\",\"type\":\"EventType\"},{\"name\":\"amount\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"volumeStep\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"selectors\",\"kind\":\"object\",\"type\":\"Selector\",\"relationName\":\"RewardEventToSelector\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Selector\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rewardEventId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rewardEvent\",\"kind\":\"object\",\"type\":\"RewardEvent\",\"relationName\":\"RewardEventToSelector\"},{\"name\":\"selector\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"eventType\",\"kind\":\"enum\",\"type\":\"SelectorEventType\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Participation\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"influencerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"influencer\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ParticipationToUser\"},{\"name\":\"campaignId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"campaign\",\"kind\":\"object\",\"type\":\"Campaign\",\"relationName\":\"CampaignToParticipation\"},{\"name\":\"links\",\"kind\":\"object\",\"type\":\"TrackingLink\",\"relationName\":\"ParticipationToTrackingLink\"},{\"name\":\"currentBalance\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"events\",\"kind\":\"object\",\"type\":\"AnalyticsEvent\",\"relationName\":\"AnalyticsEventToParticipation\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"TrackingLink\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"participationId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"participation\",\"kind\":\"object\",\"type\":\"Participation\",\"relationName\":\"ParticipationToTrackingLink\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"expiresAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"AnalyticsEvent\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"EventType\"},{\"name\":\"participationId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"participation\",\"kind\":\"object\",\"type\":\"Participation\",\"relationName\":\"AnalyticsEventToParticipation\"},{\"name\":\"externalTxId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"metadata\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"payoutGenerated\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.compilerWasm = {
       getRuntime: async () => require('./query_compiler_fast_bg.js'),

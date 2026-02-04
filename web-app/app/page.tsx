@@ -1,220 +1,363 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, Users, Megaphone, Zap, Shield, TrendingUp } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion"
+import Image from "next/image"
+import Link from "next/link"
+import { useRef } from "react"
+import { Users, TrendingUp, Shield, Zap, Globe, Wallet, ChevronDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Navbar } from "@/components/navbar"
+import { FallingLeaves } from "@/components/falling-leaves"
+import { staggerContainer, staggerItem, fadeUp } from "@/lib/animations"
 
 const features = [
   {
-    icon: Zap,
-    title: "Instant Matching",
-    description: "Connect with the perfect influencers or clients in seconds using our smart matching algorithm.",
+    icon: TrendingUp,
+    title: "Real-Time Earnings",
+    description: "Earn instantly as you hit campaign milestones. No waiting for payouts."
   },
   {
     icon: Shield,
-    title: "Secure Payments",
-    description: "Blockchain-powered escrow ensures safe and transparent transactions for all parties.",
+    title: "Transparent Tracking",
+    description: "Every view, click, and purchase is tracked on-chain for full transparency."
   },
   {
-    icon: TrendingUp,
-    title: "Track Performance",
-    description: "Real-time analytics and insights to measure campaign success and ROI.",
+    icon: Zap,
+    title: "Instant Crypto Rewards",
+    description: "Get paid in crypto directly to your wallet. Fast, secure, borderless."
   },
-];
+  {
+    icon: Globe,
+    title: "Global Reach",
+    description: "Connect with clients and influencers worldwide without barriers."
+  }
+]
 
-export default function Home() {
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+export default function LandingPage() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  })
 
-  const handleConnectWallet = () => {
-    setWalletConnected(true);
-  };
-
-  const handleRoleSelect = (role: string) => {
-    setSelectedRole(role);
-  };
+  // Parallax transforms
+  const heroY = useTransform(scrollYProgress, [0, 0.25], [0, -100])
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0])
+  const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.95])
+  const bgShape1Y = useTransform(scrollYProgress, [0, 1], [0, -200])
+  const bgShape2Y = useTransform(scrollYProgress, [0, 1], [0, -150])
+  const cardsY = useTransform(scrollYProgress, [0.05, 0.25], [100, 0])
+  const cardsOpacity = useTransform(scrollYProgress, [0.05, 0.2], [0, 1])
+  const cardsScale = useTransform(scrollYProgress, [0.05, 0.25], [0.95, 1])
+  const featuresY = useTransform(scrollYProgress, [0.25, 0.5], [100, 0])
+  const featuresOpacity = useTransform(scrollYProgress, [0.25, 0.4], [0, 1])
+  const featuresScale = useTransform(scrollYProgress, [0.25, 0.5], [0.95, 1])
+  const footerY = useTransform(scrollYProgress, [0.5, 0.75], [50, 0])
+  const footerOpacity = useTransform(scrollYProgress, [0.5, 0.65], [0, 1])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-[#162033] to-background animate-gradient">
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center min-h-screen px-6 py-20">
-        <div className="max-w-4xl mx-auto text-center">
+    <div ref={containerRef} className="bg-background">
+      {/* Falling Leaves Animation */}
+      <FallingLeaves />
+
+      {/* Animated background shapes with parallax */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <motion.div
+          className="absolute -left-1/4 -top-1/4 h-[500px] w-[500px] rounded-full bg-growi-blue/5 blur-3xl"
+          style={{ y: bgShape1Y }}
+          animate={{
+            x: [0, 50, 0],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute -bottom-1/4 -right-1/4 h-[500px] w-[500px] rounded-full bg-growi-lime/5 blur-3xl"
+          style={{ y: bgShape2Y }}
+          animate={{
+            x: [0, -50, 0],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </div>
+
+      {/* Fixed Navbar */}
+      <div className="fixed left-0 right-0 top-0 z-50">
+        <Navbar />
+      </div>
+
+      {/* Hero Section - Full Viewport */}
+      <motion.section 
+        style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
+        className="relative flex min-h-screen items-center justify-center px-4 pt-14"
+      >
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="mx-auto grid w-full max-w-7xl items-center gap-4 md:grid-cols-[1fr_1.3fr] md:gap-6 lg:gap-8"
+        >
+          {/* Left Column - Text + Button */}
+          <div className="order-2 flex flex-col items-center text-center md:order-1 md:items-start md:text-left">
+            <motion.h1
+              variants={fadeUp}
+              className="max-w-xl text-balance text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl"
+            >
+              Web3 Influencer Marketing{" "}
+              <span className="text-growi-blue">Reimagined</span>
+            </motion.h1>
+
+            <motion.p
+              variants={fadeUp}
+              className="mt-3 max-w-lg text-pretty text-sm text-muted-foreground sm:text-base md:mt-4 md:text-lg"
+            >
+              Connect clients with influencers through crypto-reward campaigns. 
+              Create performance-based bounties and earn real-time as you hit goals.
+            </motion.p>
+
+            {/* CTA Button */}
+            <motion.div
+              variants={fadeUp}
+              className="mt-5 md:mt-6"
+            >
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  size="lg"
+                  className="bg-growi-blue px-6 py-5 text-base font-semibold text-white hover:bg-growi-blue-dark sm:px-8 sm:py-6 sm:text-lg"
+                >
+                  <Wallet className="mr-2 h-5 w-5" />
+                  Connect Wallet
+                </Button>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* Right Column - Logo Image (Bigger) */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
+            variants={fadeUp}
+            className="order-1 flex w-full justify-center md:order-2 md:col-span-1 md:justify-end lg:justify-center"
           >
-            <Image
-              src="/growi-logo.png"
-              alt="Growi Logo"
-              width={320}
-              height={160}
-              className="mx-auto"
-              priority
-            />
+            <motion.div
+              animate={{
+                y: [0, -15, 0]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="w-full"
+            >
+              <Image
+                src="/growi-logo-full.png"
+                alt="GROWI Mascot"
+                width={900}
+                height={360}
+                className="h-auto w-full max-w-none"
+                priority
+              />
+            </motion.div>
+          </motion.div>
+        </motion.div>
+
+        {/* Scroll to Explore */}
+        <motion.div 
+          className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
+        >
+          <motion.span 
+            className="text-sm font-medium text-muted-foreground"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            Scroll to explore
+          </motion.span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ChevronDown className="h-5 w-5 text-muted-foreground" />
+          </motion.div>
+        </motion.div>
+      </motion.section>
+
+      {/* Role Selection Cards - Appear on Scroll */}
+      <motion.section 
+        style={{ y: cardsY, opacity: cardsOpacity, scale: cardsScale }}
+        className="relative z-10 mx-auto max-w-7xl px-4 py-20"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-10 text-center"
+        >
+          <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
+            Choose Your Path
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Join as a marketing campaign manager or influencer
+          </p>
+        </motion.div>
+
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid gap-4 sm:gap-6 md:grid-cols-2"
+        >
+          {/* Client Card */}
+          <motion.div variants={staggerItem} className="h-full">
+            <Link href="/client" className="block h-full">
+              <motion.div
+                whileHover={{ scale: 1.02, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                className="h-full"
+              >
+                <Card className="group h-full cursor-pointer border-2 border-transparent bg-card transition-colors hover:border-growi-blue hover:shadow-lg">
+                  <CardHeader className="text-center">
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-growi-blue/10 sm:h-16 sm:w-16">
+                      <Users className="h-7 w-7 text-growi-blue sm:h-8 sm:w-8" />
+                    </div>
+                    <CardTitle className="text-xl text-foreground sm:text-2xl">I&apos;m a Marketing Campaign Manager</CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                      Create crypto-reward campaigns and connect with influencers
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li>Set up performance-based bounties</li>
+                      <li>Track real-time campaign metrics</li>
+                      <li>Pay only for verified results</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </Link>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl font-bold leading-tight tracking-tight text-foreground md:text-7xl"
-          >
-            Connect{" "}
-            <span className="text-primary">Brands</span> with{" "}
-            <span className="text-secondary">Influencers</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 text-xl leading-relaxed text-muted max-w-2xl mx-auto"
-          >
-            The decentralized platform for seamless influencer marketing partnerships. 
-            Secure, transparent, and powered by blockchain technology.
-          </motion.p>
-
-          <AnimatePresence mode="wait">
-            {!walletConnected ? (
+          {/* Influencer Card */}
+          <motion.div variants={staggerItem} className="h-full">
+            <Link href="/influencer" className="block h-full">
               <motion.div
-                key="wallet-button"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="mt-10"
+                whileHover={{ scale: 1.02, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                className="h-full"
               >
-                <motion.button
-                  onClick={handleConnectWallet}
-                  whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(74, 144, 226, 0.5)" }}
-                  whileTap={{ scale: 0.98 }}
-                  className="inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold text-foreground bg-primary rounded-full transition-all hover:bg-primary/90"
-                >
-                  <Wallet className="w-6 h-6" />
-                  Connect Wallet
-                </motion.button>
+                <Card className="group h-full cursor-pointer border-2 border-transparent bg-card transition-colors hover:border-growi-lime hover:shadow-lg">
+                  <CardHeader className="text-center">
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-growi-lime/10 sm:h-16 sm:w-16">
+                      <TrendingUp className="h-7 w-7 text-growi-lime sm:h-8 sm:w-8" />
+                    </div>
+                    <CardTitle className="text-xl text-foreground sm:text-2xl">I&apos;m an Influencer</CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                      Earn crypto rewards by promoting products you love
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li>Browse available campaigns</li>
+                      <li>Earn per view, click, or sale</li>
+                      <li>Get paid instantly to your wallet</li>
+                    </ul>
+                  </CardContent>
+                </Card>
               </motion.div>
-            ) : !selectedRole ? (
-              <motion.div
-                key="role-selection"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                className="mt-10"
-              >
-                <p className="mb-6 text-lg text-muted">Choose your role to get started</p>
-                <div className="flex flex-col gap-4 sm:flex-row sm:gap-6 justify-center">
-                  <motion.button
-                    onClick={() => handleRoleSelect("client")}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 }}
-                    whileHover={{ scale: 1.03, y: -4 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="flex flex-col items-center gap-3 px-10 py-8 bg-card rounded-2xl border border-primary/30 transition-all hover:border-primary hover:bg-card-hover"
-                  >
-                    <Users className="w-12 h-12 text-primary" />
-                    <span className="text-xl font-semibold text-foreground">I'm a Client</span>
-                    <span className="text-sm text-muted">Find influencers for your brand</span>
-                  </motion.button>
+            </Link>
+          </motion.div>
+        </motion.div>
+      </motion.section>
 
-                  <motion.button
-                    onClick={() => handleRoleSelect("influencer")}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 }}
-                    whileHover={{ scale: 1.03, y: -4 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="flex flex-col items-center gap-3 px-10 py-8 bg-card rounded-2xl border border-secondary/30 transition-all hover:border-secondary hover:bg-card-hover"
-                  >
-                    <Megaphone className="w-12 h-12 text-secondary" />
-                    <span className="text-xl font-semibold text-foreground">I'm an Influencer</span>
-                    <span className="text-sm text-muted">Monetize your audience</span>
-                  </motion.button>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="selected-role"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-                className="mt-10 p-6 bg-card rounded-2xl border border-accent/50"
-              >
-                <p className="text-lg text-foreground">
-                  Welcome! You've selected:{" "}
-                  <span className="font-bold text-accent">
-                    {selectedRole === "client" ? "Client" : "Influencer"}
-                  </span>
-                </p>
-                <button
-                  onClick={() => setSelectedRole(null)}
-                  className="mt-4 text-sm text-muted hover:text-foreground transition-colors"
-                >
-                  Change selection
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="px-6 py-24 bg-card/50">
-        <div className="max-w-6xl mx-auto">
+      {/* Features Section - Appear on Scroll */}
+      <motion.section 
+        style={{ y: featuresY, opacity: featuresOpacity, scale: featuresScale }}
+        className="relative z-10 bg-card/50 pb-8 pt-16 md:pb-12 md:pt-20"
+      >
+        <div className="mx-auto max-w-7xl px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-16"
+            viewport={{ once: true }}
+            className="mb-10 text-center md:mb-12"
           >
-            <h2 className="text-4xl font-bold text-foreground md:text-5xl">
-              Why Choose <span className="text-accent">Us</span>
+            <h2 className="text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">
+              Why Choose GROWI?
             </h2>
-            <p className="mt-4 text-lg text-muted max-w-2xl mx-auto">
-              Built for the future of influencer marketing
+            <p className="mt-3 text-muted-foreground md:mt-4">
+              The future of influencer marketing is here
             </p>
           </motion.div>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: index * 0.15 }}
-                whileHover={{ y: -8 }}
-                className="p-8 bg-card rounded-2xl border border-foreground/10 transition-all hover:border-primary/50"
-              >
-                <div className="flex items-center justify-center w-14 h-14 mb-6 rounded-xl bg-primary/20">
-                  <feature.icon className="w-7 h-7 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-muted leading-relaxed">
-                  {feature.description}
-                </p>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
+          >
+            {features.map((feature) => (
+              <motion.div key={feature.title} variants={staggerItem}>
+                <Card className="h-full bg-background transition-all hover:border-growi-blue/50 hover:shadow-md">
+                  <CardHeader>
+                    <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-lg bg-growi-blue/10 sm:h-12 sm:w-12">
+                      <feature.icon className="h-5 w-5 text-growi-blue sm:h-6 sm:w-6" />
+                    </div>
+                    <CardTitle className="text-base text-foreground sm:text-lg">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
-      <footer className="px-6 py-12 border-t border-foreground/10">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-muted text-sm">
-            2026 InfluencerConnect. Built on blockchain technology.
+      <motion.footer 
+        style={{ y: footerY, opacity: footerOpacity }}
+        className="relative z-10 border-t border-border bg-background py-4 md:py-6"
+      >
+        <div className="mx-auto max-w-7xl px-4 text-center">
+          <Image
+            src="/growi-logo-full.png"
+            alt="GROWI"
+            width={100}
+            height={32}
+            className="mx-auto mb-3 h-8 w-auto opacity-60 md:mb-4"
+          />
+          <p className="text-xs text-muted-foreground sm:text-sm">
+            2026 GROWI. Web3 Influencer Marketing Platform.
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            an{" "}
+            <a 
+              href="https://ethglobal.com/events/hackmoney2026" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-growi-blue hover:underline"
+            >
+              ETH Global - Hack Money 2026
+            </a>{" "}
+            Project
           </p>
         </div>
-      </footer>
+      </motion.footer>
     </div>
-  );
+  )
 }

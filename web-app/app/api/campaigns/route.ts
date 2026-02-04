@@ -1,8 +1,7 @@
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
-import { CampaignModel } from '@/lib/db/prisma/generated/models/Campaign';
-import { ApiDataResponse, ApiErrorResponse, ApiListResponse, CreateCampaignDTO } from '@/types/dto';
-import { NextResponse } from 'next/server';
+import { Campaign } from '@/lib/db/prisma/generated';
+import { ApiDataResponse, ApiListResponse, CreateCampaignDTO } from '@/types';
 
 export async function GET(req: Request) {
   return safeRoute(async () => {
@@ -21,7 +20,7 @@ export async function GET(req: Request) {
       prisma.campaign.count(),
     ]);
     
-    const response: ApiListResponse<CampaignModel> = {
+    const response: ApiListResponse<Campaign> = {
       success: true,
       data: campaigns,
       meta: { total, page, limit },
@@ -31,34 +30,56 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  try {
+  return safeRoute(async () => {
     const body = await req.json();
     const validatedData = CreateCampaignDTO.parse(body);
     
-    const campaign = await prisma.campaign.create({
-      data: {
-        brandId: validatedData.brandId,
-        title: validatedData.title,
-        escrowAddress: validatedData.escrowAddress,
-        budgetTotal: validatedData.budgetTotal,
-        payoutRates: {
-          create: validatedData.payoutRates,
+    const campaign = await prisma.$transaction(async (tx) => {
+      let user = await tx.user.findUnique({
+        where: { walletAddress: validatedData.walletAddress },
+      });
+      
+      if (!user) {
+        user = await tx.user.create({
+          data: {
+            walletAddress: validatedData.walletAddress,
+          },
+        });
+      }
+      
+      return tx.campaign.create({
+        data: {
+          ownerId: user.id,
+          title: validatedData.title,
+          escrowAddress: '',
+          budgetTotal: validatedData.budgetTotal,
+          rewardEvents: {
+            create: validatedData.rewardEvents.map(event => ({
+              eventType: event.eventType,
+              amount: event.amount,
+              volumeStep: event.volumeStep ?? 1,
+              selectors: {
+                create: event.selectors?.map(selector => ({
+                  selector: selector.selector,
+                  eventType: selector.eventType,
+                  isActive: selector.isActive ?? true,
+                })) ?? [],
+              },
+            })),
+          },
         },
-      },
-      include: { payoutRates: true },
+        include: {
+          rewardEvents: {
+            include: { selectors: true },
+          },
+        },
+      });
     });
     
-    const response: ApiDataResponse<CampaignModel> = {
+    const response: ApiDataResponse<Campaign> = {
       success: true,
       data: campaign,
     };
-    return NextResponse.json(response, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    const response: ApiErrorResponse = {
-      success: false,
-      error: { code: 'SERVER_ERROR', message: (error as Error)?.message || 'Internal Server Error' },
-    };
-    return NextResponse.json(response, { status: 400 });
-  }
+    return { response, status: 201 };
+  });
 }

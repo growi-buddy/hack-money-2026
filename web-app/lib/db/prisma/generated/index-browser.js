@@ -131,7 +131,7 @@ exports.Prisma.UserScalarFieldEnum = {
 
 exports.Prisma.CampaignScalarFieldEnum = {
   id: 'id',
-  brandId: 'brandId',
+  ownerId: 'ownerId',
   title: 'title',
   escrowAddress: 'escrowAddress',
   budgetTotal: 'budgetTotal',
@@ -141,20 +141,33 @@ exports.Prisma.CampaignScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.PayoutRateScalarFieldEnum = {
+exports.Prisma.RewardEventScalarFieldEnum = {
   id: 'id',
   campaignId: 'campaignId',
   eventType: 'eventType',
   amount: 'amount',
   volumeStep: 'volumeStep',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SelectorScalarFieldEnum = {
+  id: 'id',
+  rewardEventId: 'rewardEventId',
+  selector: 'selector',
+  eventType: 'eventType',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ParticipationScalarFieldEnum = {
   id: 'id',
   influencerId: 'influencerId',
   campaignId: 'campaignId',
-  currentBalance: 'currentBalance'
+  currentBalance: 'currentBalance',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.TrackingLinkScalarFieldEnum = {
@@ -174,7 +187,8 @@ exports.Prisma.AnalyticsEventScalarFieldEnum = {
   externalTxId: 'externalTxId',
   metadata: 'metadata',
   payoutGenerated: 'payoutGenerated',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -203,6 +217,7 @@ exports.Prisma.JsonNullValueFilter = {
   AnyNull: Prisma.AnyNull
 };
 exports.CampaignStatus = exports.$Enums.CampaignStatus = {
+  DRAFT: 'DRAFT',
   ACTIVE: 'ACTIVE',
   PAUSED: 'PAUSED',
   DEPLETED: 'DEPLETED',
@@ -216,10 +231,17 @@ exports.EventType = exports.$Enums.EventType = {
   SIGNUP: 'SIGNUP'
 };
 
+exports.SelectorEventType = exports.$Enums.SelectorEventType = {
+  ONCLICK: 'ONCLICK',
+  HOVER: 'HOVER',
+  DOUBLE_CLICK: 'DOUBLE_CLICK'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Campaign: 'Campaign',
-  PayoutRate: 'PayoutRate',
+  RewardEvent: 'RewardEvent',
+  Selector: 'Selector',
   Participation: 'Participation',
   TrackingLink: 'TrackingLink',
   AnalyticsEvent: 'AnalyticsEvent'

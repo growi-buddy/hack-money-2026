@@ -14,7 +14,7 @@ model User {
   name          String?
   email         String? @unique
 
-  campaignsCreated Campaign[]      @relation("BrandCampaigns")
+  campaignsCreated Campaign[]      @relation("UserCampaigns")
   participations   Participation[]
 
   createdAt DateTime @default(now())
@@ -22,15 +22,16 @@ model User {
 }
 
 model Campaign {
-  id      String @id @default(cuid())
-  brandId String
-  brand   User   @relation("BrandCampaigns", fields: [brandId], references: [id])
+  id String @id @default(cuid())
+
+  ownerId String
+  owner   User   @relation("UserCampaigns", fields: [ownerId], references: [id])
 
   title         String
   escrowAddress String
   budgetTotal   Decimal
 
-  payoutRates PayoutRate[]
+  rewardEvents RewardEvent[]
 
   yellowChannelId String?
   status          CampaignStatus  @default(ACTIVE)
@@ -40,7 +41,7 @@ model Campaign {
   updatedAt DateTime @updatedAt
 }
 
-model PayoutRate {
+model RewardEvent {
   id         String   @id @default(cuid())
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id])
@@ -49,7 +50,25 @@ model PayoutRate {
   amount     Decimal
   volumeStep Int       @default(1)
 
+  selectors Selector[]
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Selector {
+  id            String      @id @default(cuid())
+  rewardEventId String
+  rewardEvent   RewardEvent @relation(fields: [rewardEventId], references: [id])
+
+  selector  String
+  eventType SelectorEventType
+  isActive  Boolean           @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([rewardEventId, selector])
 }
 
 model Participation {
@@ -63,6 +82,9 @@ model Participation {
   currentBalance Decimal        @default(0)
 
   events AnalyticsEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([influencerId, campaignId])
 }
@@ -92,6 +114,7 @@ model AnalyticsEvent {
   payoutGenerated Decimal @default(0)
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum EventType {
@@ -101,7 +124,14 @@ enum EventType {
   SIGNUP
 }
 
+enum SelectorEventType {
+  ONCLICK
+  HOVER
+  DOUBLE_CLICK
+}
+
 enum CampaignStatus {
+  DRAFT
   ACTIVE
   PAUSED
   DEPLETED

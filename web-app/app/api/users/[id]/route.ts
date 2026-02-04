@@ -1,6 +1,6 @@
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
-import { UserModel } from '@/lib/db/prisma/generated/models/User';
+import { User } from '@/lib/db/prisma/generated';
 import { ApiDataResponse, ApiErrorResponse, UpdateUserDTO } from '@/types';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -28,7 +28,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return { response, status: 404 };
     }
     
-    const response: ApiDataResponse<UserModel> = {
+    const response: ApiDataResponse<User> = {
       success: true,
       data: user,
     };
@@ -48,7 +48,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       data: validatedData,
     });
     
-    const response: ApiDataResponse<UserModel> = {
+    const response: ApiDataResponse<User> = {
       success: true,
       data: updated,
     };
