@@ -23,11 +23,10 @@ export const RewardEventSchema = z.object({
 export type RewardEventInput = z.infer<typeof RewardEventSchema>;
 
 export const CreateCampaignDTO = z.object({
-  ownerId: z.string().cuid2(),
-  title: z.string().min(3),
-  escrowAddress: z.string().startsWith('0x'),
-  budgetTotal: z.number().positive(),
-  rewardEvents: z.array(RewardEventSchema).min(1),
+  walletAddress: z.string(),
+  title: z.string(),
+  budgetTotal: z.string().or(z.number()),
+  rewardEvents: z.array(RewardEventSchema),
 });
 
 export type CreateCampaignInput = z.infer<typeof CreateCampaignDTO>;

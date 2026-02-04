@@ -34,32 +34,46 @@ export async function POST(req: Request) {
     const body = await req.json();
     const validatedData = CreateCampaignDTO.parse(body);
     
-    const campaign = await prisma.campaign.create({
-      data: {
-        ownerId: validatedData.ownerId,
-        title: validatedData.title,
-        escrowAddress: validatedData.escrowAddress,
-        budgetTotal: validatedData.budgetTotal,
-        rewardEvents: {
-          create: validatedData.rewardEvents.map(event => ({
-            eventType: event.eventType,
-            amount: event.amount,
-            volumeStep: event.volumeStep ?? 1,
-            selectors: {
-              create: event.selectors?.map(selector => ({
-                selector: selector.selector,
-                eventType: selector.eventType,
-                isActive: selector.isActive ?? true,
-              })) ?? [],
-            },
-          })),
+    const campaign = await prisma.$transaction(async (tx) => {
+      let user = await tx.user.findUnique({
+        where: { walletAddress: validatedData.walletAddress },
+      });
+      
+      if (!user) {
+        user = await tx.user.create({
+          data: {
+            walletAddress: validatedData.walletAddress,
+          },
+        });
+      }
+      
+      return tx.campaign.create({
+        data: {
+          ownerId: user.id,
+          title: validatedData.title,
+          escrowAddress: '',
+          budgetTotal: validatedData.budgetTotal,
+          rewardEvents: {
+            create: validatedData.rewardEvents.map(event => ({
+              eventType: event.eventType,
+              amount: event.amount,
+              volumeStep: event.volumeStep ?? 1,
+              selectors: {
+                create: event.selectors?.map(selector => ({
+                  selector: selector.selector,
+                  eventType: selector.eventType,
+                  isActive: selector.isActive ?? true,
+                })) ?? [],
+              },
+            })),
+          },
         },
-      },
-      include: {
-        rewardEvents: {
-          include: { selectors: true },
+        include: {
+          rewardEvents: {
+            include: { selectors: true },
+          },
         },
-      },
+      });
     });
     
     const response: ApiDataResponse<Campaign> = {

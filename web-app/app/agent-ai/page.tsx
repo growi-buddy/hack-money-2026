@@ -182,15 +182,11 @@ export default function AgentAIPage() {
     setIsCreating(true);
     
     try {
-      // NOTA: Estos valores deben venir del contexto de usuario/sesión
-      // Por ahora usamos valores de ejemplo
-      const brandId = 'REPLACE_WITH_USER_ID'; // TODO: Obtener del contexto de autenticación
-      const escrowAddress = '0x0000000000000000000000000000000000000000'; // TODO: Generar o solicitar
+      const walletAddress = '0x522E878Bf98CA82f45704F3BaFf762b6a9e071c7';
       
       const campaignInput = mapCampaignFormToAPI(
         campaignData,
-        brandId,
-        escrowAddress,
+        walletAddress,
       );
       
       const response = await fetch('/api/campaigns', {

@@ -4,8 +4,7 @@ import { CampaignFormData } from '@/types/campaign-form';
 
 export function mapCampaignFormToAPI(
   formData: CampaignFormData,
-  ownerId: string,
-  escrowAddress: string,
+  walletAddress: string,
 ): CreateCampaignInput {
   const rewardEvents: RewardEventInput[] = [];
   
@@ -55,9 +54,8 @@ export function mapCampaignFormToAPI(
   }
   
   return {
-    ownerId,
-    title: formData.name || 'Campaña sin nombre',
-    escrowAddress,
+    walletAddress,
+    title: formData.name || 'Draft',
     budgetTotal: formData.budget || 0,
     rewardEvents,
   };
