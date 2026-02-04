@@ -1,7 +1,7 @@
 import { ApiDataResponse, ApiErrorResponse, ApiListResponse } from '@/types';
-import { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
+import { Prisma } from '../lib/db/prisma/generated/client';
 
 export function responseError(error: unknown) {
   
