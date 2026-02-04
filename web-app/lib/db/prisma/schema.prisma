@@ -1,0 +1,108 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider   = "prisma-client"
+  output     = "../prisma/generated"
+  engineType = "client"
+}
+
+model User {
+  id            String  @id @default(cuid())
+  walletAddress String  @unique
+  name          String?
+  email         String? @unique
+
+  campaignsCreated Campaign[]      @relation("BrandCampaigns")
+  participations   Participation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Campaign {
+  id      String @id @default(cuid())
+  brandId String
+  brand   User   @relation("BrandCampaigns", fields: [brandId], references: [id])
+
+  title         String
+  escrowAddress String
+  budgetTotal   Decimal
+
+  payoutRates PayoutRate[]
+
+  yellowChannelId String?
+  status          CampaignStatus  @default(ACTIVE)
+  participations  Participation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PayoutRate {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+
+  eventType  EventType
+  amount     Decimal
+  volumeStep Int       @default(1)
+
+  createdAt DateTime @default(now())
+}
+
+model Participation {
+  id           String   @id @default(cuid())
+  influencerId String
+  influencer   User     @relation(fields: [influencerId], references: [id])
+  campaignId   String
+  campaign     Campaign @relation(fields: [campaignId], references: [id])
+
+  links          TrackingLink[]
+  currentBalance Decimal        @default(0)
+
+  events AnalyticsEvent[]
+
+  @@unique([influencerId, campaignId])
+}
+
+model TrackingLink {
+  id              String        @id @default(cuid())
+  url             String        @unique
+  participationId String
+  participation   Participation @relation(fields: [participationId], references: [id])
+
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AnalyticsEvent {
+  id   String    @id @default(cuid())
+  type EventType
+
+  participationId String
+  participation   Participation @relation(fields: [participationId], references: [id])
+
+  externalTxId    String? @unique
+  metadata        Json?
+  payoutGenerated Decimal @default(0)
+
+  createdAt DateTime @default(now())
+}
+
+enum EventType {
+  VISIT_PAGE
+  ADD_CART
+  BUY_PRODUCT
+  SIGNUP
+}
+
+enum CampaignStatus {
+  ACTIVE
+  PAUSED
+  DEPLETED
+}
