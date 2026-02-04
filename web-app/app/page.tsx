@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wallet, Users, Megaphone, Zap, Shield, TrendingUp } from "lucide-react";
 
@@ -39,6 +40,22 @@ export default function Home() {
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center min-h-screen px-6 py-20">
         <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+            className="mb-8"
+          >
+            <Image
+              src="/growi-logo.png"
+              alt="Growi Logo"
+              width={320}
+              height={160}
+              className="mx-auto"
+              priority
+            />
+          </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
