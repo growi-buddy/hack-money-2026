@@ -107,7 +107,7 @@ export const countUpSpring = {
 
 export const hoverLift = {
   y: -4,
-  transition: { type: "spring", stiffness: 400, damping: 10 }
+  transition: { type: "spring" as const, stiffness: 400, damping: 10 }
 }
 
 export const tapScale = {

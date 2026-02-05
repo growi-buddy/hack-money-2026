@@ -1,270 +1,707 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { Sparkles, Send, Loader2 } from "lucide-react"
+import {
+  AlertCircle,
+  Bot,
+  Calendar,
+  CheckCircle2,
+  DollarSign,
+  Globe,
+  Loader2,
+  Send,
+  Sparkles,
+  Target,
+  User,
+  Users,
+  Zap,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
 import { scaleIn, float } from "@/lib/animations"
+import { useChat } from "@ai-sdk/react"
+import { DefaultChatTransport } from "ai"
+import { CampaignFormData } from "@/types/campaign-form"
+import { mapCampaignFormToAPI, validateCampaignForm } from "@/helpers/campaign-mapper"
+import { useWallet } from "@/contexts/wallet-context"
 
-const placeholderText = `Example: Create a 2-week campaign for our summer shoe collection.
+const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
+  name: "",
+  description: "",
+  duration: undefined,
+  startDate: "",
+  endDate: "",
+  targetAudience: {
+    gender: [],
+    ageMin: undefined,
+    ageMax: undefined,
+  },
+  geographic: {
+    regions: [],
+    countries: [],
+  },
+  interests: [],
+  budget: undefined,
+  rewards: {
+    landingPageView: { enabled: false, pricePerView: undefined },
+    itemView: { enabled: false, pricePerClick: undefined },
+    addToCart: { enabled: false, pricePerClick: undefined },
+    checkout: { enabled: false, pricePerClick: undefined },
+    thankYouView: { enabled: false, pricePerView: undefined },
+  },
+}
 
-- Start date: February 10, 2026
-- End date: February 24, 2026
-- Budget: $5,000 total
-- Pay $0.01 per view
-- Pay $0.02 per view item
-- Pay $0.05 per add-to-cart
-- Pay $0.10 per checkout
-- Target audience: Fashion-forward Gen Z and millennials
-- Focus on TikTok and Instagram creators
-- Interests: Sneakers, Streetwear, Sports, Lifestyle`
+const QUICK_PROMPTS = [
+  {
+    emoji: "👟",
+    label: "E-commerce Campaign",
+    text: "I want to create a campaign for my sneaker store with a $2,000 budget",
+  },
+  {
+    emoji: "📱",
+    label: "App Launch",
+    text: "Help me promote my new mobile app with $1,500 budget targeting Gen Z",
+  },
+  {
+    emoji: "💰",
+    label: "DeFi/Crypto",
+    text: "I need a campaign for my DeFi protocol with $5,000 budget",
+  },
+  {
+    emoji: "🛍️",
+    label: "Fashion Brand",
+    text: "Create a fashion campaign targeting millennials with $3,000 budget",
+  },
+]
 
 export default function CreateCampaignPage() {
   const router = useRouter()
-  const [prompt, setPrompt] = useState("")
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [response, setResponse] = useState("")
-  const [displayedResponse, setDisplayedResponse] = useState("")
+  const { address } = useWallet()
+  const [campaignData, setCampaignData] = useState<CampaignFormData>(INITIAL_CAMPAIGN_DATA)
+  const [isCreating, setIsCreating] = useState(false)
+  const [creationError, setCreationError] = useState<string | null>(null)
+  const [input, setInput] = useState("")
+  const [lastUpdatedField, setLastUpdatedField] = useState<string | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const handleSubmit = async () => {
-    if (!prompt.trim()) return
-    
-    setIsGenerating(true)
-    setResponse("")
-    setDisplayedResponse("")
-    
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    const aiResponse = `Great! I've analyzed your campaign requirements and created the following campaign structure:
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({
+      api: "/api/chat/campaign-creator",
+      body: () => ({ campaignData }),
+    }),
+    onFinish: ({ message }) => {
+      const parts = message.parts || []
 
-**Campaign: Summer Collection Launch**
+      for (const part of parts) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const anyPart = part as any
 
-- Duration: February 10 - February 24, 2026 (14 days)
-- Total Budget: $5,000
+        if (part.type?.includes("updateCampaignData") || anyPart.toolName === "updateCampaignData") {
+          let newData: Partial<CampaignFormData> | null = null
 
-**Reward Structure:**
-- Views: $0.01 per verified view
-- View Item: $0.02 per product view
-- Add to Cart: $0.05 per action
-- Checkout: $0.10 per completed purchase
+          if (anyPart.result?.data) {
+            newData = anyPart.result.data
+          } else if (anyPart.args) {
+            newData = anyPart.args
+          } else if (anyPart.input) {
+            newData = anyPart.input
+          }
 
-**Target Metrics:**
-- Estimated reach: 500,000+ views
-- Expected conversions: 1,000+ checkouts
-- ROI projection: 3.5x
+          if (newData && Object.keys(newData).length > 0) {
+            setCampaignData((prev) => ({
+              ...prev,
+              ...newData,
+              targetAudience: {
+                ...prev.targetAudience,
+                ...newData.targetAudience,
+              },
+              geographic: {
+                ...prev.geographic,
+                ...newData.geographic,
+              },
+              rewards: {
+                ...prev.rewards,
+                ...newData.rewards,
+              },
+            }))
 
-**Interests & Affinities (Auto-Generated):**
-- Fashion & Apparel
-- Sports & Fitness
-- Lifestyle & Wellness
-- Gen Z & Millennials
-- Sneakerheads
-- Streetwear Culture
+            const updatedFields = Object.keys(newData).filter(
+              (key) => newData && newData[key as keyof CampaignFormData] !== undefined
+            )
+            if (updatedFields.length > 0) {
+              const fieldNames: Record<string, string> = {
+                name: "Name",
+                description: "Description",
+                budget: "Budget",
+                duration: "Duration",
+                startDate: "Start Date",
+                endDate: "End Date",
+              }
 
-**Recommended Influencer Tiers:**
-- Micro-influencers (10k-50k followers): 15 slots
-- Mid-tier (50k-200k followers): 5 slots
-- Macro-influencers (200k+): 2 slots
-
-These tags will help influencers find your campaign based on their content style and audience. Click "Create Campaign" to make it live!`
-
-    setResponse(aiResponse)
-    setIsGenerating(false)
-    
-    // Typewriter effect
-    let i = 0
-    const interval = setInterval(() => {
-      if (i < aiResponse.length) {
-        setDisplayedResponse(aiResponse.slice(0, i + 1))
-        i++
-      } else {
-        clearInterval(interval)
+              const readableFields = updatedFields.map((f) => fieldNames[f] || f)
+              setLastUpdatedField(readableFields.join(", "))
+              setTimeout(() => setLastUpdatedField(null), 3000)
+            }
+          }
+        }
       }
-    }, 15)
+    },
+  })
+
+  const isLoading = status === "streaming" || status === "submitted"
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!input.trim() || isLoading) return
+
+    const userMessage = input
+    setInput("")
+
+    await sendMessage({
+      role: "user",
+      parts: [{ type: "text", text: userMessage }],
+    })
+  }
+
+  const calculateCompleteness = () => {
+    let filled = 0
+    const total = 13
+
+    if (campaignData.name) filled++
+    if (campaignData.description) filled++
+    if (campaignData.duration) filled++
+    if (campaignData.startDate) filled++
+    if (campaignData.endDate) filled++
+    if (campaignData.targetAudience?.gender?.length) filled++
+    if (campaignData.targetAudience?.ageMin) filled++
+    if (campaignData.targetAudience?.ageMax) filled++
+    if (campaignData.geographic?.regions?.length) filled++
+    if (campaignData.geographic?.countries?.length) filled++
+    if (campaignData.interests?.length) filled++
+    if (campaignData.budget) filled++
+
+    const rewardsEnabled = Object.values(campaignData.rewards || {}).filter((r) => r?.enabled).length
+    if (rewardsEnabled > 0) filled++
+
+    return Math.round((filled / total) * 100)
   }
 
   const handleCreateCampaign = async () => {
-    setShowSuccess(true)
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    router.push("/client/campaign/1")
+    setCreationError(null)
+
+    const validation = validateCampaignForm(campaignData)
+    if (!validation.valid) {
+      setCreationError(validation.errors.join(", "))
+      return
+    }
+
+    if (!address) {
+      setCreationError("Please connect your wallet first")
+      return
+    }
+
+    setIsCreating(true)
+
+    try {
+      const campaignInput = mapCampaignFormToAPI(campaignData, address)
+
+      const response = await fetch("/api/campaigns", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(campaignInput),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error?.message || "Error creating campaign")
+      }
+
+      const result = await response.json()
+
+      setShowSuccess(true)
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      router.push(`/client/campaign/${result.data.id}`)
+    } catch (error) {
+      console.error("Error creating campaign:", error)
+      setCreationError(error instanceof Error ? error.message : "Unknown error creating campaign")
+    } finally {
+      setIsCreating(false)
+    }
   }
 
+  const completeness = calculateCompleteness()
+
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
+    <div className="mx-auto max-w-7xl space-y-6">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold text-foreground">AI Campaign Creator</h1>
         <p className="mt-2 text-muted-foreground">
           Tell our AI about your campaign goals and let it create the perfect structure for you
         </p>
       </motion.div>
 
-      <motion.div
-        variants={scaleIn}
-        initial="hidden"
-        animate="visible"
-      >
-        <Card className="overflow-hidden">
-          <CardHeader className="border-b border-border bg-secondary/30">
-            <div className="flex items-center gap-4">
-              <motion.div
-                variants={float}
-                initial="initial"
-                animate="animate"
-                className="relative"
-              >
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-growi-blue/20">
-                  <Image
-                    src="/growi-mascot.png"
-                    alt="AI Assistant"
-                    width={50}
-                    height={50}
-                    className="rounded-full"
-                  />
-                </div>
-                <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.5, 1, 0.5]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-growi-blue"
-                >
-                  <Sparkles className="h-3 w-3 text-white" />
-                </motion.div>
-              </motion.div>
-              <div>
-                <CardTitle className="text-foreground">GROWI AI Assistant</CardTitle>
-                <CardDescription>
-                  I&apos;ll help you create the perfect campaign
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Describe your campaign goals
-                </label>
-                <motion.div
-                  whileFocus={{ scale: 1.01 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Textarea
-                    placeholder={placeholderText}
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="min-h-[200px] resize-none bg-background transition-shadow focus:ring-2 focus:ring-growi-blue/50"
-                  />
-                </motion.div>
-              </div>
-
-              <motion.div
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-              >
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!prompt.trim() || isGenerating}
-                  className="relative w-full overflow-hidden bg-growi-blue text-white hover:bg-growi-blue/90"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Generating Campaign...
-                    </>
-                  ) : (
-                    <>
-                      <motion.div
-                        className="absolute inset-0 bg-growi-lime/30"
-                        initial={{ x: "-100%" }}
-                        whileHover={{ x: "100%" }}
-                        transition={{ duration: 0.5 }}
-                      />
-                      <Send className="mr-2 h-4 w-4" />
-                      Generate Campaign
-                    </>
-                  )}
-                </Button>
-              </motion.div>
-
-              {/* Typing dots indicator */}
-              <AnimatePresence>
-                {isGenerating && (
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Chat Panel */}
+        <motion.div variants={scaleIn} initial="hidden" animate="visible">
+          <Card className="flex h-[600px] flex-col overflow-hidden">
+            <CardHeader className="border-b border-border bg-secondary/30">
+              <div className="flex items-center gap-4">
+                <motion.div variants={float} initial="initial" animate="animate" className="relative">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-growi-blue/20">
+                    <Image
+                      src="/growi-mascot.png"
+                      alt="AI Assistant"
+                      width={45}
+                      height={45}
+                      className="rounded-full"
+                    />
+                  </div>
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex items-center gap-1 text-muted-foreground"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-growi-blue"
                   >
-                    <span className="text-sm">AI is thinking</span>
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                    >.</motion.span>
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-                    >.</motion.span>
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-                    >.</motion.span>
+                    <Sparkles className="h-3 w-3 text-white" />
                   </motion.div>
-                )}
-              </AnimatePresence>
+                </motion.div>
+                <div>
+                  <CardTitle className="text-foreground">GROWI AI Assistant</CardTitle>
+                  <CardDescription>I&apos;ll help you create the perfect campaign</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
 
-              {/* AI Response */}
-              <AnimatePresence>
-                {response && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-4"
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.length === 0 && (
+                <div className="text-center py-6">
+                  <Bot className="mx-auto mb-4 h-12 w-12 text-growi-blue/50" />
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Hi! I&apos;m your campaign assistant. Tell me about your campaign goals.
+                  </p>
+                  <div className="flex flex-col gap-2 max-w-sm mx-auto">
+                    {QUICK_PROMPTS.map((prompt, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setInput(prompt.text)}
+                        className="px-4 py-2 text-sm bg-growi-blue/10 text-growi-blue rounded-lg hover:bg-growi-blue/20 transition-colors text-left"
+                      >
+                        {prompt.emoji} {prompt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {messages.map((message) => {
+                const textParts = message.parts?.filter((p) => p.type === "text") || []
+                const toolParts = message.parts?.filter((p) => p.type?.startsWith("tool-")) || []
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const messageText = textParts.map((p) => (p as any).text).join("") || ""
+
+                return (
+                  <div
+                    key={message.id}
+                    className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    <div className="rounded-lg border border-growi-blue/30 bg-growi-blue/10 p-4">
-                      <pre className="whitespace-pre-wrap font-sans text-sm text-foreground">
-                        {displayedResponse}
-                      </pre>
+                    {message.role === "assistant" && (
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-growi-blue">
+                        <Bot className="h-5 w-5 text-white" />
+                      </div>
+                    )}
+
+                    <div
+                      className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                        message.role === "user"
+                          ? "bg-growi-blue text-white"
+                          : "bg-secondary text-foreground"
+                      }`}
+                    >
+                      {messageText && (
+                        <div className="whitespace-pre-wrap text-sm">{messageText}</div>
+                      )}
+
+                      {toolParts.length > 0 && (
+                        <div className="mt-2 flex items-center gap-1 text-xs opacity-75">
+                          <CheckCircle2 className="h-3 w-3" />
+                          <span>Data updated</span>
+                        </div>
+                      )}
                     </div>
 
-                    {displayedResponse === response && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ type: "spring" }}
-                      >
-                        <Button
-                          onClick={handleCreateCampaign}
-                          className="w-full bg-growi-success text-white hover:bg-growi-success/90"
-                        >
-                          <Sparkles className="mr-2 h-4 w-4" />
-                          Create Campaign
-                        </Button>
-                      </motion.div>
+                    {message.role === "user" && (
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-growi-lime">
+                        <User className="h-5 w-5 text-growi-blue" />
+                      </div>
                     )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+                  </div>
+                )
+              })}
 
-      {/* Success Modal with Particle Burst */}
+              {isLoading && (
+                <div className="flex gap-3 justify-start">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-growi-blue">
+                    <Bot className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="rounded-2xl bg-secondary px-4 py-3">
+                    <Loader2 className="h-5 w-5 animate-spin text-growi-blue" />
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            <form onSubmit={handleSubmit} className="border-t border-border p-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Describe your campaign..."
+                  disabled={isLoading}
+                  autoComplete="off"
+                  className="flex-1 rounded-xl border border-border bg-background px-4 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-growi-blue/50 disabled:opacity-50"
+                />
+                <Button
+                  type="submit"
+                  disabled={isLoading || !input.trim()}
+                  className="bg-growi-blue text-white hover:bg-growi-blue/90"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </motion.div>
+
+        {/* Preview Panel */}
+        <motion.div
+          variants={scaleIn}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.1 }}
+        >
+          <Card className="flex h-[600px] flex-col overflow-hidden">
+            <CardHeader className="border-b border-border bg-growi-blue/10">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-foreground">Campaign Preview</CardTitle>
+                <span className="text-sm text-muted-foreground">{completeness}% complete</span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
+                <motion.div
+                  className="h-full bg-growi-blue"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${completeness}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+              {lastUpdatedField && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 flex items-center gap-2 text-sm text-growi-blue"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span>Updated: {lastUpdatedField}</span>
+                </motion.div>
+              )}
+            </CardHeader>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <InfoCard icon={<Sparkles className="h-4 w-4" />} title="Basic Info" color="blue">
+                <Field
+                  label="Campaign Name"
+                  value={campaignData.name}
+                  onChange={(value) => setCampaignData((prev) => ({ ...prev, name: value }))}
+                />
+                <Field
+                  label="Description"
+                  value={campaignData.description}
+                  onChange={(value) => setCampaignData((prev) => ({ ...prev, description: value }))}
+                  multiline
+                />
+              </InfoCard>
+
+              <InfoCard icon={<Calendar className="h-4 w-4" />} title="Duration" color="green">
+                <Field
+                  label="Duration (days)"
+                  value={campaignData.duration?.toString()}
+                  type="number"
+                  onChange={(value) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      duration: value ? parseInt(value) : undefined,
+                    }))
+                  }
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <Field
+                    label="Start"
+                    value={campaignData.startDate}
+                    type="date"
+                    onChange={(value) => setCampaignData((prev) => ({ ...prev, startDate: value }))}
+                  />
+                  <Field
+                    label="End"
+                    value={campaignData.endDate}
+                    type="date"
+                    onChange={(value) => setCampaignData((prev) => ({ ...prev, endDate: value }))}
+                  />
+                </div>
+              </InfoCard>
+
+              <InfoCard icon={<Users className="h-4 w-4" />} title="Target Audience" color="purple">
+                <div className="grid grid-cols-2 gap-2">
+                  <Field
+                    label="Min Age"
+                    value={campaignData.targetAudience?.ageMin?.toString()}
+                    type="number"
+                    onChange={(value) =>
+                      setCampaignData((prev) => ({
+                        ...prev,
+                        targetAudience: {
+                          ...prev.targetAudience,
+                          ageMin: value ? parseInt(value) : undefined,
+                        },
+                      }))
+                    }
+                  />
+                  <Field
+                    label="Max Age"
+                    value={campaignData.targetAudience?.ageMax?.toString()}
+                    type="number"
+                    onChange={(value) =>
+                      setCampaignData((prev) => ({
+                        ...prev,
+                        targetAudience: {
+                          ...prev.targetAudience,
+                          ageMax: value ? parseInt(value) : undefined,
+                        },
+                      }))
+                    }
+                  />
+                </div>
+              </InfoCard>
+
+              <InfoCard icon={<Globe className="h-4 w-4" />} title="Geographic" color="indigo">
+                <Field
+                  label="Regions"
+                  value={campaignData.geographic?.regions?.join(", ")}
+                  onChange={(value) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      geographic: {
+                        ...prev.geographic,
+                        regions: value
+                          .split(",")
+                          .map((r) => r.trim())
+                          .filter(Boolean),
+                      },
+                    }))
+                  }
+                />
+              </InfoCard>
+
+              <InfoCard icon={<Target className="h-4 w-4" />} title="Interests" color="pink">
+                <Field
+                  label="Tags"
+                  value={campaignData.interests?.join(", ")}
+                  onChange={(value) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      interests: value
+                        .split(",")
+                        .map((i) => i.trim())
+                        .filter(Boolean),
+                    }))
+                  }
+                />
+              </InfoCard>
+
+              <InfoCard icon={<DollarSign className="h-4 w-4" />} title="Budget" color="emerald">
+                <Field
+                  label="Total Budget ($)"
+                  value={campaignData.budget?.toString()}
+                  type="number"
+                  onChange={(value) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      budget: value ? parseFloat(value) : undefined,
+                    }))
+                  }
+                />
+              </InfoCard>
+
+              <InfoCard icon={<Zap className="h-4 w-4" />} title="Rewards" color="amber">
+                <RewardField
+                  label="Landing Page View"
+                  enabled={campaignData.rewards?.landingPageView?.enabled}
+                  price={campaignData.rewards?.landingPageView?.pricePerView}
+                  onToggle={(enabled) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        landingPageView: { ...prev.rewards?.landingPageView, enabled },
+                      },
+                    }))
+                  }
+                  onPriceChange={(price) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        landingPageView: { ...prev.rewards?.landingPageView, pricePerView: price },
+                      },
+                    }))
+                  }
+                />
+                <RewardField
+                  label="Item View"
+                  enabled={campaignData.rewards?.itemView?.enabled}
+                  price={campaignData.rewards?.itemView?.pricePerClick}
+                  onToggle={(enabled) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        itemView: { ...prev.rewards?.itemView, enabled },
+                      },
+                    }))
+                  }
+                  onPriceChange={(price) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        itemView: { ...prev.rewards?.itemView, pricePerClick: price },
+                      },
+                    }))
+                  }
+                />
+                <RewardField
+                  label="Add to Cart"
+                  enabled={campaignData.rewards?.addToCart?.enabled}
+                  price={campaignData.rewards?.addToCart?.pricePerClick}
+                  onToggle={(enabled) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        addToCart: { ...prev.rewards?.addToCart, enabled },
+                      },
+                    }))
+                  }
+                  onPriceChange={(price) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        addToCart: { ...prev.rewards?.addToCart, pricePerClick: price },
+                      },
+                    }))
+                  }
+                />
+                <RewardField
+                  label="Checkout"
+                  enabled={campaignData.rewards?.checkout?.enabled}
+                  price={campaignData.rewards?.checkout?.pricePerClick}
+                  onToggle={(enabled) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        checkout: { ...prev.rewards?.checkout, enabled },
+                      },
+                    }))
+                  }
+                  onPriceChange={(price) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        checkout: { ...prev.rewards?.checkout, pricePerClick: price },
+                      },
+                    }))
+                  }
+                />
+                <RewardField
+                  label="Purchase Success"
+                  enabled={campaignData.rewards?.thankYouView?.enabled}
+                  price={campaignData.rewards?.thankYouView?.pricePerView}
+                  onToggle={(enabled) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        thankYouView: { ...prev.rewards?.thankYouView, enabled },
+                      },
+                    }))
+                  }
+                  onPriceChange={(price) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      rewards: {
+                        ...prev.rewards,
+                        thankYouView: { ...prev.rewards?.thankYouView, pricePerView: price },
+                      },
+                    }))
+                  }
+                />
+              </InfoCard>
+            </div>
+
+            <div className="border-t border-border p-4 space-y-2">
+              {creationError && (
+                <div className="flex items-start gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{creationError}</span>
+                </div>
+              )}
+
+              <Button
+                onClick={handleCreateCampaign}
+                disabled={completeness < 50 || isCreating || !address}
+                className="w-full bg-growi-blue text-white hover:bg-growi-blue/90"
+              >
+                {isCreating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                    Create Campaign
+                    {completeness < 50 && (
+                      <span className="ml-1 text-xs opacity-75">(complete at least 50%)</span>
+                    )}
+                  </>
+                )}
+              </Button>
+            </div>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Success Modal */}
       <AnimatePresence>
         {showSuccess && (
           <motion.div
@@ -280,7 +717,6 @@ These tags will help influencers find your campaign based on their content style
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               className="relative"
             >
-              {/* Particle burst effect */}
               {[...Array(12)].map((_, i) => (
                 <motion.div
                   key={i}
@@ -290,7 +726,7 @@ These tags will help influencers find your campaign based on their content style
                     x: Math.cos((i * 30 * Math.PI) / 180) * 100,
                     y: Math.sin((i * 30 * Math.PI) / 180) * 100,
                     scale: 0,
-                    opacity: 0
+                    opacity: 0,
                   }}
                   transition={{ duration: 0.8, delay: 0.2 }}
                 />
@@ -315,6 +751,132 @@ These tags will help influencers find your campaign based on their content style
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  )
+}
+
+// Component helpers
+function InfoCard({
+  icon,
+  title,
+  children,
+  color = "blue",
+}: {
+  icon: React.ReactNode
+  title: string
+  children: React.ReactNode
+  color?: "blue" | "green" | "purple" | "indigo" | "pink" | "emerald" | "amber"
+}) {
+  const colorClasses = {
+    blue: "bg-growi-blue/10 text-growi-blue",
+    green: "bg-green-500/10 text-green-600",
+    purple: "bg-purple-500/10 text-purple-600",
+    indigo: "bg-indigo-500/10 text-indigo-600",
+    pink: "bg-pink-500/10 text-pink-600",
+    emerald: "bg-emerald-500/10 text-emerald-600",
+    amber: "bg-amber-500/10 text-amber-600",
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-3">
+      <div className="mb-2 flex items-center gap-2 border-b border-border pb-2">
+        <div className={`rounded-lg p-1.5 ${colorClasses[color]}`}>{icon}</div>
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      </div>
+      <div className="space-y-2">{children}</div>
+    </div>
+  )
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  multiline = false,
+  type = "text",
+}: {
+  label: string
+  value?: string
+  onChange?: (value: string) => void
+  multiline?: boolean
+  type?: "text" | "number" | "date"
+}) {
+  const hasValue = value && value.trim() !== ""
+
+  const inputClasses = `w-full mt-1 px-2.5 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-2 transition-all ${
+    hasValue
+      ? "border-growi-success/50 bg-growi-success/5 text-foreground focus:ring-growi-success/50"
+      : "border-border bg-background text-muted-foreground focus:ring-growi-blue/50"
+  }`
+
+  return (
+    <div>
+      <label className="text-xs font-medium text-muted-foreground">{label}</label>
+      {multiline ? (
+        <textarea
+          value={value || ""}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder="Not specified"
+          className={`${inputClasses} min-h-[50px]`}
+        />
+      ) : (
+        <input
+          type={type}
+          value={value || ""}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder="Not specified"
+          className={inputClasses}
+        />
+      )}
+    </div>
+  )
+}
+
+function RewardField({
+  label,
+  enabled,
+  price,
+  onToggle,
+  onPriceChange,
+}: {
+  label: string
+  enabled?: boolean
+  price?: number
+  onToggle?: (enabled: boolean) => void
+  onPriceChange?: (price: number) => void
+}) {
+  return (
+    <div
+      className={`flex items-center gap-3 rounded-lg border px-2.5 py-2 transition-all ${
+        enabled ? "border-growi-success/50 bg-growi-success/5" : "border-border bg-background"
+      }`}
+    >
+      <label className="flex flex-1 cursor-pointer items-center gap-2">
+        <input
+          type="checkbox"
+          checked={enabled || false}
+          onChange={(e) => onToggle?.(e.target.checked)}
+          className="h-4 w-4 rounded text-growi-blue focus:ring-2 focus:ring-growi-blue/50"
+        />
+        <span
+          className={`text-sm ${enabled ? "font-medium text-foreground" : "text-muted-foreground"}`}
+        >
+          {label}
+        </span>
+      </label>
+      {enabled && (
+        <div className="flex items-center gap-1 rounded bg-secondary px-2 py-1">
+          <span className="text-xs text-muted-foreground">$</span>
+          <input
+            type="number"
+            step="0.001"
+            min="0"
+            value={price || 0}
+            onChange={(e) => onPriceChange?.(parseFloat(e.target.value) || 0)}
+            className="w-16 bg-transparent text-sm text-foreground focus:outline-none"
+          />
+        </div>
+      )}
     </div>
   )
 }

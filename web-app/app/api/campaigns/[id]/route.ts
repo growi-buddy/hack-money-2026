@@ -32,42 +32,53 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   return safeRoute(async () => {
     const body = await req.json();
     const { id } = await params;
-    
+
     const validatedData = UpdateCampaignDTO.parse(body);
-    
+
     const updated = await prisma.$transaction(async (tx) => {
-      await tx.rewardEvent.deleteMany({
+      // Delete existing campaign reward event links
+      await tx.campaignRewardEvent.deleteMany({
         where: { campaignId: id },
       });
-      
+
       const { rewardEvents, ...campaignData } = validatedData;
-      
+
       await tx.campaign.update({
         where: { id },
         data: campaignData,
-        include: { rewardEvents: true },
       });
-      
+
+      // Create new campaign reward event links
       if (rewardEvents && rewardEvents.length > 0) {
-        await tx.rewardEvent.createMany({
+        await tx.campaignRewardEvent.createMany({
           data: rewardEvents.map((event) => ({
-            ...event,
             campaignId: id,
+            rewardEventId: event.rewardEventId,
+            amount: event.amount,
+            volumeStep: event.volumeStep ?? 1,
           })),
         });
       }
-      
+
       return tx.campaign.findUnique({
         where: { id },
-        include: { rewardEvents: true },
+        include: {
+          rewardEvents: {
+            include: {
+              rewardEvent: {
+                include: { selectors: true },
+              },
+            },
+          },
+        },
       });
     });
-    
+
     const response: ApiDataResponse<Campaign> = {
       success: true,
       data: updated!,
     };
-    
+
     return { response };
   });
 }

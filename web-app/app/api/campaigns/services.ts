@@ -9,7 +9,11 @@ export const getCampaignById = (campaignId: string) => {
     },
     include: {
       rewardEvents: {
-        include: { selectors: true },
+        include: {
+          rewardEvent: {
+            include: { selectors: true },
+          },
+        },
       },
     },
   });

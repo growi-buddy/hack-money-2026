@@ -143,10 +143,37 @@ exports.Prisma.CampaignScalarFieldEnum = {
 
 exports.Prisma.RewardEventScalarFieldEnum = {
   id: 'id',
-  campaignId: 'campaignId',
+  ownerId: 'ownerId',
+  name: 'name',
   eventType: 'eventType',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CampaignRewardEventScalarFieldEnum = {
+  id: 'id',
+  campaignId: 'campaignId',
+  rewardEventId: 'rewardEventId',
   amount: 'amount',
   volumeStep: 'volumeStep',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ClientScalarFieldEnum = {
+  id: 'id',
+  userAgent: 'userAgent',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TrackedEventScalarFieldEnum = {
+  id: 'id',
+  campaignRewardEventId: 'campaignRewardEventId',
+  clientId: 'clientId',
+  data: 'data',
+  timestamp: 'timestamp',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -225,10 +252,11 @@ exports.CampaignStatus = exports.$Enums.CampaignStatus = {
 };
 
 exports.EventType = exports.$Enums.EventType = {
-  VISIT_PAGE: 'VISIT_PAGE',
-  ADD_CART: 'ADD_CART',
-  BUY_PRODUCT: 'BUY_PRODUCT',
-  SIGNUP: 'SIGNUP'
+  LANDING_PAGE_VIEW: 'LANDING_PAGE_VIEW',
+  VIEW_ITEM: 'VIEW_ITEM',
+  ADD_TO_CART: 'ADD_TO_CART',
+  CHECKOUT: 'CHECKOUT',
+  PURCHASE_SUCCESS: 'PURCHASE_SUCCESS'
 };
 
 exports.SelectorEventType = exports.$Enums.SelectorEventType = {
@@ -241,6 +269,9 @@ exports.Prisma.ModelName = {
   User: 'User',
   Campaign: 'Campaign',
   RewardEvent: 'RewardEvent',
+  CampaignRewardEvent: 'CampaignRewardEvent',
+  Client: 'Client',
+  TrackedEvent: 'TrackedEvent',
   Selector: 'Selector',
   Participation: 'Participation',
   TrackingLink: 'TrackingLink',

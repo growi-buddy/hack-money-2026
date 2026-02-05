@@ -29,7 +29,7 @@ export const CampaignFormDataSchema = z.object({
   // Budget
   budget: z.number().optional(),
   
-  // Rewards
+  // Legacy rewards (deprecated - use selectedRewardEvents instead)
   rewards: z.object({
     landingPageView: z.object({
       enabled: z.boolean().optional(),
@@ -52,6 +52,13 @@ export const CampaignFormDataSchema = z.object({
       pricePerView: z.number().optional(),
     }).optional(),
   }).optional(),
+
+  // Selected reward events to link with the campaign
+  selectedRewardEvents: z.array(z.object({
+    rewardEventId: z.string(),
+    amount: z.number().positive(),
+    volumeStep: z.number().int().positive().optional(),
+  })).optional(),
 });
 
 export type CampaignFormData = z.infer<typeof CampaignFormDataSchema>;

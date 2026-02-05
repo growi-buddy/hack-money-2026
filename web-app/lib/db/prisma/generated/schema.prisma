@@ -15,6 +15,7 @@ model User {
   email         String? @unique
 
   campaignsCreated Campaign[]      @relation("UserCampaigns")
+  rewardEvents     RewardEvent[]   @relation("UserRewardEvents")
   participations   Participation[]
 
   createdAt DateTime @default(now())
@@ -31,7 +32,7 @@ model Campaign {
   escrowAddress String
   budgetTotal   Decimal
 
-  rewardEvents RewardEvent[]
+  rewardEvents CampaignRewardEvent[]
 
   yellowChannelId String?
   status          CampaignStatus  @default(ACTIVE)
@@ -42,18 +43,70 @@ model Campaign {
 }
 
 model RewardEvent {
-  id         String   @id @default(cuid())
-  campaignId String
-  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  id String @id @default(cuid())
 
-  eventType  EventType
-  amount     Decimal
-  volumeStep Int       @default(1)
+  ownerId String
+  owner   User   @relation("UserRewardEvents", fields: [ownerId], references: [id])
+
+  name      String
+  eventType EventType
 
   selectors Selector[]
+  campaigns CampaignRewardEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model CampaignRewardEvent {
+  id String @id @default(cuid())
+
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+
+  rewardEventId String
+  rewardEvent   RewardEvent @relation(fields: [rewardEventId], references: [id])
+
+  amount     Decimal
+  volumeStep Int     @default(1)
+
+  trackedEvents TrackedEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([campaignId, rewardEventId])
+}
+
+model Client {
+  id        String  @id @default(cuid())
+  userAgent String?
+  ipAddress String?
+
+  trackedEvents TrackedEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TrackedEvent {
+  id String @id @default(cuid())
+
+  campaignRewardEventId String
+  campaignRewardEvent   CampaignRewardEvent @relation(fields: [campaignRewardEventId], references: [id])
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+
+  data      Json?
+  timestamp DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignRewardEventId])
+  @@index([clientId])
+  @@index([timestamp])
 }
 
 model Selector {
@@ -118,10 +171,11 @@ model AnalyticsEvent {
 }
 
 enum EventType {
-  VISIT_PAGE
-  ADD_CART
-  BUY_PRODUCT
-  SIGNUP
+  LANDING_PAGE_VIEW
+  VIEW_ITEM
+  ADD_TO_CART
+  CHECKOUT
+  PURCHASE_SUCCESS
 }
 
 enum SelectorEventType {

@@ -29,6 +29,21 @@ export type Campaign = $Result.DefaultSelection<Prisma.$CampaignPayload>
  */
 export type RewardEvent = $Result.DefaultSelection<Prisma.$RewardEventPayload>
 /**
+ * Model CampaignRewardEvent
+ * 
+ */
+export type CampaignRewardEvent = $Result.DefaultSelection<Prisma.$CampaignRewardEventPayload>
+/**
+ * Model Client
+ * 
+ */
+export type Client = $Result.DefaultSelection<Prisma.$ClientPayload>
+/**
+ * Model TrackedEvent
+ * 
+ */
+export type TrackedEvent = $Result.DefaultSelection<Prisma.$TrackedEventPayload>
+/**
  * Model Selector
  * 
  */
@@ -54,10 +69,11 @@ export type AnalyticsEvent = $Result.DefaultSelection<Prisma.$AnalyticsEventPayl
  */
 export namespace $Enums {
   export const EventType: {
-  VISIT_PAGE: 'VISIT_PAGE',
-  ADD_CART: 'ADD_CART',
-  BUY_PRODUCT: 'BUY_PRODUCT',
-  SIGNUP: 'SIGNUP'
+  LANDING_PAGE_VIEW: 'LANDING_PAGE_VIEW',
+  VIEW_ITEM: 'VIEW_ITEM',
+  ADD_TO_CART: 'ADD_TO_CART',
+  CHECKOUT: 'CHECKOUT',
+  PURCHASE_SUCCESS: 'PURCHASE_SUCCESS'
 };
 
 export type EventType = (typeof EventType)[keyof typeof EventType]
@@ -242,6 +258,36 @@ export class PrismaClient<
     * ```
     */
   get rewardEvent(): Prisma.RewardEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.campaignRewardEvent`: Exposes CRUD operations for the **CampaignRewardEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CampaignRewardEvents
+    * const campaignRewardEvents = await prisma.campaignRewardEvent.findMany()
+    * ```
+    */
+  get campaignRewardEvent(): Prisma.CampaignRewardEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.client`: Exposes CRUD operations for the **Client** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Clients
+    * const clients = await prisma.client.findMany()
+    * ```
+    */
+  get client(): Prisma.ClientDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.trackedEvent`: Exposes CRUD operations for the **TrackedEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TrackedEvents
+    * const trackedEvents = await prisma.trackedEvent.findMany()
+    * ```
+    */
+  get trackedEvent(): Prisma.TrackedEventDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.selector`: Exposes CRUD operations for the **Selector** model.
@@ -719,6 +765,9 @@ export namespace Prisma {
     User: 'User',
     Campaign: 'Campaign',
     RewardEvent: 'RewardEvent',
+    CampaignRewardEvent: 'CampaignRewardEvent',
+    Client: 'Client',
+    TrackedEvent: 'TrackedEvent',
     Selector: 'Selector',
     Participation: 'Participation',
     TrackingLink: 'TrackingLink',
@@ -738,7 +787,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "campaign" | "rewardEvent" | "selector" | "participation" | "trackingLink" | "analyticsEvent"
+      modelProps: "user" | "campaign" | "rewardEvent" | "campaignRewardEvent" | "client" | "trackedEvent" | "selector" | "participation" | "trackingLink" | "analyticsEvent"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -961,6 +1010,228 @@ export namespace Prisma {
           count: {
             args: Prisma.RewardEventCountArgs<ExtArgs>
             result: $Utils.Optional<RewardEventCountAggregateOutputType> | number
+          }
+        }
+      }
+      CampaignRewardEvent: {
+        payload: Prisma.$CampaignRewardEventPayload<ExtArgs>
+        fields: Prisma.CampaignRewardEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CampaignRewardEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CampaignRewardEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload>
+          }
+          findFirst: {
+            args: Prisma.CampaignRewardEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CampaignRewardEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload>
+          }
+          findMany: {
+            args: Prisma.CampaignRewardEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload>[]
+          }
+          create: {
+            args: Prisma.CampaignRewardEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload>
+          }
+          createMany: {
+            args: Prisma.CampaignRewardEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CampaignRewardEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload>[]
+          }
+          delete: {
+            args: Prisma.CampaignRewardEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload>
+          }
+          update: {
+            args: Prisma.CampaignRewardEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.CampaignRewardEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CampaignRewardEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CampaignRewardEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.CampaignRewardEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CampaignRewardEventPayload>
+          }
+          aggregate: {
+            args: Prisma.CampaignRewardEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCampaignRewardEvent>
+          }
+          groupBy: {
+            args: Prisma.CampaignRewardEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CampaignRewardEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CampaignRewardEventCountArgs<ExtArgs>
+            result: $Utils.Optional<CampaignRewardEventCountAggregateOutputType> | number
+          }
+        }
+      }
+      Client: {
+        payload: Prisma.$ClientPayload<ExtArgs>
+        fields: Prisma.ClientFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ClientFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ClientFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload>
+          }
+          findFirst: {
+            args: Prisma.ClientFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ClientFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload>
+          }
+          findMany: {
+            args: Prisma.ClientFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload>[]
+          }
+          create: {
+            args: Prisma.ClientCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload>
+          }
+          createMany: {
+            args: Prisma.ClientCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ClientCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload>[]
+          }
+          delete: {
+            args: Prisma.ClientDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload>
+          }
+          update: {
+            args: Prisma.ClientUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload>
+          }
+          deleteMany: {
+            args: Prisma.ClientDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ClientUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ClientUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload>[]
+          }
+          upsert: {
+            args: Prisma.ClientUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ClientPayload>
+          }
+          aggregate: {
+            args: Prisma.ClientAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateClient>
+          }
+          groupBy: {
+            args: Prisma.ClientGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ClientGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ClientCountArgs<ExtArgs>
+            result: $Utils.Optional<ClientCountAggregateOutputType> | number
+          }
+        }
+      }
+      TrackedEvent: {
+        payload: Prisma.$TrackedEventPayload<ExtArgs>
+        fields: Prisma.TrackedEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TrackedEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TrackedEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload>
+          }
+          findFirst: {
+            args: Prisma.TrackedEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TrackedEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload>
+          }
+          findMany: {
+            args: Prisma.TrackedEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload>[]
+          }
+          create: {
+            args: Prisma.TrackedEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload>
+          }
+          createMany: {
+            args: Prisma.TrackedEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TrackedEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload>[]
+          }
+          delete: {
+            args: Prisma.TrackedEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload>
+          }
+          update: {
+            args: Prisma.TrackedEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.TrackedEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TrackedEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TrackedEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.TrackedEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackedEventPayload>
+          }
+          aggregate: {
+            args: Prisma.TrackedEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTrackedEvent>
+          }
+          groupBy: {
+            args: Prisma.TrackedEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TrackedEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TrackedEventCountArgs<ExtArgs>
+            result: $Utils.Optional<TrackedEventCountAggregateOutputType> | number
           }
         }
       }
@@ -1371,6 +1642,9 @@ export namespace Prisma {
     user?: UserOmit
     campaign?: CampaignOmit
     rewardEvent?: RewardEventOmit
+    campaignRewardEvent?: CampaignRewardEventOmit
+    client?: ClientOmit
+    trackedEvent?: TrackedEventOmit
     selector?: SelectorOmit
     participation?: ParticipationOmit
     trackingLink?: TrackingLinkOmit
@@ -1456,11 +1730,13 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     campaignsCreated: number
+    rewardEvents: number
     participations: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     campaignsCreated?: boolean | UserCountOutputTypeCountCampaignsCreatedArgs
+    rewardEvents?: boolean | UserCountOutputTypeCountRewardEventsArgs
     participations?: boolean | UserCountOutputTypeCountParticipationsArgs
   }
 
@@ -1480,6 +1756,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountCampaignsCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CampaignWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountRewardEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RewardEventWhereInput
   }
 
   /**
@@ -1519,7 +1802,7 @@ export namespace Prisma {
    * CampaignCountOutputType without action
    */
   export type CampaignCountOutputTypeCountRewardEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RewardEventWhereInput
+    where?: CampaignRewardEventWhereInput
   }
 
   /**
@@ -1536,10 +1819,12 @@ export namespace Prisma {
 
   export type RewardEventCountOutputType = {
     selectors: number
+    campaigns: number
   }
 
   export type RewardEventCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     selectors?: boolean | RewardEventCountOutputTypeCountSelectorsArgs
+    campaigns?: boolean | RewardEventCountOutputTypeCountCampaignsArgs
   }
 
   // Custom InputTypes
@@ -1558,6 +1843,75 @@ export namespace Prisma {
    */
   export type RewardEventCountOutputTypeCountSelectorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SelectorWhereInput
+  }
+
+  /**
+   * RewardEventCountOutputType without action
+   */
+  export type RewardEventCountOutputTypeCountCampaignsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CampaignRewardEventWhereInput
+  }
+
+
+  /**
+   * Count Type CampaignRewardEventCountOutputType
+   */
+
+  export type CampaignRewardEventCountOutputType = {
+    trackedEvents: number
+  }
+
+  export type CampaignRewardEventCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    trackedEvents?: boolean | CampaignRewardEventCountOutputTypeCountTrackedEventsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * CampaignRewardEventCountOutputType without action
+   */
+  export type CampaignRewardEventCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEventCountOutputType
+     */
+    select?: CampaignRewardEventCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * CampaignRewardEventCountOutputType without action
+   */
+  export type CampaignRewardEventCountOutputTypeCountTrackedEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TrackedEventWhereInput
+  }
+
+
+  /**
+   * Count Type ClientCountOutputType
+   */
+
+  export type ClientCountOutputType = {
+    trackedEvents: number
+  }
+
+  export type ClientCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    trackedEvents?: boolean | ClientCountOutputTypeCountTrackedEventsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ClientCountOutputType without action
+   */
+  export type ClientCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClientCountOutputType
+     */
+    select?: ClientCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ClientCountOutputType without action
+   */
+  export type ClientCountOutputTypeCountTrackedEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TrackedEventWhereInput
   }
 
 
@@ -1778,6 +2132,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     campaignsCreated?: boolean | User$campaignsCreatedArgs<ExtArgs>
+    rewardEvents?: boolean | User$rewardEventsArgs<ExtArgs>
     participations?: boolean | User$participationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -1812,6 +2167,7 @@ export namespace Prisma {
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "walletAddress" | "name" | "email" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     campaignsCreated?: boolean | User$campaignsCreatedArgs<ExtArgs>
+    rewardEvents?: boolean | User$rewardEventsArgs<ExtArgs>
     participations?: boolean | User$participationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -1822,6 +2178,7 @@ export namespace Prisma {
     name: "User"
     objects: {
       campaignsCreated: Prisma.$CampaignPayload<ExtArgs>[]
+      rewardEvents: Prisma.$RewardEventPayload<ExtArgs>[]
       participations: Prisma.$ParticipationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -2226,6 +2583,7 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     campaignsCreated<T extends User$campaignsCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$campaignsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    rewardEvents<T extends User$rewardEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$rewardEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RewardEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     participations<T extends User$participationsArgs<ExtArgs> = {}>(args?: Subset<T, User$participationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ParticipationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2674,6 +3032,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.rewardEvents
+   */
+  export type User$rewardEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RewardEvent
+     */
+    select?: RewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RewardEvent
+     */
+    omit?: RewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RewardEventInclude<ExtArgs> | null
+    where?: RewardEventWhereInput
+    orderBy?: RewardEventOrderByWithRelationInput | RewardEventOrderByWithRelationInput[]
+    cursor?: RewardEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RewardEventScalarFieldEnum | RewardEventScalarFieldEnum[]
+  }
+
+  /**
    * User.participations
    */
   export type User$participationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3008,7 +3390,7 @@ export namespace Prisma {
     name: "Campaign"
     objects: {
       owner: Prisma.$UserPayload<ExtArgs>
-      rewardEvents: Prisma.$RewardEventPayload<ExtArgs>[]
+      rewardEvents: Prisma.$CampaignRewardEventPayload<ExtArgs>[]
       participations: Prisma.$ParticipationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -3416,7 +3798,7 @@ export namespace Prisma {
   export interface Prisma__CampaignClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     owner<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    rewardEvents<T extends Campaign$rewardEventsArgs<ExtArgs> = {}>(args?: Subset<T, Campaign$rewardEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RewardEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    rewardEvents<T extends Campaign$rewardEventsArgs<ExtArgs> = {}>(args?: Subset<T, Campaign$rewardEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     participations<T extends Campaign$participationsArgs<ExtArgs> = {}>(args?: Subset<T, Campaign$participationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ParticipationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3856,23 +4238,23 @@ export namespace Prisma {
    */
   export type Campaign$rewardEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the RewardEvent
+     * Select specific fields to fetch from the CampaignRewardEvent
      */
-    select?: RewardEventSelect<ExtArgs> | null
+    select?: CampaignRewardEventSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the RewardEvent
+     * Omit specific fields from the CampaignRewardEvent
      */
-    omit?: RewardEventOmit<ExtArgs> | null
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: RewardEventInclude<ExtArgs> | null
-    where?: RewardEventWhereInput
-    orderBy?: RewardEventOrderByWithRelationInput | RewardEventOrderByWithRelationInput[]
-    cursor?: RewardEventWhereUniqueInput
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    where?: CampaignRewardEventWhereInput
+    orderBy?: CampaignRewardEventOrderByWithRelationInput | CampaignRewardEventOrderByWithRelationInput[]
+    cursor?: CampaignRewardEventWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: RewardEventScalarFieldEnum | RewardEventScalarFieldEnum[]
+    distinct?: CampaignRewardEventScalarFieldEnum | CampaignRewardEventScalarFieldEnum[]
   }
 
   /**
@@ -3924,90 +4306,62 @@ export namespace Prisma {
 
   export type AggregateRewardEvent = {
     _count: RewardEventCountAggregateOutputType | null
-    _avg: RewardEventAvgAggregateOutputType | null
-    _sum: RewardEventSumAggregateOutputType | null
     _min: RewardEventMinAggregateOutputType | null
     _max: RewardEventMaxAggregateOutputType | null
   }
 
-  export type RewardEventAvgAggregateOutputType = {
-    amount: Decimal | null
-    volumeStep: number | null
-  }
-
-  export type RewardEventSumAggregateOutputType = {
-    amount: Decimal | null
-    volumeStep: number | null
-  }
-
   export type RewardEventMinAggregateOutputType = {
     id: string | null
-    campaignId: string | null
+    ownerId: string | null
+    name: string | null
     eventType: $Enums.EventType | null
-    amount: Decimal | null
-    volumeStep: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
 
   export type RewardEventMaxAggregateOutputType = {
     id: string | null
-    campaignId: string | null
+    ownerId: string | null
+    name: string | null
     eventType: $Enums.EventType | null
-    amount: Decimal | null
-    volumeStep: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
 
   export type RewardEventCountAggregateOutputType = {
     id: number
-    campaignId: number
+    ownerId: number
+    name: number
     eventType: number
-    amount: number
-    volumeStep: number
     createdAt: number
     updatedAt: number
     _all: number
   }
 
 
-  export type RewardEventAvgAggregateInputType = {
-    amount?: true
-    volumeStep?: true
-  }
-
-  export type RewardEventSumAggregateInputType = {
-    amount?: true
-    volumeStep?: true
-  }
-
   export type RewardEventMinAggregateInputType = {
     id?: true
-    campaignId?: true
+    ownerId?: true
+    name?: true
     eventType?: true
-    amount?: true
-    volumeStep?: true
     createdAt?: true
     updatedAt?: true
   }
 
   export type RewardEventMaxAggregateInputType = {
     id?: true
-    campaignId?: true
+    ownerId?: true
+    name?: true
     eventType?: true
-    amount?: true
-    volumeStep?: true
     createdAt?: true
     updatedAt?: true
   }
 
   export type RewardEventCountAggregateInputType = {
     id?: true
-    campaignId?: true
+    ownerId?: true
+    name?: true
     eventType?: true
-    amount?: true
-    volumeStep?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4051,18 +4405,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: RewardEventAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: RewardEventSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: RewardEventMinAggregateInputType
@@ -4093,23 +4435,18 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: RewardEventCountAggregateInputType | true
-    _avg?: RewardEventAvgAggregateInputType
-    _sum?: RewardEventSumAggregateInputType
     _min?: RewardEventMinAggregateInputType
     _max?: RewardEventMaxAggregateInputType
   }
 
   export type RewardEventGroupByOutputType = {
     id: string
-    campaignId: string
+    ownerId: string
+    name: string
     eventType: $Enums.EventType
-    amount: Decimal
-    volumeStep: number
     createdAt: Date
     updatedAt: Date
     _count: RewardEventCountAggregateOutputType | null
-    _avg: RewardEventAvgAggregateOutputType | null
-    _sum: RewardEventSumAggregateOutputType | null
     _min: RewardEventMinAggregateOutputType | null
     _max: RewardEventMaxAggregateOutputType | null
   }
@@ -4130,74 +4467,72 @@ export namespace Prisma {
 
   export type RewardEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    campaignId?: boolean
+    ownerId?: boolean
+    name?: boolean
     eventType?: boolean
-    amount?: boolean
-    volumeStep?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    owner?: boolean | UserDefaultArgs<ExtArgs>
     selectors?: boolean | RewardEvent$selectorsArgs<ExtArgs>
+    campaigns?: boolean | RewardEvent$campaignsArgs<ExtArgs>
     _count?: boolean | RewardEventCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["rewardEvent"]>
 
   export type RewardEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    campaignId?: boolean
+    ownerId?: boolean
+    name?: boolean
     eventType?: boolean
-    amount?: boolean
-    volumeStep?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    owner?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["rewardEvent"]>
 
   export type RewardEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    campaignId?: boolean
+    ownerId?: boolean
+    name?: boolean
     eventType?: boolean
-    amount?: boolean
-    volumeStep?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    owner?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["rewardEvent"]>
 
   export type RewardEventSelectScalar = {
     id?: boolean
-    campaignId?: boolean
+    ownerId?: boolean
+    name?: boolean
     eventType?: boolean
-    amount?: boolean
-    volumeStep?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type RewardEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "campaignId" | "eventType" | "amount" | "volumeStep" | "createdAt" | "updatedAt", ExtArgs["result"]["rewardEvent"]>
+  export type RewardEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "name" | "eventType" | "createdAt" | "updatedAt", ExtArgs["result"]["rewardEvent"]>
   export type RewardEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    owner?: boolean | UserDefaultArgs<ExtArgs>
     selectors?: boolean | RewardEvent$selectorsArgs<ExtArgs>
+    campaigns?: boolean | RewardEvent$campaignsArgs<ExtArgs>
     _count?: boolean | RewardEventCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type RewardEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    owner?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type RewardEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    owner?: boolean | UserDefaultArgs<ExtArgs>
   }
 
   export type $RewardEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "RewardEvent"
     objects: {
-      campaign: Prisma.$CampaignPayload<ExtArgs>
+      owner: Prisma.$UserPayload<ExtArgs>
       selectors: Prisma.$SelectorPayload<ExtArgs>[]
+      campaigns: Prisma.$CampaignRewardEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      campaignId: string
+      ownerId: string
+      name: string
       eventType: $Enums.EventType
-      amount: Prisma.Decimal
-      volumeStep: number
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["rewardEvent"]>
@@ -4594,8 +4929,9 @@ export namespace Prisma {
    */
   export interface Prisma__RewardEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    campaign<T extends CampaignDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CampaignDefaultArgs<ExtArgs>>): Prisma__CampaignClient<$Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    owner<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     selectors<T extends RewardEvent$selectorsArgs<ExtArgs> = {}>(args?: Subset<T, RewardEvent$selectorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SelectorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    campaigns<T extends RewardEvent$campaignsArgs<ExtArgs> = {}>(args?: Subset<T, RewardEvent$campaignsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4626,10 +4962,9 @@ export namespace Prisma {
    */
   interface RewardEventFieldRefs {
     readonly id: FieldRef<"RewardEvent", 'String'>
-    readonly campaignId: FieldRef<"RewardEvent", 'String'>
+    readonly ownerId: FieldRef<"RewardEvent", 'String'>
+    readonly name: FieldRef<"RewardEvent", 'String'>
     readonly eventType: FieldRef<"RewardEvent", 'EventType'>
-    readonly amount: FieldRef<"RewardEvent", 'Decimal'>
-    readonly volumeStep: FieldRef<"RewardEvent", 'Int'>
     readonly createdAt: FieldRef<"RewardEvent", 'DateTime'>
     readonly updatedAt: FieldRef<"RewardEvent", 'DateTime'>
   }
@@ -5052,6 +5387,30 @@ export namespace Prisma {
   }
 
   /**
+   * RewardEvent.campaigns
+   */
+  export type RewardEvent$campaignsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    where?: CampaignRewardEventWhereInput
+    orderBy?: CampaignRewardEventOrderByWithRelationInput | CampaignRewardEventOrderByWithRelationInput[]
+    cursor?: CampaignRewardEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CampaignRewardEventScalarFieldEnum | CampaignRewardEventScalarFieldEnum[]
+  }
+
+  /**
    * RewardEvent without action
    */
   export type RewardEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5067,6 +5426,3324 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: RewardEventInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CampaignRewardEvent
+   */
+
+  export type AggregateCampaignRewardEvent = {
+    _count: CampaignRewardEventCountAggregateOutputType | null
+    _avg: CampaignRewardEventAvgAggregateOutputType | null
+    _sum: CampaignRewardEventSumAggregateOutputType | null
+    _min: CampaignRewardEventMinAggregateOutputType | null
+    _max: CampaignRewardEventMaxAggregateOutputType | null
+  }
+
+  export type CampaignRewardEventAvgAggregateOutputType = {
+    amount: Decimal | null
+    volumeStep: number | null
+  }
+
+  export type CampaignRewardEventSumAggregateOutputType = {
+    amount: Decimal | null
+    volumeStep: number | null
+  }
+
+  export type CampaignRewardEventMinAggregateOutputType = {
+    id: string | null
+    campaignId: string | null
+    rewardEventId: string | null
+    amount: Decimal | null
+    volumeStep: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CampaignRewardEventMaxAggregateOutputType = {
+    id: string | null
+    campaignId: string | null
+    rewardEventId: string | null
+    amount: Decimal | null
+    volumeStep: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CampaignRewardEventCountAggregateOutputType = {
+    id: number
+    campaignId: number
+    rewardEventId: number
+    amount: number
+    volumeStep: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CampaignRewardEventAvgAggregateInputType = {
+    amount?: true
+    volumeStep?: true
+  }
+
+  export type CampaignRewardEventSumAggregateInputType = {
+    amount?: true
+    volumeStep?: true
+  }
+
+  export type CampaignRewardEventMinAggregateInputType = {
+    id?: true
+    campaignId?: true
+    rewardEventId?: true
+    amount?: true
+    volumeStep?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CampaignRewardEventMaxAggregateInputType = {
+    id?: true
+    campaignId?: true
+    rewardEventId?: true
+    amount?: true
+    volumeStep?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CampaignRewardEventCountAggregateInputType = {
+    id?: true
+    campaignId?: true
+    rewardEventId?: true
+    amount?: true
+    volumeStep?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CampaignRewardEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CampaignRewardEvent to aggregate.
+     */
+    where?: CampaignRewardEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CampaignRewardEvents to fetch.
+     */
+    orderBy?: CampaignRewardEventOrderByWithRelationInput | CampaignRewardEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CampaignRewardEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CampaignRewardEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CampaignRewardEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CampaignRewardEvents
+    **/
+    _count?: true | CampaignRewardEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CampaignRewardEventAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CampaignRewardEventSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CampaignRewardEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CampaignRewardEventMaxAggregateInputType
+  }
+
+  export type GetCampaignRewardEventAggregateType<T extends CampaignRewardEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateCampaignRewardEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCampaignRewardEvent[P]>
+      : GetScalarType<T[P], AggregateCampaignRewardEvent[P]>
+  }
+
+
+
+
+  export type CampaignRewardEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CampaignRewardEventWhereInput
+    orderBy?: CampaignRewardEventOrderByWithAggregationInput | CampaignRewardEventOrderByWithAggregationInput[]
+    by: CampaignRewardEventScalarFieldEnum[] | CampaignRewardEventScalarFieldEnum
+    having?: CampaignRewardEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CampaignRewardEventCountAggregateInputType | true
+    _avg?: CampaignRewardEventAvgAggregateInputType
+    _sum?: CampaignRewardEventSumAggregateInputType
+    _min?: CampaignRewardEventMinAggregateInputType
+    _max?: CampaignRewardEventMaxAggregateInputType
+  }
+
+  export type CampaignRewardEventGroupByOutputType = {
+    id: string
+    campaignId: string
+    rewardEventId: string
+    amount: Decimal
+    volumeStep: number
+    createdAt: Date
+    updatedAt: Date
+    _count: CampaignRewardEventCountAggregateOutputType | null
+    _avg: CampaignRewardEventAvgAggregateOutputType | null
+    _sum: CampaignRewardEventSumAggregateOutputType | null
+    _min: CampaignRewardEventMinAggregateOutputType | null
+    _max: CampaignRewardEventMaxAggregateOutputType | null
+  }
+
+  type GetCampaignRewardEventGroupByPayload<T extends CampaignRewardEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CampaignRewardEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CampaignRewardEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CampaignRewardEventGroupByOutputType[P]>
+            : GetScalarType<T[P], CampaignRewardEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CampaignRewardEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    campaignId?: boolean
+    rewardEventId?: boolean
+    amount?: boolean
+    volumeStep?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    rewardEvent?: boolean | RewardEventDefaultArgs<ExtArgs>
+    trackedEvents?: boolean | CampaignRewardEvent$trackedEventsArgs<ExtArgs>
+    _count?: boolean | CampaignRewardEventCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["campaignRewardEvent"]>
+
+  export type CampaignRewardEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    campaignId?: boolean
+    rewardEventId?: boolean
+    amount?: boolean
+    volumeStep?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    rewardEvent?: boolean | RewardEventDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["campaignRewardEvent"]>
+
+  export type CampaignRewardEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    campaignId?: boolean
+    rewardEventId?: boolean
+    amount?: boolean
+    volumeStep?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    rewardEvent?: boolean | RewardEventDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["campaignRewardEvent"]>
+
+  export type CampaignRewardEventSelectScalar = {
+    id?: boolean
+    campaignId?: boolean
+    rewardEventId?: boolean
+    amount?: boolean
+    volumeStep?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CampaignRewardEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "campaignId" | "rewardEventId" | "amount" | "volumeStep" | "createdAt" | "updatedAt", ExtArgs["result"]["campaignRewardEvent"]>
+  export type CampaignRewardEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    rewardEvent?: boolean | RewardEventDefaultArgs<ExtArgs>
+    trackedEvents?: boolean | CampaignRewardEvent$trackedEventsArgs<ExtArgs>
+    _count?: boolean | CampaignRewardEventCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type CampaignRewardEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    rewardEvent?: boolean | RewardEventDefaultArgs<ExtArgs>
+  }
+  export type CampaignRewardEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    campaign?: boolean | CampaignDefaultArgs<ExtArgs>
+    rewardEvent?: boolean | RewardEventDefaultArgs<ExtArgs>
+  }
+
+  export type $CampaignRewardEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CampaignRewardEvent"
+    objects: {
+      campaign: Prisma.$CampaignPayload<ExtArgs>
+      rewardEvent: Prisma.$RewardEventPayload<ExtArgs>
+      trackedEvents: Prisma.$TrackedEventPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      campaignId: string
+      rewardEventId: string
+      amount: Prisma.Decimal
+      volumeStep: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["campaignRewardEvent"]>
+    composites: {}
+  }
+
+  type CampaignRewardEventGetPayload<S extends boolean | null | undefined | CampaignRewardEventDefaultArgs> = $Result.GetResult<Prisma.$CampaignRewardEventPayload, S>
+
+  type CampaignRewardEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CampaignRewardEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CampaignRewardEventCountAggregateInputType | true
+    }
+
+  export interface CampaignRewardEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CampaignRewardEvent'], meta: { name: 'CampaignRewardEvent' } }
+    /**
+     * Find zero or one CampaignRewardEvent that matches the filter.
+     * @param {CampaignRewardEventFindUniqueArgs} args - Arguments to find a CampaignRewardEvent
+     * @example
+     * // Get one CampaignRewardEvent
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CampaignRewardEventFindUniqueArgs>(args: SelectSubset<T, CampaignRewardEventFindUniqueArgs<ExtArgs>>): Prisma__CampaignRewardEventClient<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CampaignRewardEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CampaignRewardEventFindUniqueOrThrowArgs} args - Arguments to find a CampaignRewardEvent
+     * @example
+     * // Get one CampaignRewardEvent
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CampaignRewardEventFindUniqueOrThrowArgs>(args: SelectSubset<T, CampaignRewardEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CampaignRewardEventClient<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CampaignRewardEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CampaignRewardEventFindFirstArgs} args - Arguments to find a CampaignRewardEvent
+     * @example
+     * // Get one CampaignRewardEvent
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CampaignRewardEventFindFirstArgs>(args?: SelectSubset<T, CampaignRewardEventFindFirstArgs<ExtArgs>>): Prisma__CampaignRewardEventClient<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CampaignRewardEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CampaignRewardEventFindFirstOrThrowArgs} args - Arguments to find a CampaignRewardEvent
+     * @example
+     * // Get one CampaignRewardEvent
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CampaignRewardEventFindFirstOrThrowArgs>(args?: SelectSubset<T, CampaignRewardEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__CampaignRewardEventClient<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CampaignRewardEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CampaignRewardEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CampaignRewardEvents
+     * const campaignRewardEvents = await prisma.campaignRewardEvent.findMany()
+     * 
+     * // Get first 10 CampaignRewardEvents
+     * const campaignRewardEvents = await prisma.campaignRewardEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const campaignRewardEventWithIdOnly = await prisma.campaignRewardEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CampaignRewardEventFindManyArgs>(args?: SelectSubset<T, CampaignRewardEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CampaignRewardEvent.
+     * @param {CampaignRewardEventCreateArgs} args - Arguments to create a CampaignRewardEvent.
+     * @example
+     * // Create one CampaignRewardEvent
+     * const CampaignRewardEvent = await prisma.campaignRewardEvent.create({
+     *   data: {
+     *     // ... data to create a CampaignRewardEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends CampaignRewardEventCreateArgs>(args: SelectSubset<T, CampaignRewardEventCreateArgs<ExtArgs>>): Prisma__CampaignRewardEventClient<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CampaignRewardEvents.
+     * @param {CampaignRewardEventCreateManyArgs} args - Arguments to create many CampaignRewardEvents.
+     * @example
+     * // Create many CampaignRewardEvents
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CampaignRewardEventCreateManyArgs>(args?: SelectSubset<T, CampaignRewardEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CampaignRewardEvents and returns the data saved in the database.
+     * @param {CampaignRewardEventCreateManyAndReturnArgs} args - Arguments to create many CampaignRewardEvents.
+     * @example
+     * // Create many CampaignRewardEvents
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CampaignRewardEvents and only return the `id`
+     * const campaignRewardEventWithIdOnly = await prisma.campaignRewardEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CampaignRewardEventCreateManyAndReturnArgs>(args?: SelectSubset<T, CampaignRewardEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CampaignRewardEvent.
+     * @param {CampaignRewardEventDeleteArgs} args - Arguments to delete one CampaignRewardEvent.
+     * @example
+     * // Delete one CampaignRewardEvent
+     * const CampaignRewardEvent = await prisma.campaignRewardEvent.delete({
+     *   where: {
+     *     // ... filter to delete one CampaignRewardEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CampaignRewardEventDeleteArgs>(args: SelectSubset<T, CampaignRewardEventDeleteArgs<ExtArgs>>): Prisma__CampaignRewardEventClient<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CampaignRewardEvent.
+     * @param {CampaignRewardEventUpdateArgs} args - Arguments to update one CampaignRewardEvent.
+     * @example
+     * // Update one CampaignRewardEvent
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CampaignRewardEventUpdateArgs>(args: SelectSubset<T, CampaignRewardEventUpdateArgs<ExtArgs>>): Prisma__CampaignRewardEventClient<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CampaignRewardEvents.
+     * @param {CampaignRewardEventDeleteManyArgs} args - Arguments to filter CampaignRewardEvents to delete.
+     * @example
+     * // Delete a few CampaignRewardEvents
+     * const { count } = await prisma.campaignRewardEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CampaignRewardEventDeleteManyArgs>(args?: SelectSubset<T, CampaignRewardEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CampaignRewardEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CampaignRewardEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CampaignRewardEvents
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CampaignRewardEventUpdateManyArgs>(args: SelectSubset<T, CampaignRewardEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CampaignRewardEvents and returns the data updated in the database.
+     * @param {CampaignRewardEventUpdateManyAndReturnArgs} args - Arguments to update many CampaignRewardEvents.
+     * @example
+     * // Update many CampaignRewardEvents
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CampaignRewardEvents and only return the `id`
+     * const campaignRewardEventWithIdOnly = await prisma.campaignRewardEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CampaignRewardEventUpdateManyAndReturnArgs>(args: SelectSubset<T, CampaignRewardEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CampaignRewardEvent.
+     * @param {CampaignRewardEventUpsertArgs} args - Arguments to update or create a CampaignRewardEvent.
+     * @example
+     * // Update or create a CampaignRewardEvent
+     * const campaignRewardEvent = await prisma.campaignRewardEvent.upsert({
+     *   create: {
+     *     // ... data to create a CampaignRewardEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CampaignRewardEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CampaignRewardEventUpsertArgs>(args: SelectSubset<T, CampaignRewardEventUpsertArgs<ExtArgs>>): Prisma__CampaignRewardEventClient<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CampaignRewardEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CampaignRewardEventCountArgs} args - Arguments to filter CampaignRewardEvents to count.
+     * @example
+     * // Count the number of CampaignRewardEvents
+     * const count = await prisma.campaignRewardEvent.count({
+     *   where: {
+     *     // ... the filter for the CampaignRewardEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends CampaignRewardEventCountArgs>(
+      args?: Subset<T, CampaignRewardEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CampaignRewardEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CampaignRewardEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CampaignRewardEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CampaignRewardEventAggregateArgs>(args: Subset<T, CampaignRewardEventAggregateArgs>): Prisma.PrismaPromise<GetCampaignRewardEventAggregateType<T>>
+
+    /**
+     * Group by CampaignRewardEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CampaignRewardEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CampaignRewardEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CampaignRewardEventGroupByArgs['orderBy'] }
+        : { orderBy?: CampaignRewardEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CampaignRewardEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCampaignRewardEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CampaignRewardEvent model
+   */
+  readonly fields: CampaignRewardEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CampaignRewardEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CampaignRewardEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    campaign<T extends CampaignDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CampaignDefaultArgs<ExtArgs>>): Prisma__CampaignClient<$Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    rewardEvent<T extends RewardEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RewardEventDefaultArgs<ExtArgs>>): Prisma__RewardEventClient<$Result.GetResult<Prisma.$RewardEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    trackedEvents<T extends CampaignRewardEvent$trackedEventsArgs<ExtArgs> = {}>(args?: Subset<T, CampaignRewardEvent$trackedEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CampaignRewardEvent model
+   */
+  interface CampaignRewardEventFieldRefs {
+    readonly id: FieldRef<"CampaignRewardEvent", 'String'>
+    readonly campaignId: FieldRef<"CampaignRewardEvent", 'String'>
+    readonly rewardEventId: FieldRef<"CampaignRewardEvent", 'String'>
+    readonly amount: FieldRef<"CampaignRewardEvent", 'Decimal'>
+    readonly volumeStep: FieldRef<"CampaignRewardEvent", 'Int'>
+    readonly createdAt: FieldRef<"CampaignRewardEvent", 'DateTime'>
+    readonly updatedAt: FieldRef<"CampaignRewardEvent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CampaignRewardEvent findUnique
+   */
+  export type CampaignRewardEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    /**
+     * Filter, which CampaignRewardEvent to fetch.
+     */
+    where: CampaignRewardEventWhereUniqueInput
+  }
+
+  /**
+   * CampaignRewardEvent findUniqueOrThrow
+   */
+  export type CampaignRewardEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    /**
+     * Filter, which CampaignRewardEvent to fetch.
+     */
+    where: CampaignRewardEventWhereUniqueInput
+  }
+
+  /**
+   * CampaignRewardEvent findFirst
+   */
+  export type CampaignRewardEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    /**
+     * Filter, which CampaignRewardEvent to fetch.
+     */
+    where?: CampaignRewardEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CampaignRewardEvents to fetch.
+     */
+    orderBy?: CampaignRewardEventOrderByWithRelationInput | CampaignRewardEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CampaignRewardEvents.
+     */
+    cursor?: CampaignRewardEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CampaignRewardEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CampaignRewardEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CampaignRewardEvents.
+     */
+    distinct?: CampaignRewardEventScalarFieldEnum | CampaignRewardEventScalarFieldEnum[]
+  }
+
+  /**
+   * CampaignRewardEvent findFirstOrThrow
+   */
+  export type CampaignRewardEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    /**
+     * Filter, which CampaignRewardEvent to fetch.
+     */
+    where?: CampaignRewardEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CampaignRewardEvents to fetch.
+     */
+    orderBy?: CampaignRewardEventOrderByWithRelationInput | CampaignRewardEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CampaignRewardEvents.
+     */
+    cursor?: CampaignRewardEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CampaignRewardEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CampaignRewardEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CampaignRewardEvents.
+     */
+    distinct?: CampaignRewardEventScalarFieldEnum | CampaignRewardEventScalarFieldEnum[]
+  }
+
+  /**
+   * CampaignRewardEvent findMany
+   */
+  export type CampaignRewardEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    /**
+     * Filter, which CampaignRewardEvents to fetch.
+     */
+    where?: CampaignRewardEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CampaignRewardEvents to fetch.
+     */
+    orderBy?: CampaignRewardEventOrderByWithRelationInput | CampaignRewardEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CampaignRewardEvents.
+     */
+    cursor?: CampaignRewardEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CampaignRewardEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CampaignRewardEvents.
+     */
+    skip?: number
+    distinct?: CampaignRewardEventScalarFieldEnum | CampaignRewardEventScalarFieldEnum[]
+  }
+
+  /**
+   * CampaignRewardEvent create
+   */
+  export type CampaignRewardEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CampaignRewardEvent.
+     */
+    data: XOR<CampaignRewardEventCreateInput, CampaignRewardEventUncheckedCreateInput>
+  }
+
+  /**
+   * CampaignRewardEvent createMany
+   */
+  export type CampaignRewardEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CampaignRewardEvents.
+     */
+    data: CampaignRewardEventCreateManyInput | CampaignRewardEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CampaignRewardEvent createManyAndReturn
+   */
+  export type CampaignRewardEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many CampaignRewardEvents.
+     */
+    data: CampaignRewardEventCreateManyInput | CampaignRewardEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CampaignRewardEvent update
+   */
+  export type CampaignRewardEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CampaignRewardEvent.
+     */
+    data: XOR<CampaignRewardEventUpdateInput, CampaignRewardEventUncheckedUpdateInput>
+    /**
+     * Choose, which CampaignRewardEvent to update.
+     */
+    where: CampaignRewardEventWhereUniqueInput
+  }
+
+  /**
+   * CampaignRewardEvent updateMany
+   */
+  export type CampaignRewardEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CampaignRewardEvents.
+     */
+    data: XOR<CampaignRewardEventUpdateManyMutationInput, CampaignRewardEventUncheckedUpdateManyInput>
+    /**
+     * Filter which CampaignRewardEvents to update
+     */
+    where?: CampaignRewardEventWhereInput
+    /**
+     * Limit how many CampaignRewardEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CampaignRewardEvent updateManyAndReturn
+   */
+  export type CampaignRewardEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * The data used to update CampaignRewardEvents.
+     */
+    data: XOR<CampaignRewardEventUpdateManyMutationInput, CampaignRewardEventUncheckedUpdateManyInput>
+    /**
+     * Filter which CampaignRewardEvents to update
+     */
+    where?: CampaignRewardEventWhereInput
+    /**
+     * Limit how many CampaignRewardEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CampaignRewardEvent upsert
+   */
+  export type CampaignRewardEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CampaignRewardEvent to update in case it exists.
+     */
+    where: CampaignRewardEventWhereUniqueInput
+    /**
+     * In case the CampaignRewardEvent found by the `where` argument doesn't exist, create a new CampaignRewardEvent with this data.
+     */
+    create: XOR<CampaignRewardEventCreateInput, CampaignRewardEventUncheckedCreateInput>
+    /**
+     * In case the CampaignRewardEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CampaignRewardEventUpdateInput, CampaignRewardEventUncheckedUpdateInput>
+  }
+
+  /**
+   * CampaignRewardEvent delete
+   */
+  export type CampaignRewardEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+    /**
+     * Filter which CampaignRewardEvent to delete.
+     */
+    where: CampaignRewardEventWhereUniqueInput
+  }
+
+  /**
+   * CampaignRewardEvent deleteMany
+   */
+  export type CampaignRewardEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CampaignRewardEvents to delete
+     */
+    where?: CampaignRewardEventWhereInput
+    /**
+     * Limit how many CampaignRewardEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CampaignRewardEvent.trackedEvents
+   */
+  export type CampaignRewardEvent$trackedEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    where?: TrackedEventWhereInput
+    orderBy?: TrackedEventOrderByWithRelationInput | TrackedEventOrderByWithRelationInput[]
+    cursor?: TrackedEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TrackedEventScalarFieldEnum | TrackedEventScalarFieldEnum[]
+  }
+
+  /**
+   * CampaignRewardEvent without action
+   */
+  export type CampaignRewardEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CampaignRewardEvent
+     */
+    select?: CampaignRewardEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CampaignRewardEvent
+     */
+    omit?: CampaignRewardEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CampaignRewardEventInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Client
+   */
+
+  export type AggregateClient = {
+    _count: ClientCountAggregateOutputType | null
+    _min: ClientMinAggregateOutputType | null
+    _max: ClientMaxAggregateOutputType | null
+  }
+
+  export type ClientMinAggregateOutputType = {
+    id: string | null
+    userAgent: string | null
+    ipAddress: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ClientMaxAggregateOutputType = {
+    id: string | null
+    userAgent: string | null
+    ipAddress: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ClientCountAggregateOutputType = {
+    id: number
+    userAgent: number
+    ipAddress: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ClientMinAggregateInputType = {
+    id?: true
+    userAgent?: true
+    ipAddress?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ClientMaxAggregateInputType = {
+    id?: true
+    userAgent?: true
+    ipAddress?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ClientCountAggregateInputType = {
+    id?: true
+    userAgent?: true
+    ipAddress?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ClientAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Client to aggregate.
+     */
+    where?: ClientWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Clients to fetch.
+     */
+    orderBy?: ClientOrderByWithRelationInput | ClientOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ClientWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Clients from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Clients.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Clients
+    **/
+    _count?: true | ClientCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ClientMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ClientMaxAggregateInputType
+  }
+
+  export type GetClientAggregateType<T extends ClientAggregateArgs> = {
+        [P in keyof T & keyof AggregateClient]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateClient[P]>
+      : GetScalarType<T[P], AggregateClient[P]>
+  }
+
+
+
+
+  export type ClientGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ClientWhereInput
+    orderBy?: ClientOrderByWithAggregationInput | ClientOrderByWithAggregationInput[]
+    by: ClientScalarFieldEnum[] | ClientScalarFieldEnum
+    having?: ClientScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ClientCountAggregateInputType | true
+    _min?: ClientMinAggregateInputType
+    _max?: ClientMaxAggregateInputType
+  }
+
+  export type ClientGroupByOutputType = {
+    id: string
+    userAgent: string | null
+    ipAddress: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ClientCountAggregateOutputType | null
+    _min: ClientMinAggregateOutputType | null
+    _max: ClientMaxAggregateOutputType | null
+  }
+
+  type GetClientGroupByPayload<T extends ClientGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ClientGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ClientGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ClientGroupByOutputType[P]>
+            : GetScalarType<T[P], ClientGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ClientSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userAgent?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    trackedEvents?: boolean | Client$trackedEventsArgs<ExtArgs>
+    _count?: boolean | ClientCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["client"]>
+
+  export type ClientSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userAgent?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["client"]>
+
+  export type ClientSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userAgent?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["client"]>
+
+  export type ClientSelectScalar = {
+    id?: boolean
+    userAgent?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ClientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userAgent" | "ipAddress" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
+  export type ClientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    trackedEvents?: boolean | Client$trackedEventsArgs<ExtArgs>
+    _count?: boolean | ClientCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type ClientIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type ClientIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $ClientPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Client"
+    objects: {
+      trackedEvents: Prisma.$TrackedEventPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userAgent: string | null
+      ipAddress: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["client"]>
+    composites: {}
+  }
+
+  type ClientGetPayload<S extends boolean | null | undefined | ClientDefaultArgs> = $Result.GetResult<Prisma.$ClientPayload, S>
+
+  type ClientCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ClientFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ClientCountAggregateInputType | true
+    }
+
+  export interface ClientDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Client'], meta: { name: 'Client' } }
+    /**
+     * Find zero or one Client that matches the filter.
+     * @param {ClientFindUniqueArgs} args - Arguments to find a Client
+     * @example
+     * // Get one Client
+     * const client = await prisma.client.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ClientFindUniqueArgs>(args: SelectSubset<T, ClientFindUniqueArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Client that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ClientFindUniqueOrThrowArgs} args - Arguments to find a Client
+     * @example
+     * // Get one Client
+     * const client = await prisma.client.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ClientFindUniqueOrThrowArgs>(args: SelectSubset<T, ClientFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Client that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClientFindFirstArgs} args - Arguments to find a Client
+     * @example
+     * // Get one Client
+     * const client = await prisma.client.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ClientFindFirstArgs>(args?: SelectSubset<T, ClientFindFirstArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Client that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClientFindFirstOrThrowArgs} args - Arguments to find a Client
+     * @example
+     * // Get one Client
+     * const client = await prisma.client.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ClientFindFirstOrThrowArgs>(args?: SelectSubset<T, ClientFindFirstOrThrowArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Clients that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClientFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Clients
+     * const clients = await prisma.client.findMany()
+     * 
+     * // Get first 10 Clients
+     * const clients = await prisma.client.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const clientWithIdOnly = await prisma.client.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ClientFindManyArgs>(args?: SelectSubset<T, ClientFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Client.
+     * @param {ClientCreateArgs} args - Arguments to create a Client.
+     * @example
+     * // Create one Client
+     * const Client = await prisma.client.create({
+     *   data: {
+     *     // ... data to create a Client
+     *   }
+     * })
+     * 
+     */
+    create<T extends ClientCreateArgs>(args: SelectSubset<T, ClientCreateArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Clients.
+     * @param {ClientCreateManyArgs} args - Arguments to create many Clients.
+     * @example
+     * // Create many Clients
+     * const client = await prisma.client.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ClientCreateManyArgs>(args?: SelectSubset<T, ClientCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Clients and returns the data saved in the database.
+     * @param {ClientCreateManyAndReturnArgs} args - Arguments to create many Clients.
+     * @example
+     * // Create many Clients
+     * const client = await prisma.client.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Clients and only return the `id`
+     * const clientWithIdOnly = await prisma.client.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ClientCreateManyAndReturnArgs>(args?: SelectSubset<T, ClientCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Client.
+     * @param {ClientDeleteArgs} args - Arguments to delete one Client.
+     * @example
+     * // Delete one Client
+     * const Client = await prisma.client.delete({
+     *   where: {
+     *     // ... filter to delete one Client
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ClientDeleteArgs>(args: SelectSubset<T, ClientDeleteArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Client.
+     * @param {ClientUpdateArgs} args - Arguments to update one Client.
+     * @example
+     * // Update one Client
+     * const client = await prisma.client.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ClientUpdateArgs>(args: SelectSubset<T, ClientUpdateArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Clients.
+     * @param {ClientDeleteManyArgs} args - Arguments to filter Clients to delete.
+     * @example
+     * // Delete a few Clients
+     * const { count } = await prisma.client.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ClientDeleteManyArgs>(args?: SelectSubset<T, ClientDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Clients.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClientUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Clients
+     * const client = await prisma.client.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ClientUpdateManyArgs>(args: SelectSubset<T, ClientUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Clients and returns the data updated in the database.
+     * @param {ClientUpdateManyAndReturnArgs} args - Arguments to update many Clients.
+     * @example
+     * // Update many Clients
+     * const client = await prisma.client.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Clients and only return the `id`
+     * const clientWithIdOnly = await prisma.client.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ClientUpdateManyAndReturnArgs>(args: SelectSubset<T, ClientUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Client.
+     * @param {ClientUpsertArgs} args - Arguments to update or create a Client.
+     * @example
+     * // Update or create a Client
+     * const client = await prisma.client.upsert({
+     *   create: {
+     *     // ... data to create a Client
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Client we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ClientUpsertArgs>(args: SelectSubset<T, ClientUpsertArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Clients.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClientCountArgs} args - Arguments to filter Clients to count.
+     * @example
+     * // Count the number of Clients
+     * const count = await prisma.client.count({
+     *   where: {
+     *     // ... the filter for the Clients we want to count
+     *   }
+     * })
+    **/
+    count<T extends ClientCountArgs>(
+      args?: Subset<T, ClientCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ClientCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Client.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClientAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ClientAggregateArgs>(args: Subset<T, ClientAggregateArgs>): Prisma.PrismaPromise<GetClientAggregateType<T>>
+
+    /**
+     * Group by Client.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClientGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ClientGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ClientGroupByArgs['orderBy'] }
+        : { orderBy?: ClientGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ClientGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetClientGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Client model
+   */
+  readonly fields: ClientFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Client.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ClientClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    trackedEvents<T extends Client$trackedEventsArgs<ExtArgs> = {}>(args?: Subset<T, Client$trackedEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Client model
+   */
+  interface ClientFieldRefs {
+    readonly id: FieldRef<"Client", 'String'>
+    readonly userAgent: FieldRef<"Client", 'String'>
+    readonly ipAddress: FieldRef<"Client", 'String'>
+    readonly createdAt: FieldRef<"Client", 'DateTime'>
+    readonly updatedAt: FieldRef<"Client", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Client findUnique
+   */
+  export type ClientFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+    /**
+     * Filter, which Client to fetch.
+     */
+    where: ClientWhereUniqueInput
+  }
+
+  /**
+   * Client findUniqueOrThrow
+   */
+  export type ClientFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+    /**
+     * Filter, which Client to fetch.
+     */
+    where: ClientWhereUniqueInput
+  }
+
+  /**
+   * Client findFirst
+   */
+  export type ClientFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+    /**
+     * Filter, which Client to fetch.
+     */
+    where?: ClientWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Clients to fetch.
+     */
+    orderBy?: ClientOrderByWithRelationInput | ClientOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Clients.
+     */
+    cursor?: ClientWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Clients from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Clients.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Clients.
+     */
+    distinct?: ClientScalarFieldEnum | ClientScalarFieldEnum[]
+  }
+
+  /**
+   * Client findFirstOrThrow
+   */
+  export type ClientFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+    /**
+     * Filter, which Client to fetch.
+     */
+    where?: ClientWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Clients to fetch.
+     */
+    orderBy?: ClientOrderByWithRelationInput | ClientOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Clients.
+     */
+    cursor?: ClientWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Clients from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Clients.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Clients.
+     */
+    distinct?: ClientScalarFieldEnum | ClientScalarFieldEnum[]
+  }
+
+  /**
+   * Client findMany
+   */
+  export type ClientFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+    /**
+     * Filter, which Clients to fetch.
+     */
+    where?: ClientWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Clients to fetch.
+     */
+    orderBy?: ClientOrderByWithRelationInput | ClientOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Clients.
+     */
+    cursor?: ClientWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Clients from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Clients.
+     */
+    skip?: number
+    distinct?: ClientScalarFieldEnum | ClientScalarFieldEnum[]
+  }
+
+  /**
+   * Client create
+   */
+  export type ClientCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Client.
+     */
+    data: XOR<ClientCreateInput, ClientUncheckedCreateInput>
+  }
+
+  /**
+   * Client createMany
+   */
+  export type ClientCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Clients.
+     */
+    data: ClientCreateManyInput | ClientCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Client createManyAndReturn
+   */
+  export type ClientCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * The data used to create many Clients.
+     */
+    data: ClientCreateManyInput | ClientCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Client update
+   */
+  export type ClientUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Client.
+     */
+    data: XOR<ClientUpdateInput, ClientUncheckedUpdateInput>
+    /**
+     * Choose, which Client to update.
+     */
+    where: ClientWhereUniqueInput
+  }
+
+  /**
+   * Client updateMany
+   */
+  export type ClientUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Clients.
+     */
+    data: XOR<ClientUpdateManyMutationInput, ClientUncheckedUpdateManyInput>
+    /**
+     * Filter which Clients to update
+     */
+    where?: ClientWhereInput
+    /**
+     * Limit how many Clients to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Client updateManyAndReturn
+   */
+  export type ClientUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * The data used to update Clients.
+     */
+    data: XOR<ClientUpdateManyMutationInput, ClientUncheckedUpdateManyInput>
+    /**
+     * Filter which Clients to update
+     */
+    where?: ClientWhereInput
+    /**
+     * Limit how many Clients to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Client upsert
+   */
+  export type ClientUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Client to update in case it exists.
+     */
+    where: ClientWhereUniqueInput
+    /**
+     * In case the Client found by the `where` argument doesn't exist, create a new Client with this data.
+     */
+    create: XOR<ClientCreateInput, ClientUncheckedCreateInput>
+    /**
+     * In case the Client was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ClientUpdateInput, ClientUncheckedUpdateInput>
+  }
+
+  /**
+   * Client delete
+   */
+  export type ClientDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+    /**
+     * Filter which Client to delete.
+     */
+    where: ClientWhereUniqueInput
+  }
+
+  /**
+   * Client deleteMany
+   */
+  export type ClientDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Clients to delete
+     */
+    where?: ClientWhereInput
+    /**
+     * Limit how many Clients to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Client.trackedEvents
+   */
+  export type Client$trackedEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    where?: TrackedEventWhereInput
+    orderBy?: TrackedEventOrderByWithRelationInput | TrackedEventOrderByWithRelationInput[]
+    cursor?: TrackedEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TrackedEventScalarFieldEnum | TrackedEventScalarFieldEnum[]
+  }
+
+  /**
+   * Client without action
+   */
+  export type ClientDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Client
+     */
+    select?: ClientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Client
+     */
+    omit?: ClientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClientInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TrackedEvent
+   */
+
+  export type AggregateTrackedEvent = {
+    _count: TrackedEventCountAggregateOutputType | null
+    _min: TrackedEventMinAggregateOutputType | null
+    _max: TrackedEventMaxAggregateOutputType | null
+  }
+
+  export type TrackedEventMinAggregateOutputType = {
+    id: string | null
+    campaignRewardEventId: string | null
+    clientId: string | null
+    timestamp: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TrackedEventMaxAggregateOutputType = {
+    id: string | null
+    campaignRewardEventId: string | null
+    clientId: string | null
+    timestamp: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TrackedEventCountAggregateOutputType = {
+    id: number
+    campaignRewardEventId: number
+    clientId: number
+    data: number
+    timestamp: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TrackedEventMinAggregateInputType = {
+    id?: true
+    campaignRewardEventId?: true
+    clientId?: true
+    timestamp?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TrackedEventMaxAggregateInputType = {
+    id?: true
+    campaignRewardEventId?: true
+    clientId?: true
+    timestamp?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TrackedEventCountAggregateInputType = {
+    id?: true
+    campaignRewardEventId?: true
+    clientId?: true
+    data?: true
+    timestamp?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TrackedEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TrackedEvent to aggregate.
+     */
+    where?: TrackedEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrackedEvents to fetch.
+     */
+    orderBy?: TrackedEventOrderByWithRelationInput | TrackedEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TrackedEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrackedEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrackedEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TrackedEvents
+    **/
+    _count?: true | TrackedEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TrackedEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TrackedEventMaxAggregateInputType
+  }
+
+  export type GetTrackedEventAggregateType<T extends TrackedEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateTrackedEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTrackedEvent[P]>
+      : GetScalarType<T[P], AggregateTrackedEvent[P]>
+  }
+
+
+
+
+  export type TrackedEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TrackedEventWhereInput
+    orderBy?: TrackedEventOrderByWithAggregationInput | TrackedEventOrderByWithAggregationInput[]
+    by: TrackedEventScalarFieldEnum[] | TrackedEventScalarFieldEnum
+    having?: TrackedEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TrackedEventCountAggregateInputType | true
+    _min?: TrackedEventMinAggregateInputType
+    _max?: TrackedEventMaxAggregateInputType
+  }
+
+  export type TrackedEventGroupByOutputType = {
+    id: string
+    campaignRewardEventId: string
+    clientId: string
+    data: JsonValue | null
+    timestamp: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: TrackedEventCountAggregateOutputType | null
+    _min: TrackedEventMinAggregateOutputType | null
+    _max: TrackedEventMaxAggregateOutputType | null
+  }
+
+  type GetTrackedEventGroupByPayload<T extends TrackedEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TrackedEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TrackedEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TrackedEventGroupByOutputType[P]>
+            : GetScalarType<T[P], TrackedEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TrackedEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    campaignRewardEventId?: boolean
+    clientId?: boolean
+    data?: boolean
+    timestamp?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    campaignRewardEvent?: boolean | CampaignRewardEventDefaultArgs<ExtArgs>
+    client?: boolean | ClientDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["trackedEvent"]>
+
+  export type TrackedEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    campaignRewardEventId?: boolean
+    clientId?: boolean
+    data?: boolean
+    timestamp?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    campaignRewardEvent?: boolean | CampaignRewardEventDefaultArgs<ExtArgs>
+    client?: boolean | ClientDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["trackedEvent"]>
+
+  export type TrackedEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    campaignRewardEventId?: boolean
+    clientId?: boolean
+    data?: boolean
+    timestamp?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    campaignRewardEvent?: boolean | CampaignRewardEventDefaultArgs<ExtArgs>
+    client?: boolean | ClientDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["trackedEvent"]>
+
+  export type TrackedEventSelectScalar = {
+    id?: boolean
+    campaignRewardEventId?: boolean
+    clientId?: boolean
+    data?: boolean
+    timestamp?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type TrackedEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "campaignRewardEventId" | "clientId" | "data" | "timestamp" | "createdAt" | "updatedAt", ExtArgs["result"]["trackedEvent"]>
+  export type TrackedEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    campaignRewardEvent?: boolean | CampaignRewardEventDefaultArgs<ExtArgs>
+    client?: boolean | ClientDefaultArgs<ExtArgs>
+  }
+  export type TrackedEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    campaignRewardEvent?: boolean | CampaignRewardEventDefaultArgs<ExtArgs>
+    client?: boolean | ClientDefaultArgs<ExtArgs>
+  }
+  export type TrackedEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    campaignRewardEvent?: boolean | CampaignRewardEventDefaultArgs<ExtArgs>
+    client?: boolean | ClientDefaultArgs<ExtArgs>
+  }
+
+  export type $TrackedEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TrackedEvent"
+    objects: {
+      campaignRewardEvent: Prisma.$CampaignRewardEventPayload<ExtArgs>
+      client: Prisma.$ClientPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      campaignRewardEventId: string
+      clientId: string
+      data: Prisma.JsonValue | null
+      timestamp: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["trackedEvent"]>
+    composites: {}
+  }
+
+  type TrackedEventGetPayload<S extends boolean | null | undefined | TrackedEventDefaultArgs> = $Result.GetResult<Prisma.$TrackedEventPayload, S>
+
+  type TrackedEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TrackedEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TrackedEventCountAggregateInputType | true
+    }
+
+  export interface TrackedEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TrackedEvent'], meta: { name: 'TrackedEvent' } }
+    /**
+     * Find zero or one TrackedEvent that matches the filter.
+     * @param {TrackedEventFindUniqueArgs} args - Arguments to find a TrackedEvent
+     * @example
+     * // Get one TrackedEvent
+     * const trackedEvent = await prisma.trackedEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TrackedEventFindUniqueArgs>(args: SelectSubset<T, TrackedEventFindUniqueArgs<ExtArgs>>): Prisma__TrackedEventClient<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TrackedEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TrackedEventFindUniqueOrThrowArgs} args - Arguments to find a TrackedEvent
+     * @example
+     * // Get one TrackedEvent
+     * const trackedEvent = await prisma.trackedEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TrackedEventFindUniqueOrThrowArgs>(args: SelectSubset<T, TrackedEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TrackedEventClient<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TrackedEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackedEventFindFirstArgs} args - Arguments to find a TrackedEvent
+     * @example
+     * // Get one TrackedEvent
+     * const trackedEvent = await prisma.trackedEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TrackedEventFindFirstArgs>(args?: SelectSubset<T, TrackedEventFindFirstArgs<ExtArgs>>): Prisma__TrackedEventClient<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TrackedEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackedEventFindFirstOrThrowArgs} args - Arguments to find a TrackedEvent
+     * @example
+     * // Get one TrackedEvent
+     * const trackedEvent = await prisma.trackedEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TrackedEventFindFirstOrThrowArgs>(args?: SelectSubset<T, TrackedEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__TrackedEventClient<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TrackedEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackedEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TrackedEvents
+     * const trackedEvents = await prisma.trackedEvent.findMany()
+     * 
+     * // Get first 10 TrackedEvents
+     * const trackedEvents = await prisma.trackedEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const trackedEventWithIdOnly = await prisma.trackedEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TrackedEventFindManyArgs>(args?: SelectSubset<T, TrackedEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TrackedEvent.
+     * @param {TrackedEventCreateArgs} args - Arguments to create a TrackedEvent.
+     * @example
+     * // Create one TrackedEvent
+     * const TrackedEvent = await prisma.trackedEvent.create({
+     *   data: {
+     *     // ... data to create a TrackedEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends TrackedEventCreateArgs>(args: SelectSubset<T, TrackedEventCreateArgs<ExtArgs>>): Prisma__TrackedEventClient<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TrackedEvents.
+     * @param {TrackedEventCreateManyArgs} args - Arguments to create many TrackedEvents.
+     * @example
+     * // Create many TrackedEvents
+     * const trackedEvent = await prisma.trackedEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TrackedEventCreateManyArgs>(args?: SelectSubset<T, TrackedEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TrackedEvents and returns the data saved in the database.
+     * @param {TrackedEventCreateManyAndReturnArgs} args - Arguments to create many TrackedEvents.
+     * @example
+     * // Create many TrackedEvents
+     * const trackedEvent = await prisma.trackedEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TrackedEvents and only return the `id`
+     * const trackedEventWithIdOnly = await prisma.trackedEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TrackedEventCreateManyAndReturnArgs>(args?: SelectSubset<T, TrackedEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TrackedEvent.
+     * @param {TrackedEventDeleteArgs} args - Arguments to delete one TrackedEvent.
+     * @example
+     * // Delete one TrackedEvent
+     * const TrackedEvent = await prisma.trackedEvent.delete({
+     *   where: {
+     *     // ... filter to delete one TrackedEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TrackedEventDeleteArgs>(args: SelectSubset<T, TrackedEventDeleteArgs<ExtArgs>>): Prisma__TrackedEventClient<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TrackedEvent.
+     * @param {TrackedEventUpdateArgs} args - Arguments to update one TrackedEvent.
+     * @example
+     * // Update one TrackedEvent
+     * const trackedEvent = await prisma.trackedEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TrackedEventUpdateArgs>(args: SelectSubset<T, TrackedEventUpdateArgs<ExtArgs>>): Prisma__TrackedEventClient<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TrackedEvents.
+     * @param {TrackedEventDeleteManyArgs} args - Arguments to filter TrackedEvents to delete.
+     * @example
+     * // Delete a few TrackedEvents
+     * const { count } = await prisma.trackedEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TrackedEventDeleteManyArgs>(args?: SelectSubset<T, TrackedEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TrackedEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackedEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TrackedEvents
+     * const trackedEvent = await prisma.trackedEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TrackedEventUpdateManyArgs>(args: SelectSubset<T, TrackedEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TrackedEvents and returns the data updated in the database.
+     * @param {TrackedEventUpdateManyAndReturnArgs} args - Arguments to update many TrackedEvents.
+     * @example
+     * // Update many TrackedEvents
+     * const trackedEvent = await prisma.trackedEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TrackedEvents and only return the `id`
+     * const trackedEventWithIdOnly = await prisma.trackedEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TrackedEventUpdateManyAndReturnArgs>(args: SelectSubset<T, TrackedEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TrackedEvent.
+     * @param {TrackedEventUpsertArgs} args - Arguments to update or create a TrackedEvent.
+     * @example
+     * // Update or create a TrackedEvent
+     * const trackedEvent = await prisma.trackedEvent.upsert({
+     *   create: {
+     *     // ... data to create a TrackedEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TrackedEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TrackedEventUpsertArgs>(args: SelectSubset<T, TrackedEventUpsertArgs<ExtArgs>>): Prisma__TrackedEventClient<$Result.GetResult<Prisma.$TrackedEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TrackedEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackedEventCountArgs} args - Arguments to filter TrackedEvents to count.
+     * @example
+     * // Count the number of TrackedEvents
+     * const count = await prisma.trackedEvent.count({
+     *   where: {
+     *     // ... the filter for the TrackedEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends TrackedEventCountArgs>(
+      args?: Subset<T, TrackedEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TrackedEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TrackedEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackedEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TrackedEventAggregateArgs>(args: Subset<T, TrackedEventAggregateArgs>): Prisma.PrismaPromise<GetTrackedEventAggregateType<T>>
+
+    /**
+     * Group by TrackedEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackedEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TrackedEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TrackedEventGroupByArgs['orderBy'] }
+        : { orderBy?: TrackedEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TrackedEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTrackedEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TrackedEvent model
+   */
+  readonly fields: TrackedEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TrackedEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TrackedEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    campaignRewardEvent<T extends CampaignRewardEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CampaignRewardEventDefaultArgs<ExtArgs>>): Prisma__CampaignRewardEventClient<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    client<T extends ClientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClientDefaultArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TrackedEvent model
+   */
+  interface TrackedEventFieldRefs {
+    readonly id: FieldRef<"TrackedEvent", 'String'>
+    readonly campaignRewardEventId: FieldRef<"TrackedEvent", 'String'>
+    readonly clientId: FieldRef<"TrackedEvent", 'String'>
+    readonly data: FieldRef<"TrackedEvent", 'Json'>
+    readonly timestamp: FieldRef<"TrackedEvent", 'DateTime'>
+    readonly createdAt: FieldRef<"TrackedEvent", 'DateTime'>
+    readonly updatedAt: FieldRef<"TrackedEvent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TrackedEvent findUnique
+   */
+  export type TrackedEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackedEvent to fetch.
+     */
+    where: TrackedEventWhereUniqueInput
+  }
+
+  /**
+   * TrackedEvent findUniqueOrThrow
+   */
+  export type TrackedEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackedEvent to fetch.
+     */
+    where: TrackedEventWhereUniqueInput
+  }
+
+  /**
+   * TrackedEvent findFirst
+   */
+  export type TrackedEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackedEvent to fetch.
+     */
+    where?: TrackedEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrackedEvents to fetch.
+     */
+    orderBy?: TrackedEventOrderByWithRelationInput | TrackedEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TrackedEvents.
+     */
+    cursor?: TrackedEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrackedEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrackedEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TrackedEvents.
+     */
+    distinct?: TrackedEventScalarFieldEnum | TrackedEventScalarFieldEnum[]
+  }
+
+  /**
+   * TrackedEvent findFirstOrThrow
+   */
+  export type TrackedEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackedEvent to fetch.
+     */
+    where?: TrackedEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrackedEvents to fetch.
+     */
+    orderBy?: TrackedEventOrderByWithRelationInput | TrackedEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TrackedEvents.
+     */
+    cursor?: TrackedEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrackedEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrackedEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TrackedEvents.
+     */
+    distinct?: TrackedEventScalarFieldEnum | TrackedEventScalarFieldEnum[]
+  }
+
+  /**
+   * TrackedEvent findMany
+   */
+  export type TrackedEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackedEvents to fetch.
+     */
+    where?: TrackedEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrackedEvents to fetch.
+     */
+    orderBy?: TrackedEventOrderByWithRelationInput | TrackedEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TrackedEvents.
+     */
+    cursor?: TrackedEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrackedEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrackedEvents.
+     */
+    skip?: number
+    distinct?: TrackedEventScalarFieldEnum | TrackedEventScalarFieldEnum[]
+  }
+
+  /**
+   * TrackedEvent create
+   */
+  export type TrackedEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TrackedEvent.
+     */
+    data: XOR<TrackedEventCreateInput, TrackedEventUncheckedCreateInput>
+  }
+
+  /**
+   * TrackedEvent createMany
+   */
+  export type TrackedEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TrackedEvents.
+     */
+    data: TrackedEventCreateManyInput | TrackedEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TrackedEvent createManyAndReturn
+   */
+  export type TrackedEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many TrackedEvents.
+     */
+    data: TrackedEventCreateManyInput | TrackedEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TrackedEvent update
+   */
+  export type TrackedEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TrackedEvent.
+     */
+    data: XOR<TrackedEventUpdateInput, TrackedEventUncheckedUpdateInput>
+    /**
+     * Choose, which TrackedEvent to update.
+     */
+    where: TrackedEventWhereUniqueInput
+  }
+
+  /**
+   * TrackedEvent updateMany
+   */
+  export type TrackedEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TrackedEvents.
+     */
+    data: XOR<TrackedEventUpdateManyMutationInput, TrackedEventUncheckedUpdateManyInput>
+    /**
+     * Filter which TrackedEvents to update
+     */
+    where?: TrackedEventWhereInput
+    /**
+     * Limit how many TrackedEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TrackedEvent updateManyAndReturn
+   */
+  export type TrackedEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * The data used to update TrackedEvents.
+     */
+    data: XOR<TrackedEventUpdateManyMutationInput, TrackedEventUncheckedUpdateManyInput>
+    /**
+     * Filter which TrackedEvents to update
+     */
+    where?: TrackedEventWhereInput
+    /**
+     * Limit how many TrackedEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TrackedEvent upsert
+   */
+  export type TrackedEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TrackedEvent to update in case it exists.
+     */
+    where: TrackedEventWhereUniqueInput
+    /**
+     * In case the TrackedEvent found by the `where` argument doesn't exist, create a new TrackedEvent with this data.
+     */
+    create: XOR<TrackedEventCreateInput, TrackedEventUncheckedCreateInput>
+    /**
+     * In case the TrackedEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TrackedEventUpdateInput, TrackedEventUncheckedUpdateInput>
+  }
+
+  /**
+   * TrackedEvent delete
+   */
+  export type TrackedEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
+    /**
+     * Filter which TrackedEvent to delete.
+     */
+    where: TrackedEventWhereUniqueInput
+  }
+
+  /**
+   * TrackedEvent deleteMany
+   */
+  export type TrackedEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TrackedEvents to delete
+     */
+    where?: TrackedEventWhereInput
+    /**
+     * Limit how many TrackedEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TrackedEvent without action
+   */
+  export type TrackedEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackedEvent
+     */
+    select?: TrackedEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackedEvent
+     */
+    omit?: TrackedEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackedEventInclude<ExtArgs> | null
   }
 
 
@@ -9579,15 +13256,51 @@ export namespace Prisma {
 
   export const RewardEventScalarFieldEnum: {
     id: 'id',
-    campaignId: 'campaignId',
+    ownerId: 'ownerId',
+    name: 'name',
     eventType: 'eventType',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type RewardEventScalarFieldEnum = (typeof RewardEventScalarFieldEnum)[keyof typeof RewardEventScalarFieldEnum]
+
+
+  export const CampaignRewardEventScalarFieldEnum: {
+    id: 'id',
+    campaignId: 'campaignId',
+    rewardEventId: 'rewardEventId',
     amount: 'amount',
     volumeStep: 'volumeStep',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
-  export type RewardEventScalarFieldEnum = (typeof RewardEventScalarFieldEnum)[keyof typeof RewardEventScalarFieldEnum]
+  export type CampaignRewardEventScalarFieldEnum = (typeof CampaignRewardEventScalarFieldEnum)[keyof typeof CampaignRewardEventScalarFieldEnum]
+
+
+  export const ClientScalarFieldEnum: {
+    id: 'id',
+    userAgent: 'userAgent',
+    ipAddress: 'ipAddress',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ClientScalarFieldEnum = (typeof ClientScalarFieldEnum)[keyof typeof ClientScalarFieldEnum]
+
+
+  export const TrackedEventScalarFieldEnum: {
+    id: 'id',
+    campaignRewardEventId: 'campaignRewardEventId',
+    clientId: 'clientId',
+    data: 'data',
+    timestamp: 'timestamp',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TrackedEventScalarFieldEnum = (typeof TrackedEventScalarFieldEnum)[keyof typeof TrackedEventScalarFieldEnum]
 
 
   export const SelectorScalarFieldEnum: {
@@ -9773,6 +13486,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
    * Reference to a field of type 'SelectorEventType'
    */
   export type EnumSelectorEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SelectorEventType'>
@@ -9790,20 +13517,6 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -9835,6 +13548,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     campaignsCreated?: CampaignListRelationFilter
+    rewardEvents?: RewardEventListRelationFilter
     participations?: ParticipationListRelationFilter
   }
 
@@ -9846,6 +13560,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     campaignsCreated?: CampaignOrderByRelationAggregateInput
+    rewardEvents?: RewardEventOrderByRelationAggregateInput
     participations?: ParticipationOrderByRelationAggregateInput
   }
 
@@ -9860,6 +13575,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     campaignsCreated?: CampaignListRelationFilter
+    rewardEvents?: RewardEventListRelationFilter
     participations?: ParticipationListRelationFilter
   }, "id" | "walletAddress" | "email">
 
@@ -9901,7 +13617,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Campaign"> | Date | string
     updatedAt?: DateTimeFilter<"Campaign"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
-    rewardEvents?: RewardEventListRelationFilter
+    rewardEvents?: CampaignRewardEventListRelationFilter
     participations?: ParticipationListRelationFilter
   }
 
@@ -9916,7 +13632,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     owner?: UserOrderByWithRelationInput
-    rewardEvents?: RewardEventOrderByRelationAggregateInput
+    rewardEvents?: CampaignRewardEventOrderByRelationAggregateInput
     participations?: ParticipationOrderByRelationAggregateInput
   }
 
@@ -9934,7 +13650,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Campaign"> | Date | string
     updatedAt?: DateTimeFilter<"Campaign"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
-    rewardEvents?: RewardEventListRelationFilter
+    rewardEvents?: CampaignRewardEventListRelationFilter
     participations?: ParticipationListRelationFilter
   }, "id">
 
@@ -9975,26 +13691,26 @@ export namespace Prisma {
     OR?: RewardEventWhereInput[]
     NOT?: RewardEventWhereInput | RewardEventWhereInput[]
     id?: StringFilter<"RewardEvent"> | string
-    campaignId?: StringFilter<"RewardEvent"> | string
+    ownerId?: StringFilter<"RewardEvent"> | string
+    name?: StringFilter<"RewardEvent"> | string
     eventType?: EnumEventTypeFilter<"RewardEvent"> | $Enums.EventType
-    amount?: DecimalFilter<"RewardEvent"> | Decimal | DecimalJsLike | number | string
-    volumeStep?: IntFilter<"RewardEvent"> | number
     createdAt?: DateTimeFilter<"RewardEvent"> | Date | string
     updatedAt?: DateTimeFilter<"RewardEvent"> | Date | string
-    campaign?: XOR<CampaignScalarRelationFilter, CampaignWhereInput>
+    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
     selectors?: SelectorListRelationFilter
+    campaigns?: CampaignRewardEventListRelationFilter
   }
 
   export type RewardEventOrderByWithRelationInput = {
     id?: SortOrder
-    campaignId?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
     eventType?: SortOrder
-    amount?: SortOrder
-    volumeStep?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    campaign?: CampaignOrderByWithRelationInput
+    owner?: UserOrderByWithRelationInput
     selectors?: SelectorOrderByRelationAggregateInput
+    campaigns?: CampaignRewardEventOrderByRelationAggregateInput
   }
 
   export type RewardEventWhereUniqueInput = Prisma.AtLeast<{
@@ -10002,29 +13718,26 @@ export namespace Prisma {
     AND?: RewardEventWhereInput | RewardEventWhereInput[]
     OR?: RewardEventWhereInput[]
     NOT?: RewardEventWhereInput | RewardEventWhereInput[]
-    campaignId?: StringFilter<"RewardEvent"> | string
+    ownerId?: StringFilter<"RewardEvent"> | string
+    name?: StringFilter<"RewardEvent"> | string
     eventType?: EnumEventTypeFilter<"RewardEvent"> | $Enums.EventType
-    amount?: DecimalFilter<"RewardEvent"> | Decimal | DecimalJsLike | number | string
-    volumeStep?: IntFilter<"RewardEvent"> | number
     createdAt?: DateTimeFilter<"RewardEvent"> | Date | string
     updatedAt?: DateTimeFilter<"RewardEvent"> | Date | string
-    campaign?: XOR<CampaignScalarRelationFilter, CampaignWhereInput>
+    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
     selectors?: SelectorListRelationFilter
+    campaigns?: CampaignRewardEventListRelationFilter
   }, "id">
 
   export type RewardEventOrderByWithAggregationInput = {
     id?: SortOrder
-    campaignId?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
     eventType?: SortOrder
-    amount?: SortOrder
-    volumeStep?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: RewardEventCountOrderByAggregateInput
-    _avg?: RewardEventAvgOrderByAggregateInput
     _max?: RewardEventMaxOrderByAggregateInput
     _min?: RewardEventMinOrderByAggregateInput
-    _sum?: RewardEventSumOrderByAggregateInput
   }
 
   export type RewardEventScalarWhereWithAggregatesInput = {
@@ -10032,12 +13745,208 @@ export namespace Prisma {
     OR?: RewardEventScalarWhereWithAggregatesInput[]
     NOT?: RewardEventScalarWhereWithAggregatesInput | RewardEventScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"RewardEvent"> | string
-    campaignId?: StringWithAggregatesFilter<"RewardEvent"> | string
+    ownerId?: StringWithAggregatesFilter<"RewardEvent"> | string
+    name?: StringWithAggregatesFilter<"RewardEvent"> | string
     eventType?: EnumEventTypeWithAggregatesFilter<"RewardEvent"> | $Enums.EventType
-    amount?: DecimalWithAggregatesFilter<"RewardEvent"> | Decimal | DecimalJsLike | number | string
-    volumeStep?: IntWithAggregatesFilter<"RewardEvent"> | number
     createdAt?: DateTimeWithAggregatesFilter<"RewardEvent"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"RewardEvent"> | Date | string
+  }
+
+  export type CampaignRewardEventWhereInput = {
+    AND?: CampaignRewardEventWhereInput | CampaignRewardEventWhereInput[]
+    OR?: CampaignRewardEventWhereInput[]
+    NOT?: CampaignRewardEventWhereInput | CampaignRewardEventWhereInput[]
+    id?: StringFilter<"CampaignRewardEvent"> | string
+    campaignId?: StringFilter<"CampaignRewardEvent"> | string
+    rewardEventId?: StringFilter<"CampaignRewardEvent"> | string
+    amount?: DecimalFilter<"CampaignRewardEvent"> | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFilter<"CampaignRewardEvent"> | number
+    createdAt?: DateTimeFilter<"CampaignRewardEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"CampaignRewardEvent"> | Date | string
+    campaign?: XOR<CampaignScalarRelationFilter, CampaignWhereInput>
+    rewardEvent?: XOR<RewardEventScalarRelationFilter, RewardEventWhereInput>
+    trackedEvents?: TrackedEventListRelationFilter
+  }
+
+  export type CampaignRewardEventOrderByWithRelationInput = {
+    id?: SortOrder
+    campaignId?: SortOrder
+    rewardEventId?: SortOrder
+    amount?: SortOrder
+    volumeStep?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    campaign?: CampaignOrderByWithRelationInput
+    rewardEvent?: RewardEventOrderByWithRelationInput
+    trackedEvents?: TrackedEventOrderByRelationAggregateInput
+  }
+
+  export type CampaignRewardEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    campaignId_rewardEventId?: CampaignRewardEventCampaignIdRewardEventIdCompoundUniqueInput
+    AND?: CampaignRewardEventWhereInput | CampaignRewardEventWhereInput[]
+    OR?: CampaignRewardEventWhereInput[]
+    NOT?: CampaignRewardEventWhereInput | CampaignRewardEventWhereInput[]
+    campaignId?: StringFilter<"CampaignRewardEvent"> | string
+    rewardEventId?: StringFilter<"CampaignRewardEvent"> | string
+    amount?: DecimalFilter<"CampaignRewardEvent"> | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFilter<"CampaignRewardEvent"> | number
+    createdAt?: DateTimeFilter<"CampaignRewardEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"CampaignRewardEvent"> | Date | string
+    campaign?: XOR<CampaignScalarRelationFilter, CampaignWhereInput>
+    rewardEvent?: XOR<RewardEventScalarRelationFilter, RewardEventWhereInput>
+    trackedEvents?: TrackedEventListRelationFilter
+  }, "id" | "campaignId_rewardEventId">
+
+  export type CampaignRewardEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    campaignId?: SortOrder
+    rewardEventId?: SortOrder
+    amount?: SortOrder
+    volumeStep?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CampaignRewardEventCountOrderByAggregateInput
+    _avg?: CampaignRewardEventAvgOrderByAggregateInput
+    _max?: CampaignRewardEventMaxOrderByAggregateInput
+    _min?: CampaignRewardEventMinOrderByAggregateInput
+    _sum?: CampaignRewardEventSumOrderByAggregateInput
+  }
+
+  export type CampaignRewardEventScalarWhereWithAggregatesInput = {
+    AND?: CampaignRewardEventScalarWhereWithAggregatesInput | CampaignRewardEventScalarWhereWithAggregatesInput[]
+    OR?: CampaignRewardEventScalarWhereWithAggregatesInput[]
+    NOT?: CampaignRewardEventScalarWhereWithAggregatesInput | CampaignRewardEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CampaignRewardEvent"> | string
+    campaignId?: StringWithAggregatesFilter<"CampaignRewardEvent"> | string
+    rewardEventId?: StringWithAggregatesFilter<"CampaignRewardEvent"> | string
+    amount?: DecimalWithAggregatesFilter<"CampaignRewardEvent"> | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntWithAggregatesFilter<"CampaignRewardEvent"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"CampaignRewardEvent"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"CampaignRewardEvent"> | Date | string
+  }
+
+  export type ClientWhereInput = {
+    AND?: ClientWhereInput | ClientWhereInput[]
+    OR?: ClientWhereInput[]
+    NOT?: ClientWhereInput | ClientWhereInput[]
+    id?: StringFilter<"Client"> | string
+    userAgent?: StringNullableFilter<"Client"> | string | null
+    ipAddress?: StringNullableFilter<"Client"> | string | null
+    createdAt?: DateTimeFilter<"Client"> | Date | string
+    updatedAt?: DateTimeFilter<"Client"> | Date | string
+    trackedEvents?: TrackedEventListRelationFilter
+  }
+
+  export type ClientOrderByWithRelationInput = {
+    id?: SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    trackedEvents?: TrackedEventOrderByRelationAggregateInput
+  }
+
+  export type ClientWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ClientWhereInput | ClientWhereInput[]
+    OR?: ClientWhereInput[]
+    NOT?: ClientWhereInput | ClientWhereInput[]
+    userAgent?: StringNullableFilter<"Client"> | string | null
+    ipAddress?: StringNullableFilter<"Client"> | string | null
+    createdAt?: DateTimeFilter<"Client"> | Date | string
+    updatedAt?: DateTimeFilter<"Client"> | Date | string
+    trackedEvents?: TrackedEventListRelationFilter
+  }, "id">
+
+  export type ClientOrderByWithAggregationInput = {
+    id?: SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ClientCountOrderByAggregateInput
+    _max?: ClientMaxOrderByAggregateInput
+    _min?: ClientMinOrderByAggregateInput
+  }
+
+  export type ClientScalarWhereWithAggregatesInput = {
+    AND?: ClientScalarWhereWithAggregatesInput | ClientScalarWhereWithAggregatesInput[]
+    OR?: ClientScalarWhereWithAggregatesInput[]
+    NOT?: ClientScalarWhereWithAggregatesInput | ClientScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Client"> | string
+    userAgent?: StringNullableWithAggregatesFilter<"Client"> | string | null
+    ipAddress?: StringNullableWithAggregatesFilter<"Client"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Client"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Client"> | Date | string
+  }
+
+  export type TrackedEventWhereInput = {
+    AND?: TrackedEventWhereInput | TrackedEventWhereInput[]
+    OR?: TrackedEventWhereInput[]
+    NOT?: TrackedEventWhereInput | TrackedEventWhereInput[]
+    id?: StringFilter<"TrackedEvent"> | string
+    campaignRewardEventId?: StringFilter<"TrackedEvent"> | string
+    clientId?: StringFilter<"TrackedEvent"> | string
+    data?: JsonNullableFilter<"TrackedEvent">
+    timestamp?: DateTimeFilter<"TrackedEvent"> | Date | string
+    createdAt?: DateTimeFilter<"TrackedEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"TrackedEvent"> | Date | string
+    campaignRewardEvent?: XOR<CampaignRewardEventScalarRelationFilter, CampaignRewardEventWhereInput>
+    client?: XOR<ClientScalarRelationFilter, ClientWhereInput>
+  }
+
+  export type TrackedEventOrderByWithRelationInput = {
+    id?: SortOrder
+    campaignRewardEventId?: SortOrder
+    clientId?: SortOrder
+    data?: SortOrderInput | SortOrder
+    timestamp?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    campaignRewardEvent?: CampaignRewardEventOrderByWithRelationInput
+    client?: ClientOrderByWithRelationInput
+  }
+
+  export type TrackedEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: TrackedEventWhereInput | TrackedEventWhereInput[]
+    OR?: TrackedEventWhereInput[]
+    NOT?: TrackedEventWhereInput | TrackedEventWhereInput[]
+    campaignRewardEventId?: StringFilter<"TrackedEvent"> | string
+    clientId?: StringFilter<"TrackedEvent"> | string
+    data?: JsonNullableFilter<"TrackedEvent">
+    timestamp?: DateTimeFilter<"TrackedEvent"> | Date | string
+    createdAt?: DateTimeFilter<"TrackedEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"TrackedEvent"> | Date | string
+    campaignRewardEvent?: XOR<CampaignRewardEventScalarRelationFilter, CampaignRewardEventWhereInput>
+    client?: XOR<ClientScalarRelationFilter, ClientWhereInput>
+  }, "id">
+
+  export type TrackedEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    campaignRewardEventId?: SortOrder
+    clientId?: SortOrder
+    data?: SortOrderInput | SortOrder
+    timestamp?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TrackedEventCountOrderByAggregateInput
+    _max?: TrackedEventMaxOrderByAggregateInput
+    _min?: TrackedEventMinOrderByAggregateInput
+  }
+
+  export type TrackedEventScalarWhereWithAggregatesInput = {
+    AND?: TrackedEventScalarWhereWithAggregatesInput | TrackedEventScalarWhereWithAggregatesInput[]
+    OR?: TrackedEventScalarWhereWithAggregatesInput[]
+    NOT?: TrackedEventScalarWhereWithAggregatesInput | TrackedEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TrackedEvent"> | string
+    campaignRewardEventId?: StringWithAggregatesFilter<"TrackedEvent"> | string
+    clientId?: StringWithAggregatesFilter<"TrackedEvent"> | string
+    data?: JsonNullableWithAggregatesFilter<"TrackedEvent">
+    timestamp?: DateTimeWithAggregatesFilter<"TrackedEvent"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"TrackedEvent"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TrackedEvent"> | Date | string
   }
 
   export type SelectorWhereInput = {
@@ -10323,6 +14232,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     campaignsCreated?: CampaignCreateNestedManyWithoutOwnerInput
+    rewardEvents?: RewardEventCreateNestedManyWithoutOwnerInput
     participations?: ParticipationCreateNestedManyWithoutInfluencerInput
   }
 
@@ -10334,6 +14244,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     campaignsCreated?: CampaignUncheckedCreateNestedManyWithoutOwnerInput
+    rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutOwnerInput
     participations?: ParticipationUncheckedCreateNestedManyWithoutInfluencerInput
   }
 
@@ -10345,6 +14256,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaignsCreated?: CampaignUpdateManyWithoutOwnerNestedInput
+    rewardEvents?: RewardEventUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUpdateManyWithoutInfluencerNestedInput
   }
 
@@ -10356,6 +14268,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaignsCreated?: CampaignUncheckedUpdateManyWithoutOwnerNestedInput
+    rewardEvents?: RewardEventUncheckedUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUncheckedUpdateManyWithoutInfluencerNestedInput
   }
 
@@ -10396,7 +14309,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutCampaignsCreatedInput
-    rewardEvents?: RewardEventCreateNestedManyWithoutCampaignInput
+    rewardEvents?: CampaignRewardEventCreateNestedManyWithoutCampaignInput
     participations?: ParticipationCreateNestedManyWithoutCampaignInput
   }
 
@@ -10410,7 +14323,7 @@ export namespace Prisma {
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutCampaignInput
+    rewardEvents?: CampaignRewardEventUncheckedCreateNestedManyWithoutCampaignInput
     participations?: ParticipationUncheckedCreateNestedManyWithoutCampaignInput
   }
 
@@ -10424,7 +14337,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutCampaignsCreatedNestedInput
-    rewardEvents?: RewardEventUpdateManyWithoutCampaignNestedInput
+    rewardEvents?: CampaignRewardEventUpdateManyWithoutCampaignNestedInput
     participations?: ParticipationUpdateManyWithoutCampaignNestedInput
   }
 
@@ -10438,7 +14351,7 @@ export namespace Prisma {
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rewardEvents?: RewardEventUncheckedUpdateManyWithoutCampaignNestedInput
+    rewardEvents?: CampaignRewardEventUncheckedUpdateManyWithoutCampaignNestedInput
     participations?: ParticipationUncheckedUpdateManyWithoutCampaignNestedInput
   }
 
@@ -10479,73 +14392,270 @@ export namespace Prisma {
 
   export type RewardEventCreateInput = {
     id?: string
+    name: string
     eventType: $Enums.EventType
-    amount: Decimal | DecimalJsLike | number | string
-    volumeStep?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    campaign: CampaignCreateNestedOneWithoutRewardEventsInput
+    owner: UserCreateNestedOneWithoutRewardEventsInput
     selectors?: SelectorCreateNestedManyWithoutRewardEventInput
+    campaigns?: CampaignRewardEventCreateNestedManyWithoutRewardEventInput
   }
 
   export type RewardEventUncheckedCreateInput = {
     id?: string
-    campaignId: string
+    ownerId: string
+    name: string
     eventType: $Enums.EventType
-    amount: Decimal | DecimalJsLike | number | string
-    volumeStep?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     selectors?: SelectorUncheckedCreateNestedManyWithoutRewardEventInput
+    campaigns?: CampaignRewardEventUncheckedCreateNestedManyWithoutRewardEventInput
   }
 
   export type RewardEventUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
     eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
-    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    volumeStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    campaign?: CampaignUpdateOneRequiredWithoutRewardEventsNestedInput
+    owner?: UserUpdateOneRequiredWithoutRewardEventsNestedInput
     selectors?: SelectorUpdateManyWithoutRewardEventNestedInput
+    campaigns?: CampaignRewardEventUpdateManyWithoutRewardEventNestedInput
   }
 
   export type RewardEventUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    campaignId?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
     eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
-    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    volumeStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     selectors?: SelectorUncheckedUpdateManyWithoutRewardEventNestedInput
+    campaigns?: CampaignRewardEventUncheckedUpdateManyWithoutRewardEventNestedInput
   }
 
   export type RewardEventCreateManyInput = {
     id?: string
-    campaignId: string
+    ownerId: string
+    name: string
     eventType: $Enums.EventType
-    amount: Decimal | DecimalJsLike | number | string
-    volumeStep?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type RewardEventUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
     eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
-    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    volumeStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type RewardEventUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    campaignId?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
     eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CampaignRewardEventCreateInput = {
+    id?: string
+    amount: Decimal | DecimalJsLike | number | string
+    volumeStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    campaign: CampaignCreateNestedOneWithoutRewardEventsInput
+    rewardEvent: RewardEventCreateNestedOneWithoutCampaignsInput
+    trackedEvents?: TrackedEventCreateNestedManyWithoutCampaignRewardEventInput
+  }
+
+  export type CampaignRewardEventUncheckedCreateInput = {
+    id?: string
+    campaignId: string
+    rewardEventId: string
+    amount: Decimal | DecimalJsLike | number | string
+    volumeStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trackedEvents?: TrackedEventUncheckedCreateNestedManyWithoutCampaignRewardEventInput
+  }
+
+  export type CampaignRewardEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     volumeStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaign?: CampaignUpdateOneRequiredWithoutRewardEventsNestedInput
+    rewardEvent?: RewardEventUpdateOneRequiredWithoutCampaignsNestedInput
+    trackedEvents?: TrackedEventUpdateManyWithoutCampaignRewardEventNestedInput
+  }
+
+  export type CampaignRewardEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    campaignId?: StringFieldUpdateOperationsInput | string
+    rewardEventId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackedEvents?: TrackedEventUncheckedUpdateManyWithoutCampaignRewardEventNestedInput
+  }
+
+  export type CampaignRewardEventCreateManyInput = {
+    id?: string
+    campaignId: string
+    rewardEventId: string
+    amount: Decimal | DecimalJsLike | number | string
+    volumeStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CampaignRewardEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CampaignRewardEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    campaignId?: StringFieldUpdateOperationsInput | string
+    rewardEventId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClientCreateInput = {
+    id?: string
+    userAgent?: string | null
+    ipAddress?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trackedEvents?: TrackedEventCreateNestedManyWithoutClientInput
+  }
+
+  export type ClientUncheckedCreateInput = {
+    id?: string
+    userAgent?: string | null
+    ipAddress?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trackedEvents?: TrackedEventUncheckedCreateNestedManyWithoutClientInput
+  }
+
+  export type ClientUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackedEvents?: TrackedEventUpdateManyWithoutClientNestedInput
+  }
+
+  export type ClientUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackedEvents?: TrackedEventUncheckedUpdateManyWithoutClientNestedInput
+  }
+
+  export type ClientCreateManyInput = {
+    id?: string
+    userAgent?: string | null
+    ipAddress?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ClientUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClientUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackedEventCreateInput = {
+    id?: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    campaignRewardEvent: CampaignRewardEventCreateNestedOneWithoutTrackedEventsInput
+    client: ClientCreateNestedOneWithoutTrackedEventsInput
+  }
+
+  export type TrackedEventUncheckedCreateInput = {
+    id?: string
+    campaignRewardEventId: string
+    clientId: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TrackedEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaignRewardEvent?: CampaignRewardEventUpdateOneRequiredWithoutTrackedEventsNestedInput
+    client?: ClientUpdateOneRequiredWithoutTrackedEventsNestedInput
+  }
+
+  export type TrackedEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    campaignRewardEventId?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackedEventCreateManyInput = {
+    id?: string
+    campaignRewardEventId: string
+    clientId: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TrackedEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackedEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    campaignRewardEventId?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10880,6 +14990,12 @@ export namespace Prisma {
     none?: CampaignWhereInput
   }
 
+  export type RewardEventListRelationFilter = {
+    every?: RewardEventWhereInput
+    some?: RewardEventWhereInput
+    none?: RewardEventWhereInput
+  }
+
   export type ParticipationListRelationFilter = {
     every?: ParticipationWhereInput
     some?: ParticipationWhereInput
@@ -10892,6 +15008,10 @@ export namespace Prisma {
   }
 
   export type CampaignOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RewardEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10999,13 +15119,13 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
-  export type RewardEventListRelationFilter = {
-    every?: RewardEventWhereInput
-    some?: RewardEventWhereInput
-    none?: RewardEventWhereInput
+  export type CampaignRewardEventListRelationFilter = {
+    every?: CampaignRewardEventWhereInput
+    some?: CampaignRewardEventWhereInput
+    none?: CampaignRewardEventWhereInput
   }
 
-  export type RewardEventOrderByRelationAggregateInput = {
+  export type CampaignRewardEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -11086,6 +15206,53 @@ export namespace Prisma {
     not?: NestedEnumEventTypeFilter<$PrismaModel> | $Enums.EventType
   }
 
+  export type SelectorListRelationFilter = {
+    every?: SelectorWhereInput
+    some?: SelectorWhereInput
+    none?: SelectorWhereInput
+  }
+
+  export type SelectorOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RewardEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
+    eventType?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RewardEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
+    eventType?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RewardEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    ownerId?: SortOrder
+    name?: SortOrder
+    eventType?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.EventType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEventTypeFilter<$PrismaModel>
+    _max?: NestedEnumEventTypeFilter<$PrismaModel>
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -11102,64 +15269,64 @@ export namespace Prisma {
     isNot?: CampaignWhereInput
   }
 
-  export type SelectorListRelationFilter = {
-    every?: SelectorWhereInput
-    some?: SelectorWhereInput
-    none?: SelectorWhereInput
+  export type RewardEventScalarRelationFilter = {
+    is?: RewardEventWhereInput
+    isNot?: RewardEventWhereInput
   }
 
-  export type SelectorOrderByRelationAggregateInput = {
+  export type TrackedEventListRelationFilter = {
+    every?: TrackedEventWhereInput
+    some?: TrackedEventWhereInput
+    none?: TrackedEventWhereInput
+  }
+
+  export type TrackedEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
-  export type RewardEventCountOrderByAggregateInput = {
+  export type CampaignRewardEventCampaignIdRewardEventIdCompoundUniqueInput = {
+    campaignId: string
+    rewardEventId: string
+  }
+
+  export type CampaignRewardEventCountOrderByAggregateInput = {
     id?: SortOrder
     campaignId?: SortOrder
-    eventType?: SortOrder
+    rewardEventId?: SortOrder
     amount?: SortOrder
     volumeStep?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
-  export type RewardEventAvgOrderByAggregateInput = {
+  export type CampaignRewardEventAvgOrderByAggregateInput = {
     amount?: SortOrder
     volumeStep?: SortOrder
   }
 
-  export type RewardEventMaxOrderByAggregateInput = {
+  export type CampaignRewardEventMaxOrderByAggregateInput = {
     id?: SortOrder
     campaignId?: SortOrder
-    eventType?: SortOrder
+    rewardEventId?: SortOrder
     amount?: SortOrder
     volumeStep?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
-  export type RewardEventMinOrderByAggregateInput = {
+  export type CampaignRewardEventMinOrderByAggregateInput = {
     id?: SortOrder
     campaignId?: SortOrder
-    eventType?: SortOrder
+    rewardEventId?: SortOrder
     amount?: SortOrder
     volumeStep?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
-  export type RewardEventSumOrderByAggregateInput = {
+  export type CampaignRewardEventSumOrderByAggregateInput = {
     amount?: SortOrder
     volumeStep?: SortOrder
-  }
-
-  export type EnumEventTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.EventType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumEventTypeFilter<$PrismaModel>
-    _max?: NestedEnumEventTypeFilter<$PrismaModel>
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -11178,6 +15345,117 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type ClientCountOrderByAggregateInput = {
+    id?: SortOrder
+    userAgent?: SortOrder
+    ipAddress?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ClientMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userAgent?: SortOrder
+    ipAddress?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ClientMinOrderByAggregateInput = {
+    id?: SortOrder
+    userAgent?: SortOrder
+    ipAddress?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type CampaignRewardEventScalarRelationFilter = {
+    is?: CampaignRewardEventWhereInput
+    isNot?: CampaignRewardEventWhereInput
+  }
+
+  export type ClientScalarRelationFilter = {
+    is?: ClientWhereInput
+    isNot?: ClientWhereInput
+  }
+
+  export type TrackedEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    campaignRewardEventId?: SortOrder
+    clientId?: SortOrder
+    data?: SortOrder
+    timestamp?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TrackedEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    campaignRewardEventId?: SortOrder
+    clientId?: SortOrder
+    timestamp?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TrackedEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    campaignRewardEventId?: SortOrder
+    clientId?: SortOrder
+    timestamp?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
   export type EnumSelectorEventTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.SelectorEventType | EnumSelectorEventTypeFieldRefInput<$PrismaModel>
     in?: $Enums.SelectorEventType[] | ListEnumSelectorEventTypeFieldRefInput<$PrismaModel>
@@ -11188,11 +15466,6 @@ export namespace Prisma {
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type RewardEventScalarRelationFilter = {
-    is?: RewardEventWhereInput
-    isNot?: RewardEventWhereInput
   }
 
   export type SelectorRewardEventIdSelectorCompoundUniqueInput = {
@@ -11367,29 +15640,6 @@ export namespace Prisma {
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type AnalyticsEventCountOrderByAggregateInput = {
     id?: SortOrder
@@ -11429,38 +15679,19 @@ export namespace Prisma {
   export type AnalyticsEventSumOrderByAggregateInput = {
     payoutGenerated?: SortOrder
   }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
-  }
 
   export type CampaignCreateNestedManyWithoutOwnerInput = {
     create?: XOR<CampaignCreateWithoutOwnerInput, CampaignUncheckedCreateWithoutOwnerInput> | CampaignCreateWithoutOwnerInput[] | CampaignUncheckedCreateWithoutOwnerInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutOwnerInput | CampaignCreateOrConnectWithoutOwnerInput[]
     createMany?: CampaignCreateManyOwnerInputEnvelope
     connect?: CampaignWhereUniqueInput | CampaignWhereUniqueInput[]
+  }
+
+  export type RewardEventCreateNestedManyWithoutOwnerInput = {
+    create?: XOR<RewardEventCreateWithoutOwnerInput, RewardEventUncheckedCreateWithoutOwnerInput> | RewardEventCreateWithoutOwnerInput[] | RewardEventUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: RewardEventCreateOrConnectWithoutOwnerInput | RewardEventCreateOrConnectWithoutOwnerInput[]
+    createMany?: RewardEventCreateManyOwnerInputEnvelope
+    connect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
   }
 
   export type ParticipationCreateNestedManyWithoutInfluencerInput = {
@@ -11475,6 +15706,13 @@ export namespace Prisma {
     connectOrCreate?: CampaignCreateOrConnectWithoutOwnerInput | CampaignCreateOrConnectWithoutOwnerInput[]
     createMany?: CampaignCreateManyOwnerInputEnvelope
     connect?: CampaignWhereUniqueInput | CampaignWhereUniqueInput[]
+  }
+
+  export type RewardEventUncheckedCreateNestedManyWithoutOwnerInput = {
+    create?: XOR<RewardEventCreateWithoutOwnerInput, RewardEventUncheckedCreateWithoutOwnerInput> | RewardEventCreateWithoutOwnerInput[] | RewardEventUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: RewardEventCreateOrConnectWithoutOwnerInput | RewardEventCreateOrConnectWithoutOwnerInput[]
+    createMany?: RewardEventCreateManyOwnerInputEnvelope
+    connect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
   }
 
   export type ParticipationUncheckedCreateNestedManyWithoutInfluencerInput = {
@@ -11510,6 +15748,20 @@ export namespace Prisma {
     deleteMany?: CampaignScalarWhereInput | CampaignScalarWhereInput[]
   }
 
+  export type RewardEventUpdateManyWithoutOwnerNestedInput = {
+    create?: XOR<RewardEventCreateWithoutOwnerInput, RewardEventUncheckedCreateWithoutOwnerInput> | RewardEventCreateWithoutOwnerInput[] | RewardEventUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: RewardEventCreateOrConnectWithoutOwnerInput | RewardEventCreateOrConnectWithoutOwnerInput[]
+    upsert?: RewardEventUpsertWithWhereUniqueWithoutOwnerInput | RewardEventUpsertWithWhereUniqueWithoutOwnerInput[]
+    createMany?: RewardEventCreateManyOwnerInputEnvelope
+    set?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+    disconnect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+    delete?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+    connect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+    update?: RewardEventUpdateWithWhereUniqueWithoutOwnerInput | RewardEventUpdateWithWhereUniqueWithoutOwnerInput[]
+    updateMany?: RewardEventUpdateManyWithWhereWithoutOwnerInput | RewardEventUpdateManyWithWhereWithoutOwnerInput[]
+    deleteMany?: RewardEventScalarWhereInput | RewardEventScalarWhereInput[]
+  }
+
   export type ParticipationUpdateManyWithoutInfluencerNestedInput = {
     create?: XOR<ParticipationCreateWithoutInfluencerInput, ParticipationUncheckedCreateWithoutInfluencerInput> | ParticipationCreateWithoutInfluencerInput[] | ParticipationUncheckedCreateWithoutInfluencerInput[]
     connectOrCreate?: ParticipationCreateOrConnectWithoutInfluencerInput | ParticipationCreateOrConnectWithoutInfluencerInput[]
@@ -11538,6 +15790,20 @@ export namespace Prisma {
     deleteMany?: CampaignScalarWhereInput | CampaignScalarWhereInput[]
   }
 
+  export type RewardEventUncheckedUpdateManyWithoutOwnerNestedInput = {
+    create?: XOR<RewardEventCreateWithoutOwnerInput, RewardEventUncheckedCreateWithoutOwnerInput> | RewardEventCreateWithoutOwnerInput[] | RewardEventUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: RewardEventCreateOrConnectWithoutOwnerInput | RewardEventCreateOrConnectWithoutOwnerInput[]
+    upsert?: RewardEventUpsertWithWhereUniqueWithoutOwnerInput | RewardEventUpsertWithWhereUniqueWithoutOwnerInput[]
+    createMany?: RewardEventCreateManyOwnerInputEnvelope
+    set?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+    disconnect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+    delete?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+    connect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+    update?: RewardEventUpdateWithWhereUniqueWithoutOwnerInput | RewardEventUpdateWithWhereUniqueWithoutOwnerInput[]
+    updateMany?: RewardEventUpdateManyWithWhereWithoutOwnerInput | RewardEventUpdateManyWithWhereWithoutOwnerInput[]
+    deleteMany?: RewardEventScalarWhereInput | RewardEventScalarWhereInput[]
+  }
+
   export type ParticipationUncheckedUpdateManyWithoutInfluencerNestedInput = {
     create?: XOR<ParticipationCreateWithoutInfluencerInput, ParticipationUncheckedCreateWithoutInfluencerInput> | ParticipationCreateWithoutInfluencerInput[] | ParticipationUncheckedCreateWithoutInfluencerInput[]
     connectOrCreate?: ParticipationCreateOrConnectWithoutInfluencerInput | ParticipationCreateOrConnectWithoutInfluencerInput[]
@@ -11558,11 +15824,11 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type RewardEventCreateNestedManyWithoutCampaignInput = {
-    create?: XOR<RewardEventCreateWithoutCampaignInput, RewardEventUncheckedCreateWithoutCampaignInput> | RewardEventCreateWithoutCampaignInput[] | RewardEventUncheckedCreateWithoutCampaignInput[]
-    connectOrCreate?: RewardEventCreateOrConnectWithoutCampaignInput | RewardEventCreateOrConnectWithoutCampaignInput[]
-    createMany?: RewardEventCreateManyCampaignInputEnvelope
-    connect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+  export type CampaignRewardEventCreateNestedManyWithoutCampaignInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutCampaignInput, CampaignRewardEventUncheckedCreateWithoutCampaignInput> | CampaignRewardEventCreateWithoutCampaignInput[] | CampaignRewardEventUncheckedCreateWithoutCampaignInput[]
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutCampaignInput | CampaignRewardEventCreateOrConnectWithoutCampaignInput[]
+    createMany?: CampaignRewardEventCreateManyCampaignInputEnvelope
+    connect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
   }
 
   export type ParticipationCreateNestedManyWithoutCampaignInput = {
@@ -11572,11 +15838,11 @@ export namespace Prisma {
     connect?: ParticipationWhereUniqueInput | ParticipationWhereUniqueInput[]
   }
 
-  export type RewardEventUncheckedCreateNestedManyWithoutCampaignInput = {
-    create?: XOR<RewardEventCreateWithoutCampaignInput, RewardEventUncheckedCreateWithoutCampaignInput> | RewardEventCreateWithoutCampaignInput[] | RewardEventUncheckedCreateWithoutCampaignInput[]
-    connectOrCreate?: RewardEventCreateOrConnectWithoutCampaignInput | RewardEventCreateOrConnectWithoutCampaignInput[]
-    createMany?: RewardEventCreateManyCampaignInputEnvelope
-    connect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
+  export type CampaignRewardEventUncheckedCreateNestedManyWithoutCampaignInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutCampaignInput, CampaignRewardEventUncheckedCreateWithoutCampaignInput> | CampaignRewardEventCreateWithoutCampaignInput[] | CampaignRewardEventUncheckedCreateWithoutCampaignInput[]
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutCampaignInput | CampaignRewardEventCreateOrConnectWithoutCampaignInput[]
+    createMany?: CampaignRewardEventCreateManyCampaignInputEnvelope
+    connect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
   }
 
   export type ParticipationUncheckedCreateNestedManyWithoutCampaignInput = {
@@ -11606,18 +15872,18 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCampaignsCreatedInput, UserUpdateWithoutCampaignsCreatedInput>, UserUncheckedUpdateWithoutCampaignsCreatedInput>
   }
 
-  export type RewardEventUpdateManyWithoutCampaignNestedInput = {
-    create?: XOR<RewardEventCreateWithoutCampaignInput, RewardEventUncheckedCreateWithoutCampaignInput> | RewardEventCreateWithoutCampaignInput[] | RewardEventUncheckedCreateWithoutCampaignInput[]
-    connectOrCreate?: RewardEventCreateOrConnectWithoutCampaignInput | RewardEventCreateOrConnectWithoutCampaignInput[]
-    upsert?: RewardEventUpsertWithWhereUniqueWithoutCampaignInput | RewardEventUpsertWithWhereUniqueWithoutCampaignInput[]
-    createMany?: RewardEventCreateManyCampaignInputEnvelope
-    set?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
-    disconnect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
-    delete?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
-    connect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
-    update?: RewardEventUpdateWithWhereUniqueWithoutCampaignInput | RewardEventUpdateWithWhereUniqueWithoutCampaignInput[]
-    updateMany?: RewardEventUpdateManyWithWhereWithoutCampaignInput | RewardEventUpdateManyWithWhereWithoutCampaignInput[]
-    deleteMany?: RewardEventScalarWhereInput | RewardEventScalarWhereInput[]
+  export type CampaignRewardEventUpdateManyWithoutCampaignNestedInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutCampaignInput, CampaignRewardEventUncheckedCreateWithoutCampaignInput> | CampaignRewardEventCreateWithoutCampaignInput[] | CampaignRewardEventUncheckedCreateWithoutCampaignInput[]
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutCampaignInput | CampaignRewardEventCreateOrConnectWithoutCampaignInput[]
+    upsert?: CampaignRewardEventUpsertWithWhereUniqueWithoutCampaignInput | CampaignRewardEventUpsertWithWhereUniqueWithoutCampaignInput[]
+    createMany?: CampaignRewardEventCreateManyCampaignInputEnvelope
+    set?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    disconnect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    delete?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    connect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    update?: CampaignRewardEventUpdateWithWhereUniqueWithoutCampaignInput | CampaignRewardEventUpdateWithWhereUniqueWithoutCampaignInput[]
+    updateMany?: CampaignRewardEventUpdateManyWithWhereWithoutCampaignInput | CampaignRewardEventUpdateManyWithWhereWithoutCampaignInput[]
+    deleteMany?: CampaignRewardEventScalarWhereInput | CampaignRewardEventScalarWhereInput[]
   }
 
   export type ParticipationUpdateManyWithoutCampaignNestedInput = {
@@ -11634,18 +15900,18 @@ export namespace Prisma {
     deleteMany?: ParticipationScalarWhereInput | ParticipationScalarWhereInput[]
   }
 
-  export type RewardEventUncheckedUpdateManyWithoutCampaignNestedInput = {
-    create?: XOR<RewardEventCreateWithoutCampaignInput, RewardEventUncheckedCreateWithoutCampaignInput> | RewardEventCreateWithoutCampaignInput[] | RewardEventUncheckedCreateWithoutCampaignInput[]
-    connectOrCreate?: RewardEventCreateOrConnectWithoutCampaignInput | RewardEventCreateOrConnectWithoutCampaignInput[]
-    upsert?: RewardEventUpsertWithWhereUniqueWithoutCampaignInput | RewardEventUpsertWithWhereUniqueWithoutCampaignInput[]
-    createMany?: RewardEventCreateManyCampaignInputEnvelope
-    set?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
-    disconnect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
-    delete?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
-    connect?: RewardEventWhereUniqueInput | RewardEventWhereUniqueInput[]
-    update?: RewardEventUpdateWithWhereUniqueWithoutCampaignInput | RewardEventUpdateWithWhereUniqueWithoutCampaignInput[]
-    updateMany?: RewardEventUpdateManyWithWhereWithoutCampaignInput | RewardEventUpdateManyWithWhereWithoutCampaignInput[]
-    deleteMany?: RewardEventScalarWhereInput | RewardEventScalarWhereInput[]
+  export type CampaignRewardEventUncheckedUpdateManyWithoutCampaignNestedInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutCampaignInput, CampaignRewardEventUncheckedCreateWithoutCampaignInput> | CampaignRewardEventCreateWithoutCampaignInput[] | CampaignRewardEventUncheckedCreateWithoutCampaignInput[]
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutCampaignInput | CampaignRewardEventCreateOrConnectWithoutCampaignInput[]
+    upsert?: CampaignRewardEventUpsertWithWhereUniqueWithoutCampaignInput | CampaignRewardEventUpsertWithWhereUniqueWithoutCampaignInput[]
+    createMany?: CampaignRewardEventCreateManyCampaignInputEnvelope
+    set?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    disconnect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    delete?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    connect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    update?: CampaignRewardEventUpdateWithWhereUniqueWithoutCampaignInput | CampaignRewardEventUpdateWithWhereUniqueWithoutCampaignInput[]
+    updateMany?: CampaignRewardEventUpdateManyWithWhereWithoutCampaignInput | CampaignRewardEventUpdateManyWithWhereWithoutCampaignInput[]
+    deleteMany?: CampaignRewardEventScalarWhereInput | CampaignRewardEventScalarWhereInput[]
   }
 
   export type ParticipationUncheckedUpdateManyWithoutCampaignNestedInput = {
@@ -11662,10 +15928,10 @@ export namespace Prisma {
     deleteMany?: ParticipationScalarWhereInput | ParticipationScalarWhereInput[]
   }
 
-  export type CampaignCreateNestedOneWithoutRewardEventsInput = {
-    create?: XOR<CampaignCreateWithoutRewardEventsInput, CampaignUncheckedCreateWithoutRewardEventsInput>
-    connectOrCreate?: CampaignCreateOrConnectWithoutRewardEventsInput
-    connect?: CampaignWhereUniqueInput
+  export type UserCreateNestedOneWithoutRewardEventsInput = {
+    create?: XOR<UserCreateWithoutRewardEventsInput, UserUncheckedCreateWithoutRewardEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRewardEventsInput
+    connect?: UserWhereUniqueInput
   }
 
   export type SelectorCreateNestedManyWithoutRewardEventInput = {
@@ -11675,6 +15941,13 @@ export namespace Prisma {
     connect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
   }
 
+  export type CampaignRewardEventCreateNestedManyWithoutRewardEventInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutRewardEventInput, CampaignRewardEventUncheckedCreateWithoutRewardEventInput> | CampaignRewardEventCreateWithoutRewardEventInput[] | CampaignRewardEventUncheckedCreateWithoutRewardEventInput[]
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutRewardEventInput | CampaignRewardEventCreateOrConnectWithoutRewardEventInput[]
+    createMany?: CampaignRewardEventCreateManyRewardEventInputEnvelope
+    connect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+  }
+
   export type SelectorUncheckedCreateNestedManyWithoutRewardEventInput = {
     create?: XOR<SelectorCreateWithoutRewardEventInput, SelectorUncheckedCreateWithoutRewardEventInput> | SelectorCreateWithoutRewardEventInput[] | SelectorUncheckedCreateWithoutRewardEventInput[]
     connectOrCreate?: SelectorCreateOrConnectWithoutRewardEventInput | SelectorCreateOrConnectWithoutRewardEventInput[]
@@ -11682,8 +15955,105 @@ export namespace Prisma {
     connect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
   }
 
+  export type CampaignRewardEventUncheckedCreateNestedManyWithoutRewardEventInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutRewardEventInput, CampaignRewardEventUncheckedCreateWithoutRewardEventInput> | CampaignRewardEventCreateWithoutRewardEventInput[] | CampaignRewardEventUncheckedCreateWithoutRewardEventInput[]
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutRewardEventInput | CampaignRewardEventCreateOrConnectWithoutRewardEventInput[]
+    createMany?: CampaignRewardEventCreateManyRewardEventInputEnvelope
+    connect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+  }
+
   export type EnumEventTypeFieldUpdateOperationsInput = {
     set?: $Enums.EventType
+  }
+
+  export type UserUpdateOneRequiredWithoutRewardEventsNestedInput = {
+    create?: XOR<UserCreateWithoutRewardEventsInput, UserUncheckedCreateWithoutRewardEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRewardEventsInput
+    upsert?: UserUpsertWithoutRewardEventsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutRewardEventsInput, UserUpdateWithoutRewardEventsInput>, UserUncheckedUpdateWithoutRewardEventsInput>
+  }
+
+  export type SelectorUpdateManyWithoutRewardEventNestedInput = {
+    create?: XOR<SelectorCreateWithoutRewardEventInput, SelectorUncheckedCreateWithoutRewardEventInput> | SelectorCreateWithoutRewardEventInput[] | SelectorUncheckedCreateWithoutRewardEventInput[]
+    connectOrCreate?: SelectorCreateOrConnectWithoutRewardEventInput | SelectorCreateOrConnectWithoutRewardEventInput[]
+    upsert?: SelectorUpsertWithWhereUniqueWithoutRewardEventInput | SelectorUpsertWithWhereUniqueWithoutRewardEventInput[]
+    createMany?: SelectorCreateManyRewardEventInputEnvelope
+    set?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
+    disconnect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
+    delete?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
+    connect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
+    update?: SelectorUpdateWithWhereUniqueWithoutRewardEventInput | SelectorUpdateWithWhereUniqueWithoutRewardEventInput[]
+    updateMany?: SelectorUpdateManyWithWhereWithoutRewardEventInput | SelectorUpdateManyWithWhereWithoutRewardEventInput[]
+    deleteMany?: SelectorScalarWhereInput | SelectorScalarWhereInput[]
+  }
+
+  export type CampaignRewardEventUpdateManyWithoutRewardEventNestedInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutRewardEventInput, CampaignRewardEventUncheckedCreateWithoutRewardEventInput> | CampaignRewardEventCreateWithoutRewardEventInput[] | CampaignRewardEventUncheckedCreateWithoutRewardEventInput[]
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutRewardEventInput | CampaignRewardEventCreateOrConnectWithoutRewardEventInput[]
+    upsert?: CampaignRewardEventUpsertWithWhereUniqueWithoutRewardEventInput | CampaignRewardEventUpsertWithWhereUniqueWithoutRewardEventInput[]
+    createMany?: CampaignRewardEventCreateManyRewardEventInputEnvelope
+    set?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    disconnect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    delete?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    connect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    update?: CampaignRewardEventUpdateWithWhereUniqueWithoutRewardEventInput | CampaignRewardEventUpdateWithWhereUniqueWithoutRewardEventInput[]
+    updateMany?: CampaignRewardEventUpdateManyWithWhereWithoutRewardEventInput | CampaignRewardEventUpdateManyWithWhereWithoutRewardEventInput[]
+    deleteMany?: CampaignRewardEventScalarWhereInput | CampaignRewardEventScalarWhereInput[]
+  }
+
+  export type SelectorUncheckedUpdateManyWithoutRewardEventNestedInput = {
+    create?: XOR<SelectorCreateWithoutRewardEventInput, SelectorUncheckedCreateWithoutRewardEventInput> | SelectorCreateWithoutRewardEventInput[] | SelectorUncheckedCreateWithoutRewardEventInput[]
+    connectOrCreate?: SelectorCreateOrConnectWithoutRewardEventInput | SelectorCreateOrConnectWithoutRewardEventInput[]
+    upsert?: SelectorUpsertWithWhereUniqueWithoutRewardEventInput | SelectorUpsertWithWhereUniqueWithoutRewardEventInput[]
+    createMany?: SelectorCreateManyRewardEventInputEnvelope
+    set?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
+    disconnect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
+    delete?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
+    connect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
+    update?: SelectorUpdateWithWhereUniqueWithoutRewardEventInput | SelectorUpdateWithWhereUniqueWithoutRewardEventInput[]
+    updateMany?: SelectorUpdateManyWithWhereWithoutRewardEventInput | SelectorUpdateManyWithWhereWithoutRewardEventInput[]
+    deleteMany?: SelectorScalarWhereInput | SelectorScalarWhereInput[]
+  }
+
+  export type CampaignRewardEventUncheckedUpdateManyWithoutRewardEventNestedInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutRewardEventInput, CampaignRewardEventUncheckedCreateWithoutRewardEventInput> | CampaignRewardEventCreateWithoutRewardEventInput[] | CampaignRewardEventUncheckedCreateWithoutRewardEventInput[]
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutRewardEventInput | CampaignRewardEventCreateOrConnectWithoutRewardEventInput[]
+    upsert?: CampaignRewardEventUpsertWithWhereUniqueWithoutRewardEventInput | CampaignRewardEventUpsertWithWhereUniqueWithoutRewardEventInput[]
+    createMany?: CampaignRewardEventCreateManyRewardEventInputEnvelope
+    set?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    disconnect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    delete?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    connect?: CampaignRewardEventWhereUniqueInput | CampaignRewardEventWhereUniqueInput[]
+    update?: CampaignRewardEventUpdateWithWhereUniqueWithoutRewardEventInput | CampaignRewardEventUpdateWithWhereUniqueWithoutRewardEventInput[]
+    updateMany?: CampaignRewardEventUpdateManyWithWhereWithoutRewardEventInput | CampaignRewardEventUpdateManyWithWhereWithoutRewardEventInput[]
+    deleteMany?: CampaignRewardEventScalarWhereInput | CampaignRewardEventScalarWhereInput[]
+  }
+
+  export type CampaignCreateNestedOneWithoutRewardEventsInput = {
+    create?: XOR<CampaignCreateWithoutRewardEventsInput, CampaignUncheckedCreateWithoutRewardEventsInput>
+    connectOrCreate?: CampaignCreateOrConnectWithoutRewardEventsInput
+    connect?: CampaignWhereUniqueInput
+  }
+
+  export type RewardEventCreateNestedOneWithoutCampaignsInput = {
+    create?: XOR<RewardEventCreateWithoutCampaignsInput, RewardEventUncheckedCreateWithoutCampaignsInput>
+    connectOrCreate?: RewardEventCreateOrConnectWithoutCampaignsInput
+    connect?: RewardEventWhereUniqueInput
+  }
+
+  export type TrackedEventCreateNestedManyWithoutCampaignRewardEventInput = {
+    create?: XOR<TrackedEventCreateWithoutCampaignRewardEventInput, TrackedEventUncheckedCreateWithoutCampaignRewardEventInput> | TrackedEventCreateWithoutCampaignRewardEventInput[] | TrackedEventUncheckedCreateWithoutCampaignRewardEventInput[]
+    connectOrCreate?: TrackedEventCreateOrConnectWithoutCampaignRewardEventInput | TrackedEventCreateOrConnectWithoutCampaignRewardEventInput[]
+    createMany?: TrackedEventCreateManyCampaignRewardEventInputEnvelope
+    connect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+  }
+
+  export type TrackedEventUncheckedCreateNestedManyWithoutCampaignRewardEventInput = {
+    create?: XOR<TrackedEventCreateWithoutCampaignRewardEventInput, TrackedEventUncheckedCreateWithoutCampaignRewardEventInput> | TrackedEventCreateWithoutCampaignRewardEventInput[] | TrackedEventUncheckedCreateWithoutCampaignRewardEventInput[]
+    connectOrCreate?: TrackedEventCreateOrConnectWithoutCampaignRewardEventInput | TrackedEventCreateOrConnectWithoutCampaignRewardEventInput[]
+    createMany?: TrackedEventCreateManyCampaignRewardEventInputEnvelope
+    connect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -11702,32 +16072,110 @@ export namespace Prisma {
     update?: XOR<XOR<CampaignUpdateToOneWithWhereWithoutRewardEventsInput, CampaignUpdateWithoutRewardEventsInput>, CampaignUncheckedUpdateWithoutRewardEventsInput>
   }
 
-  export type SelectorUpdateManyWithoutRewardEventNestedInput = {
-    create?: XOR<SelectorCreateWithoutRewardEventInput, SelectorUncheckedCreateWithoutRewardEventInput> | SelectorCreateWithoutRewardEventInput[] | SelectorUncheckedCreateWithoutRewardEventInput[]
-    connectOrCreate?: SelectorCreateOrConnectWithoutRewardEventInput | SelectorCreateOrConnectWithoutRewardEventInput[]
-    upsert?: SelectorUpsertWithWhereUniqueWithoutRewardEventInput | SelectorUpsertWithWhereUniqueWithoutRewardEventInput[]
-    createMany?: SelectorCreateManyRewardEventInputEnvelope
-    set?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
-    disconnect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
-    delete?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
-    connect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
-    update?: SelectorUpdateWithWhereUniqueWithoutRewardEventInput | SelectorUpdateWithWhereUniqueWithoutRewardEventInput[]
-    updateMany?: SelectorUpdateManyWithWhereWithoutRewardEventInput | SelectorUpdateManyWithWhereWithoutRewardEventInput[]
-    deleteMany?: SelectorScalarWhereInput | SelectorScalarWhereInput[]
+  export type RewardEventUpdateOneRequiredWithoutCampaignsNestedInput = {
+    create?: XOR<RewardEventCreateWithoutCampaignsInput, RewardEventUncheckedCreateWithoutCampaignsInput>
+    connectOrCreate?: RewardEventCreateOrConnectWithoutCampaignsInput
+    upsert?: RewardEventUpsertWithoutCampaignsInput
+    connect?: RewardEventWhereUniqueInput
+    update?: XOR<XOR<RewardEventUpdateToOneWithWhereWithoutCampaignsInput, RewardEventUpdateWithoutCampaignsInput>, RewardEventUncheckedUpdateWithoutCampaignsInput>
   }
 
-  export type SelectorUncheckedUpdateManyWithoutRewardEventNestedInput = {
-    create?: XOR<SelectorCreateWithoutRewardEventInput, SelectorUncheckedCreateWithoutRewardEventInput> | SelectorCreateWithoutRewardEventInput[] | SelectorUncheckedCreateWithoutRewardEventInput[]
-    connectOrCreate?: SelectorCreateOrConnectWithoutRewardEventInput | SelectorCreateOrConnectWithoutRewardEventInput[]
-    upsert?: SelectorUpsertWithWhereUniqueWithoutRewardEventInput | SelectorUpsertWithWhereUniqueWithoutRewardEventInput[]
-    createMany?: SelectorCreateManyRewardEventInputEnvelope
-    set?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
-    disconnect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
-    delete?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
-    connect?: SelectorWhereUniqueInput | SelectorWhereUniqueInput[]
-    update?: SelectorUpdateWithWhereUniqueWithoutRewardEventInput | SelectorUpdateWithWhereUniqueWithoutRewardEventInput[]
-    updateMany?: SelectorUpdateManyWithWhereWithoutRewardEventInput | SelectorUpdateManyWithWhereWithoutRewardEventInput[]
-    deleteMany?: SelectorScalarWhereInput | SelectorScalarWhereInput[]
+  export type TrackedEventUpdateManyWithoutCampaignRewardEventNestedInput = {
+    create?: XOR<TrackedEventCreateWithoutCampaignRewardEventInput, TrackedEventUncheckedCreateWithoutCampaignRewardEventInput> | TrackedEventCreateWithoutCampaignRewardEventInput[] | TrackedEventUncheckedCreateWithoutCampaignRewardEventInput[]
+    connectOrCreate?: TrackedEventCreateOrConnectWithoutCampaignRewardEventInput | TrackedEventCreateOrConnectWithoutCampaignRewardEventInput[]
+    upsert?: TrackedEventUpsertWithWhereUniqueWithoutCampaignRewardEventInput | TrackedEventUpsertWithWhereUniqueWithoutCampaignRewardEventInput[]
+    createMany?: TrackedEventCreateManyCampaignRewardEventInputEnvelope
+    set?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    disconnect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    delete?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    connect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    update?: TrackedEventUpdateWithWhereUniqueWithoutCampaignRewardEventInput | TrackedEventUpdateWithWhereUniqueWithoutCampaignRewardEventInput[]
+    updateMany?: TrackedEventUpdateManyWithWhereWithoutCampaignRewardEventInput | TrackedEventUpdateManyWithWhereWithoutCampaignRewardEventInput[]
+    deleteMany?: TrackedEventScalarWhereInput | TrackedEventScalarWhereInput[]
+  }
+
+  export type TrackedEventUncheckedUpdateManyWithoutCampaignRewardEventNestedInput = {
+    create?: XOR<TrackedEventCreateWithoutCampaignRewardEventInput, TrackedEventUncheckedCreateWithoutCampaignRewardEventInput> | TrackedEventCreateWithoutCampaignRewardEventInput[] | TrackedEventUncheckedCreateWithoutCampaignRewardEventInput[]
+    connectOrCreate?: TrackedEventCreateOrConnectWithoutCampaignRewardEventInput | TrackedEventCreateOrConnectWithoutCampaignRewardEventInput[]
+    upsert?: TrackedEventUpsertWithWhereUniqueWithoutCampaignRewardEventInput | TrackedEventUpsertWithWhereUniqueWithoutCampaignRewardEventInput[]
+    createMany?: TrackedEventCreateManyCampaignRewardEventInputEnvelope
+    set?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    disconnect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    delete?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    connect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    update?: TrackedEventUpdateWithWhereUniqueWithoutCampaignRewardEventInput | TrackedEventUpdateWithWhereUniqueWithoutCampaignRewardEventInput[]
+    updateMany?: TrackedEventUpdateManyWithWhereWithoutCampaignRewardEventInput | TrackedEventUpdateManyWithWhereWithoutCampaignRewardEventInput[]
+    deleteMany?: TrackedEventScalarWhereInput | TrackedEventScalarWhereInput[]
+  }
+
+  export type TrackedEventCreateNestedManyWithoutClientInput = {
+    create?: XOR<TrackedEventCreateWithoutClientInput, TrackedEventUncheckedCreateWithoutClientInput> | TrackedEventCreateWithoutClientInput[] | TrackedEventUncheckedCreateWithoutClientInput[]
+    connectOrCreate?: TrackedEventCreateOrConnectWithoutClientInput | TrackedEventCreateOrConnectWithoutClientInput[]
+    createMany?: TrackedEventCreateManyClientInputEnvelope
+    connect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+  }
+
+  export type TrackedEventUncheckedCreateNestedManyWithoutClientInput = {
+    create?: XOR<TrackedEventCreateWithoutClientInput, TrackedEventUncheckedCreateWithoutClientInput> | TrackedEventCreateWithoutClientInput[] | TrackedEventUncheckedCreateWithoutClientInput[]
+    connectOrCreate?: TrackedEventCreateOrConnectWithoutClientInput | TrackedEventCreateOrConnectWithoutClientInput[]
+    createMany?: TrackedEventCreateManyClientInputEnvelope
+    connect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+  }
+
+  export type TrackedEventUpdateManyWithoutClientNestedInput = {
+    create?: XOR<TrackedEventCreateWithoutClientInput, TrackedEventUncheckedCreateWithoutClientInput> | TrackedEventCreateWithoutClientInput[] | TrackedEventUncheckedCreateWithoutClientInput[]
+    connectOrCreate?: TrackedEventCreateOrConnectWithoutClientInput | TrackedEventCreateOrConnectWithoutClientInput[]
+    upsert?: TrackedEventUpsertWithWhereUniqueWithoutClientInput | TrackedEventUpsertWithWhereUniqueWithoutClientInput[]
+    createMany?: TrackedEventCreateManyClientInputEnvelope
+    set?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    disconnect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    delete?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    connect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    update?: TrackedEventUpdateWithWhereUniqueWithoutClientInput | TrackedEventUpdateWithWhereUniqueWithoutClientInput[]
+    updateMany?: TrackedEventUpdateManyWithWhereWithoutClientInput | TrackedEventUpdateManyWithWhereWithoutClientInput[]
+    deleteMany?: TrackedEventScalarWhereInput | TrackedEventScalarWhereInput[]
+  }
+
+  export type TrackedEventUncheckedUpdateManyWithoutClientNestedInput = {
+    create?: XOR<TrackedEventCreateWithoutClientInput, TrackedEventUncheckedCreateWithoutClientInput> | TrackedEventCreateWithoutClientInput[] | TrackedEventUncheckedCreateWithoutClientInput[]
+    connectOrCreate?: TrackedEventCreateOrConnectWithoutClientInput | TrackedEventCreateOrConnectWithoutClientInput[]
+    upsert?: TrackedEventUpsertWithWhereUniqueWithoutClientInput | TrackedEventUpsertWithWhereUniqueWithoutClientInput[]
+    createMany?: TrackedEventCreateManyClientInputEnvelope
+    set?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    disconnect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    delete?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    connect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
+    update?: TrackedEventUpdateWithWhereUniqueWithoutClientInput | TrackedEventUpdateWithWhereUniqueWithoutClientInput[]
+    updateMany?: TrackedEventUpdateManyWithWhereWithoutClientInput | TrackedEventUpdateManyWithWhereWithoutClientInput[]
+    deleteMany?: TrackedEventScalarWhereInput | TrackedEventScalarWhereInput[]
+  }
+
+  export type CampaignRewardEventCreateNestedOneWithoutTrackedEventsInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutTrackedEventsInput, CampaignRewardEventUncheckedCreateWithoutTrackedEventsInput>
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutTrackedEventsInput
+    connect?: CampaignRewardEventWhereUniqueInput
+  }
+
+  export type ClientCreateNestedOneWithoutTrackedEventsInput = {
+    create?: XOR<ClientCreateWithoutTrackedEventsInput, ClientUncheckedCreateWithoutTrackedEventsInput>
+    connectOrCreate?: ClientCreateOrConnectWithoutTrackedEventsInput
+    connect?: ClientWhereUniqueInput
+  }
+
+  export type CampaignRewardEventUpdateOneRequiredWithoutTrackedEventsNestedInput = {
+    create?: XOR<CampaignRewardEventCreateWithoutTrackedEventsInput, CampaignRewardEventUncheckedCreateWithoutTrackedEventsInput>
+    connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutTrackedEventsInput
+    upsert?: CampaignRewardEventUpsertWithoutTrackedEventsInput
+    connect?: CampaignRewardEventWhereUniqueInput
+    update?: XOR<XOR<CampaignRewardEventUpdateToOneWithWhereWithoutTrackedEventsInput, CampaignRewardEventUpdateWithoutTrackedEventsInput>, CampaignRewardEventUncheckedUpdateWithoutTrackedEventsInput>
+  }
+
+  export type ClientUpdateOneRequiredWithoutTrackedEventsNestedInput = {
+    create?: XOR<ClientCreateWithoutTrackedEventsInput, ClientUncheckedCreateWithoutTrackedEventsInput>
+    connectOrCreate?: ClientCreateOrConnectWithoutTrackedEventsInput
+    upsert?: ClientUpsertWithoutTrackedEventsInput
+    connect?: ClientWhereUniqueInput
+    update?: XOR<XOR<ClientUpdateToOneWithWhereWithoutTrackedEventsInput, ClientUpdateWithoutTrackedEventsInput>, ClientUncheckedUpdateWithoutTrackedEventsInput>
   }
 
   export type RewardEventCreateNestedOneWithoutSelectorsInput = {
@@ -12092,6 +16540,29 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedEnumSelectorEventTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.SelectorEventType | EnumSelectorEventTypeFieldRefInput<$PrismaModel>
@@ -12147,29 +16618,6 @@ export namespace Prisma {
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type CampaignCreateWithoutOwnerInput = {
     id?: string
@@ -12180,7 +16628,7 @@ export namespace Prisma {
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    rewardEvents?: RewardEventCreateNestedManyWithoutCampaignInput
+    rewardEvents?: CampaignRewardEventCreateNestedManyWithoutCampaignInput
     participations?: ParticipationCreateNestedManyWithoutCampaignInput
   }
 
@@ -12193,7 +16641,7 @@ export namespace Prisma {
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutCampaignInput
+    rewardEvents?: CampaignRewardEventUncheckedCreateNestedManyWithoutCampaignInput
     participations?: ParticipationUncheckedCreateNestedManyWithoutCampaignInput
   }
 
@@ -12204,6 +16652,36 @@ export namespace Prisma {
 
   export type CampaignCreateManyOwnerInputEnvelope = {
     data: CampaignCreateManyOwnerInput | CampaignCreateManyOwnerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type RewardEventCreateWithoutOwnerInput = {
+    id?: string
+    name: string
+    eventType: $Enums.EventType
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    selectors?: SelectorCreateNestedManyWithoutRewardEventInput
+    campaigns?: CampaignRewardEventCreateNestedManyWithoutRewardEventInput
+  }
+
+  export type RewardEventUncheckedCreateWithoutOwnerInput = {
+    id?: string
+    name: string
+    eventType: $Enums.EventType
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    selectors?: SelectorUncheckedCreateNestedManyWithoutRewardEventInput
+    campaigns?: CampaignRewardEventUncheckedCreateNestedManyWithoutRewardEventInput
+  }
+
+  export type RewardEventCreateOrConnectWithoutOwnerInput = {
+    where: RewardEventWhereUniqueInput
+    create: XOR<RewardEventCreateWithoutOwnerInput, RewardEventUncheckedCreateWithoutOwnerInput>
+  }
+
+  export type RewardEventCreateManyOwnerInputEnvelope = {
+    data: RewardEventCreateManyOwnerInput | RewardEventCreateManyOwnerInput[]
     skipDuplicates?: boolean
   }
 
@@ -12268,6 +16746,34 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Campaign"> | Date | string
   }
 
+  export type RewardEventUpsertWithWhereUniqueWithoutOwnerInput = {
+    where: RewardEventWhereUniqueInput
+    update: XOR<RewardEventUpdateWithoutOwnerInput, RewardEventUncheckedUpdateWithoutOwnerInput>
+    create: XOR<RewardEventCreateWithoutOwnerInput, RewardEventUncheckedCreateWithoutOwnerInput>
+  }
+
+  export type RewardEventUpdateWithWhereUniqueWithoutOwnerInput = {
+    where: RewardEventWhereUniqueInput
+    data: XOR<RewardEventUpdateWithoutOwnerInput, RewardEventUncheckedUpdateWithoutOwnerInput>
+  }
+
+  export type RewardEventUpdateManyWithWhereWithoutOwnerInput = {
+    where: RewardEventScalarWhereInput
+    data: XOR<RewardEventUpdateManyMutationInput, RewardEventUncheckedUpdateManyWithoutOwnerInput>
+  }
+
+  export type RewardEventScalarWhereInput = {
+    AND?: RewardEventScalarWhereInput | RewardEventScalarWhereInput[]
+    OR?: RewardEventScalarWhereInput[]
+    NOT?: RewardEventScalarWhereInput | RewardEventScalarWhereInput[]
+    id?: StringFilter<"RewardEvent"> | string
+    ownerId?: StringFilter<"RewardEvent"> | string
+    name?: StringFilter<"RewardEvent"> | string
+    eventType?: EnumEventTypeFilter<"RewardEvent"> | $Enums.EventType
+    createdAt?: DateTimeFilter<"RewardEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"RewardEvent"> | Date | string
+  }
+
   export type ParticipationUpsertWithWhereUniqueWithoutInfluencerInput = {
     where: ParticipationWhereUniqueInput
     update: XOR<ParticipationUpdateWithoutInfluencerInput, ParticipationUncheckedUpdateWithoutInfluencerInput>
@@ -12303,6 +16809,7 @@ export namespace Prisma {
     email?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    rewardEvents?: RewardEventCreateNestedManyWithoutOwnerInput
     participations?: ParticipationCreateNestedManyWithoutInfluencerInput
   }
 
@@ -12313,6 +16820,7 @@ export namespace Prisma {
     email?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutOwnerInput
     participations?: ParticipationUncheckedCreateNestedManyWithoutInfluencerInput
   }
 
@@ -12321,33 +16829,33 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutCampaignsCreatedInput, UserUncheckedCreateWithoutCampaignsCreatedInput>
   }
 
-  export type RewardEventCreateWithoutCampaignInput = {
+  export type CampaignRewardEventCreateWithoutCampaignInput = {
     id?: string
-    eventType: $Enums.EventType
     amount: Decimal | DecimalJsLike | number | string
     volumeStep?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    selectors?: SelectorCreateNestedManyWithoutRewardEventInput
+    rewardEvent: RewardEventCreateNestedOneWithoutCampaignsInput
+    trackedEvents?: TrackedEventCreateNestedManyWithoutCampaignRewardEventInput
   }
 
-  export type RewardEventUncheckedCreateWithoutCampaignInput = {
+  export type CampaignRewardEventUncheckedCreateWithoutCampaignInput = {
     id?: string
-    eventType: $Enums.EventType
+    rewardEventId: string
     amount: Decimal | DecimalJsLike | number | string
     volumeStep?: number
     createdAt?: Date | string
     updatedAt?: Date | string
-    selectors?: SelectorUncheckedCreateNestedManyWithoutRewardEventInput
+    trackedEvents?: TrackedEventUncheckedCreateNestedManyWithoutCampaignRewardEventInput
   }
 
-  export type RewardEventCreateOrConnectWithoutCampaignInput = {
-    where: RewardEventWhereUniqueInput
-    create: XOR<RewardEventCreateWithoutCampaignInput, RewardEventUncheckedCreateWithoutCampaignInput>
+  export type CampaignRewardEventCreateOrConnectWithoutCampaignInput = {
+    where: CampaignRewardEventWhereUniqueInput
+    create: XOR<CampaignRewardEventCreateWithoutCampaignInput, CampaignRewardEventUncheckedCreateWithoutCampaignInput>
   }
 
-  export type RewardEventCreateManyCampaignInputEnvelope = {
-    data: RewardEventCreateManyCampaignInput | RewardEventCreateManyCampaignInput[]
+  export type CampaignRewardEventCreateManyCampaignInputEnvelope = {
+    data: CampaignRewardEventCreateManyCampaignInput | CampaignRewardEventCreateManyCampaignInput[]
     skipDuplicates?: boolean
   }
 
@@ -12399,6 +16907,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rewardEvents?: RewardEventUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUpdateManyWithoutInfluencerNestedInput
   }
 
@@ -12409,36 +16918,37 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rewardEvents?: RewardEventUncheckedUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUncheckedUpdateManyWithoutInfluencerNestedInput
   }
 
-  export type RewardEventUpsertWithWhereUniqueWithoutCampaignInput = {
-    where: RewardEventWhereUniqueInput
-    update: XOR<RewardEventUpdateWithoutCampaignInput, RewardEventUncheckedUpdateWithoutCampaignInput>
-    create: XOR<RewardEventCreateWithoutCampaignInput, RewardEventUncheckedCreateWithoutCampaignInput>
+  export type CampaignRewardEventUpsertWithWhereUniqueWithoutCampaignInput = {
+    where: CampaignRewardEventWhereUniqueInput
+    update: XOR<CampaignRewardEventUpdateWithoutCampaignInput, CampaignRewardEventUncheckedUpdateWithoutCampaignInput>
+    create: XOR<CampaignRewardEventCreateWithoutCampaignInput, CampaignRewardEventUncheckedCreateWithoutCampaignInput>
   }
 
-  export type RewardEventUpdateWithWhereUniqueWithoutCampaignInput = {
-    where: RewardEventWhereUniqueInput
-    data: XOR<RewardEventUpdateWithoutCampaignInput, RewardEventUncheckedUpdateWithoutCampaignInput>
+  export type CampaignRewardEventUpdateWithWhereUniqueWithoutCampaignInput = {
+    where: CampaignRewardEventWhereUniqueInput
+    data: XOR<CampaignRewardEventUpdateWithoutCampaignInput, CampaignRewardEventUncheckedUpdateWithoutCampaignInput>
   }
 
-  export type RewardEventUpdateManyWithWhereWithoutCampaignInput = {
-    where: RewardEventScalarWhereInput
-    data: XOR<RewardEventUpdateManyMutationInput, RewardEventUncheckedUpdateManyWithoutCampaignInput>
+  export type CampaignRewardEventUpdateManyWithWhereWithoutCampaignInput = {
+    where: CampaignRewardEventScalarWhereInput
+    data: XOR<CampaignRewardEventUpdateManyMutationInput, CampaignRewardEventUncheckedUpdateManyWithoutCampaignInput>
   }
 
-  export type RewardEventScalarWhereInput = {
-    AND?: RewardEventScalarWhereInput | RewardEventScalarWhereInput[]
-    OR?: RewardEventScalarWhereInput[]
-    NOT?: RewardEventScalarWhereInput | RewardEventScalarWhereInput[]
-    id?: StringFilter<"RewardEvent"> | string
-    campaignId?: StringFilter<"RewardEvent"> | string
-    eventType?: EnumEventTypeFilter<"RewardEvent"> | $Enums.EventType
-    amount?: DecimalFilter<"RewardEvent"> | Decimal | DecimalJsLike | number | string
-    volumeStep?: IntFilter<"RewardEvent"> | number
-    createdAt?: DateTimeFilter<"RewardEvent"> | Date | string
-    updatedAt?: DateTimeFilter<"RewardEvent"> | Date | string
+  export type CampaignRewardEventScalarWhereInput = {
+    AND?: CampaignRewardEventScalarWhereInput | CampaignRewardEventScalarWhereInput[]
+    OR?: CampaignRewardEventScalarWhereInput[]
+    NOT?: CampaignRewardEventScalarWhereInput | CampaignRewardEventScalarWhereInput[]
+    id?: StringFilter<"CampaignRewardEvent"> | string
+    campaignId?: StringFilter<"CampaignRewardEvent"> | string
+    rewardEventId?: StringFilter<"CampaignRewardEvent"> | string
+    amount?: DecimalFilter<"CampaignRewardEvent"> | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFilter<"CampaignRewardEvent"> | number
+    createdAt?: DateTimeFilter<"CampaignRewardEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"CampaignRewardEvent"> | Date | string
   }
 
   export type ParticipationUpsertWithWhereUniqueWithoutCampaignInput = {
@@ -12455,6 +16965,169 @@ export namespace Prisma {
   export type ParticipationUpdateManyWithWhereWithoutCampaignInput = {
     where: ParticipationScalarWhereInput
     data: XOR<ParticipationUpdateManyMutationInput, ParticipationUncheckedUpdateManyWithoutCampaignInput>
+  }
+
+  export type UserCreateWithoutRewardEventsInput = {
+    id?: string
+    walletAddress: string
+    name?: string | null
+    email?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    campaignsCreated?: CampaignCreateNestedManyWithoutOwnerInput
+    participations?: ParticipationCreateNestedManyWithoutInfluencerInput
+  }
+
+  export type UserUncheckedCreateWithoutRewardEventsInput = {
+    id?: string
+    walletAddress: string
+    name?: string | null
+    email?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    campaignsCreated?: CampaignUncheckedCreateNestedManyWithoutOwnerInput
+    participations?: ParticipationUncheckedCreateNestedManyWithoutInfluencerInput
+  }
+
+  export type UserCreateOrConnectWithoutRewardEventsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutRewardEventsInput, UserUncheckedCreateWithoutRewardEventsInput>
+  }
+
+  export type SelectorCreateWithoutRewardEventInput = {
+    id?: string
+    selector: string
+    eventType: $Enums.SelectorEventType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SelectorUncheckedCreateWithoutRewardEventInput = {
+    id?: string
+    selector: string
+    eventType: $Enums.SelectorEventType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SelectorCreateOrConnectWithoutRewardEventInput = {
+    where: SelectorWhereUniqueInput
+    create: XOR<SelectorCreateWithoutRewardEventInput, SelectorUncheckedCreateWithoutRewardEventInput>
+  }
+
+  export type SelectorCreateManyRewardEventInputEnvelope = {
+    data: SelectorCreateManyRewardEventInput | SelectorCreateManyRewardEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CampaignRewardEventCreateWithoutRewardEventInput = {
+    id?: string
+    amount: Decimal | DecimalJsLike | number | string
+    volumeStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    campaign: CampaignCreateNestedOneWithoutRewardEventsInput
+    trackedEvents?: TrackedEventCreateNestedManyWithoutCampaignRewardEventInput
+  }
+
+  export type CampaignRewardEventUncheckedCreateWithoutRewardEventInput = {
+    id?: string
+    campaignId: string
+    amount: Decimal | DecimalJsLike | number | string
+    volumeStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    trackedEvents?: TrackedEventUncheckedCreateNestedManyWithoutCampaignRewardEventInput
+  }
+
+  export type CampaignRewardEventCreateOrConnectWithoutRewardEventInput = {
+    where: CampaignRewardEventWhereUniqueInput
+    create: XOR<CampaignRewardEventCreateWithoutRewardEventInput, CampaignRewardEventUncheckedCreateWithoutRewardEventInput>
+  }
+
+  export type CampaignRewardEventCreateManyRewardEventInputEnvelope = {
+    data: CampaignRewardEventCreateManyRewardEventInput | CampaignRewardEventCreateManyRewardEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutRewardEventsInput = {
+    update: XOR<UserUpdateWithoutRewardEventsInput, UserUncheckedUpdateWithoutRewardEventsInput>
+    create: XOR<UserCreateWithoutRewardEventsInput, UserUncheckedCreateWithoutRewardEventsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutRewardEventsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutRewardEventsInput, UserUncheckedUpdateWithoutRewardEventsInput>
+  }
+
+  export type UserUpdateWithoutRewardEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    walletAddress?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaignsCreated?: CampaignUpdateManyWithoutOwnerNestedInput
+    participations?: ParticipationUpdateManyWithoutInfluencerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutRewardEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    walletAddress?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaignsCreated?: CampaignUncheckedUpdateManyWithoutOwnerNestedInput
+    participations?: ParticipationUncheckedUpdateManyWithoutInfluencerNestedInput
+  }
+
+  export type SelectorUpsertWithWhereUniqueWithoutRewardEventInput = {
+    where: SelectorWhereUniqueInput
+    update: XOR<SelectorUpdateWithoutRewardEventInput, SelectorUncheckedUpdateWithoutRewardEventInput>
+    create: XOR<SelectorCreateWithoutRewardEventInput, SelectorUncheckedCreateWithoutRewardEventInput>
+  }
+
+  export type SelectorUpdateWithWhereUniqueWithoutRewardEventInput = {
+    where: SelectorWhereUniqueInput
+    data: XOR<SelectorUpdateWithoutRewardEventInput, SelectorUncheckedUpdateWithoutRewardEventInput>
+  }
+
+  export type SelectorUpdateManyWithWhereWithoutRewardEventInput = {
+    where: SelectorScalarWhereInput
+    data: XOR<SelectorUpdateManyMutationInput, SelectorUncheckedUpdateManyWithoutRewardEventInput>
+  }
+
+  export type SelectorScalarWhereInput = {
+    AND?: SelectorScalarWhereInput | SelectorScalarWhereInput[]
+    OR?: SelectorScalarWhereInput[]
+    NOT?: SelectorScalarWhereInput | SelectorScalarWhereInput[]
+    id?: StringFilter<"Selector"> | string
+    rewardEventId?: StringFilter<"Selector"> | string
+    selector?: StringFilter<"Selector"> | string
+    eventType?: EnumSelectorEventTypeFilter<"Selector"> | $Enums.SelectorEventType
+    isActive?: BoolFilter<"Selector"> | boolean
+    createdAt?: DateTimeFilter<"Selector"> | Date | string
+    updatedAt?: DateTimeFilter<"Selector"> | Date | string
+  }
+
+  export type CampaignRewardEventUpsertWithWhereUniqueWithoutRewardEventInput = {
+    where: CampaignRewardEventWhereUniqueInput
+    update: XOR<CampaignRewardEventUpdateWithoutRewardEventInput, CampaignRewardEventUncheckedUpdateWithoutRewardEventInput>
+    create: XOR<CampaignRewardEventCreateWithoutRewardEventInput, CampaignRewardEventUncheckedCreateWithoutRewardEventInput>
+  }
+
+  export type CampaignRewardEventUpdateWithWhereUniqueWithoutRewardEventInput = {
+    where: CampaignRewardEventWhereUniqueInput
+    data: XOR<CampaignRewardEventUpdateWithoutRewardEventInput, CampaignRewardEventUncheckedUpdateWithoutRewardEventInput>
+  }
+
+  export type CampaignRewardEventUpdateManyWithWhereWithoutRewardEventInput = {
+    where: CampaignRewardEventScalarWhereInput
+    data: XOR<CampaignRewardEventUpdateManyMutationInput, CampaignRewardEventUncheckedUpdateManyWithoutRewardEventInput>
   }
 
   export type CampaignCreateWithoutRewardEventsInput = {
@@ -12488,31 +17161,56 @@ export namespace Prisma {
     create: XOR<CampaignCreateWithoutRewardEventsInput, CampaignUncheckedCreateWithoutRewardEventsInput>
   }
 
-  export type SelectorCreateWithoutRewardEventInput = {
+  export type RewardEventCreateWithoutCampaignsInput = {
     id?: string
-    selector: string
-    eventType: $Enums.SelectorEventType
-    isActive?: boolean
+    name: string
+    eventType: $Enums.EventType
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutRewardEventsInput
+    selectors?: SelectorCreateNestedManyWithoutRewardEventInput
+  }
+
+  export type RewardEventUncheckedCreateWithoutCampaignsInput = {
+    id?: string
+    ownerId: string
+    name: string
+    eventType: $Enums.EventType
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    selectors?: SelectorUncheckedCreateNestedManyWithoutRewardEventInput
+  }
+
+  export type RewardEventCreateOrConnectWithoutCampaignsInput = {
+    where: RewardEventWhereUniqueInput
+    create: XOR<RewardEventCreateWithoutCampaignsInput, RewardEventUncheckedCreateWithoutCampaignsInput>
+  }
+
+  export type TrackedEventCreateWithoutCampaignRewardEventInput = {
+    id?: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    client: ClientCreateNestedOneWithoutTrackedEventsInput
+  }
+
+  export type TrackedEventUncheckedCreateWithoutCampaignRewardEventInput = {
+    id?: string
+    clientId: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type SelectorUncheckedCreateWithoutRewardEventInput = {
-    id?: string
-    selector: string
-    eventType: $Enums.SelectorEventType
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
+  export type TrackedEventCreateOrConnectWithoutCampaignRewardEventInput = {
+    where: TrackedEventWhereUniqueInput
+    create: XOR<TrackedEventCreateWithoutCampaignRewardEventInput, TrackedEventUncheckedCreateWithoutCampaignRewardEventInput>
   }
 
-  export type SelectorCreateOrConnectWithoutRewardEventInput = {
-    where: SelectorWhereUniqueInput
-    create: XOR<SelectorCreateWithoutRewardEventInput, SelectorUncheckedCreateWithoutRewardEventInput>
-  }
-
-  export type SelectorCreateManyRewardEventInputEnvelope = {
-    data: SelectorCreateManyRewardEventInput | SelectorCreateManyRewardEventInput[]
+  export type TrackedEventCreateManyCampaignRewardEventInputEnvelope = {
+    data: TrackedEventCreateManyCampaignRewardEventInput | TrackedEventCreateManyCampaignRewardEventInput[]
     skipDuplicates?: boolean
   }
 
@@ -12553,53 +17251,232 @@ export namespace Prisma {
     participations?: ParticipationUncheckedUpdateManyWithoutCampaignNestedInput
   }
 
-  export type SelectorUpsertWithWhereUniqueWithoutRewardEventInput = {
-    where: SelectorWhereUniqueInput
-    update: XOR<SelectorUpdateWithoutRewardEventInput, SelectorUncheckedUpdateWithoutRewardEventInput>
-    create: XOR<SelectorCreateWithoutRewardEventInput, SelectorUncheckedCreateWithoutRewardEventInput>
+  export type RewardEventUpsertWithoutCampaignsInput = {
+    update: XOR<RewardEventUpdateWithoutCampaignsInput, RewardEventUncheckedUpdateWithoutCampaignsInput>
+    create: XOR<RewardEventCreateWithoutCampaignsInput, RewardEventUncheckedCreateWithoutCampaignsInput>
+    where?: RewardEventWhereInput
   }
 
-  export type SelectorUpdateWithWhereUniqueWithoutRewardEventInput = {
-    where: SelectorWhereUniqueInput
-    data: XOR<SelectorUpdateWithoutRewardEventInput, SelectorUncheckedUpdateWithoutRewardEventInput>
+  export type RewardEventUpdateToOneWithWhereWithoutCampaignsInput = {
+    where?: RewardEventWhereInput
+    data: XOR<RewardEventUpdateWithoutCampaignsInput, RewardEventUncheckedUpdateWithoutCampaignsInput>
   }
 
-  export type SelectorUpdateManyWithWhereWithoutRewardEventInput = {
-    where: SelectorScalarWhereInput
-    data: XOR<SelectorUpdateManyMutationInput, SelectorUncheckedUpdateManyWithoutRewardEventInput>
+  export type RewardEventUpdateWithoutCampaignsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutRewardEventsNestedInput
+    selectors?: SelectorUpdateManyWithoutRewardEventNestedInput
   }
 
-  export type SelectorScalarWhereInput = {
-    AND?: SelectorScalarWhereInput | SelectorScalarWhereInput[]
-    OR?: SelectorScalarWhereInput[]
-    NOT?: SelectorScalarWhereInput | SelectorScalarWhereInput[]
-    id?: StringFilter<"Selector"> | string
-    rewardEventId?: StringFilter<"Selector"> | string
-    selector?: StringFilter<"Selector"> | string
-    eventType?: EnumSelectorEventTypeFilter<"Selector"> | $Enums.SelectorEventType
-    isActive?: BoolFilter<"Selector"> | boolean
-    createdAt?: DateTimeFilter<"Selector"> | Date | string
-    updatedAt?: DateTimeFilter<"Selector"> | Date | string
+  export type RewardEventUncheckedUpdateWithoutCampaignsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    selectors?: SelectorUncheckedUpdateManyWithoutRewardEventNestedInput
   }
 
-  export type RewardEventCreateWithoutSelectorsInput = {
+  export type TrackedEventUpsertWithWhereUniqueWithoutCampaignRewardEventInput = {
+    where: TrackedEventWhereUniqueInput
+    update: XOR<TrackedEventUpdateWithoutCampaignRewardEventInput, TrackedEventUncheckedUpdateWithoutCampaignRewardEventInput>
+    create: XOR<TrackedEventCreateWithoutCampaignRewardEventInput, TrackedEventUncheckedCreateWithoutCampaignRewardEventInput>
+  }
+
+  export type TrackedEventUpdateWithWhereUniqueWithoutCampaignRewardEventInput = {
+    where: TrackedEventWhereUniqueInput
+    data: XOR<TrackedEventUpdateWithoutCampaignRewardEventInput, TrackedEventUncheckedUpdateWithoutCampaignRewardEventInput>
+  }
+
+  export type TrackedEventUpdateManyWithWhereWithoutCampaignRewardEventInput = {
+    where: TrackedEventScalarWhereInput
+    data: XOR<TrackedEventUpdateManyMutationInput, TrackedEventUncheckedUpdateManyWithoutCampaignRewardEventInput>
+  }
+
+  export type TrackedEventScalarWhereInput = {
+    AND?: TrackedEventScalarWhereInput | TrackedEventScalarWhereInput[]
+    OR?: TrackedEventScalarWhereInput[]
+    NOT?: TrackedEventScalarWhereInput | TrackedEventScalarWhereInput[]
+    id?: StringFilter<"TrackedEvent"> | string
+    campaignRewardEventId?: StringFilter<"TrackedEvent"> | string
+    clientId?: StringFilter<"TrackedEvent"> | string
+    data?: JsonNullableFilter<"TrackedEvent">
+    timestamp?: DateTimeFilter<"TrackedEvent"> | Date | string
+    createdAt?: DateTimeFilter<"TrackedEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"TrackedEvent"> | Date | string
+  }
+
+  export type TrackedEventCreateWithoutClientInput = {
     id?: string
-    eventType: $Enums.EventType
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    campaignRewardEvent: CampaignRewardEventCreateNestedOneWithoutTrackedEventsInput
+  }
+
+  export type TrackedEventUncheckedCreateWithoutClientInput = {
+    id?: string
+    campaignRewardEventId: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TrackedEventCreateOrConnectWithoutClientInput = {
+    where: TrackedEventWhereUniqueInput
+    create: XOR<TrackedEventCreateWithoutClientInput, TrackedEventUncheckedCreateWithoutClientInput>
+  }
+
+  export type TrackedEventCreateManyClientInputEnvelope = {
+    data: TrackedEventCreateManyClientInput | TrackedEventCreateManyClientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TrackedEventUpsertWithWhereUniqueWithoutClientInput = {
+    where: TrackedEventWhereUniqueInput
+    update: XOR<TrackedEventUpdateWithoutClientInput, TrackedEventUncheckedUpdateWithoutClientInput>
+    create: XOR<TrackedEventCreateWithoutClientInput, TrackedEventUncheckedCreateWithoutClientInput>
+  }
+
+  export type TrackedEventUpdateWithWhereUniqueWithoutClientInput = {
+    where: TrackedEventWhereUniqueInput
+    data: XOR<TrackedEventUpdateWithoutClientInput, TrackedEventUncheckedUpdateWithoutClientInput>
+  }
+
+  export type TrackedEventUpdateManyWithWhereWithoutClientInput = {
+    where: TrackedEventScalarWhereInput
+    data: XOR<TrackedEventUpdateManyMutationInput, TrackedEventUncheckedUpdateManyWithoutClientInput>
+  }
+
+  export type CampaignRewardEventCreateWithoutTrackedEventsInput = {
+    id?: string
     amount: Decimal | DecimalJsLike | number | string
     volumeStep?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     campaign: CampaignCreateNestedOneWithoutRewardEventsInput
+    rewardEvent: RewardEventCreateNestedOneWithoutCampaignsInput
   }
 
-  export type RewardEventUncheckedCreateWithoutSelectorsInput = {
+  export type CampaignRewardEventUncheckedCreateWithoutTrackedEventsInput = {
     id?: string
     campaignId: string
-    eventType: $Enums.EventType
+    rewardEventId: string
     amount: Decimal | DecimalJsLike | number | string
     volumeStep?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type CampaignRewardEventCreateOrConnectWithoutTrackedEventsInput = {
+    where: CampaignRewardEventWhereUniqueInput
+    create: XOR<CampaignRewardEventCreateWithoutTrackedEventsInput, CampaignRewardEventUncheckedCreateWithoutTrackedEventsInput>
+  }
+
+  export type ClientCreateWithoutTrackedEventsInput = {
+    id?: string
+    userAgent?: string | null
+    ipAddress?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ClientUncheckedCreateWithoutTrackedEventsInput = {
+    id?: string
+    userAgent?: string | null
+    ipAddress?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ClientCreateOrConnectWithoutTrackedEventsInput = {
+    where: ClientWhereUniqueInput
+    create: XOR<ClientCreateWithoutTrackedEventsInput, ClientUncheckedCreateWithoutTrackedEventsInput>
+  }
+
+  export type CampaignRewardEventUpsertWithoutTrackedEventsInput = {
+    update: XOR<CampaignRewardEventUpdateWithoutTrackedEventsInput, CampaignRewardEventUncheckedUpdateWithoutTrackedEventsInput>
+    create: XOR<CampaignRewardEventCreateWithoutTrackedEventsInput, CampaignRewardEventUncheckedCreateWithoutTrackedEventsInput>
+    where?: CampaignRewardEventWhereInput
+  }
+
+  export type CampaignRewardEventUpdateToOneWithWhereWithoutTrackedEventsInput = {
+    where?: CampaignRewardEventWhereInput
+    data: XOR<CampaignRewardEventUpdateWithoutTrackedEventsInput, CampaignRewardEventUncheckedUpdateWithoutTrackedEventsInput>
+  }
+
+  export type CampaignRewardEventUpdateWithoutTrackedEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaign?: CampaignUpdateOneRequiredWithoutRewardEventsNestedInput
+    rewardEvent?: RewardEventUpdateOneRequiredWithoutCampaignsNestedInput
+  }
+
+  export type CampaignRewardEventUncheckedUpdateWithoutTrackedEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    campaignId?: StringFieldUpdateOperationsInput | string
+    rewardEventId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClientUpsertWithoutTrackedEventsInput = {
+    update: XOR<ClientUpdateWithoutTrackedEventsInput, ClientUncheckedUpdateWithoutTrackedEventsInput>
+    create: XOR<ClientCreateWithoutTrackedEventsInput, ClientUncheckedCreateWithoutTrackedEventsInput>
+    where?: ClientWhereInput
+  }
+
+  export type ClientUpdateToOneWithWhereWithoutTrackedEventsInput = {
+    where?: ClientWhereInput
+    data: XOR<ClientUpdateWithoutTrackedEventsInput, ClientUncheckedUpdateWithoutTrackedEventsInput>
+  }
+
+  export type ClientUpdateWithoutTrackedEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ClientUncheckedUpdateWithoutTrackedEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RewardEventCreateWithoutSelectorsInput = {
+    id?: string
+    name: string
+    eventType: $Enums.EventType
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutRewardEventsInput
+    campaigns?: CampaignRewardEventCreateNestedManyWithoutRewardEventInput
+  }
+
+  export type RewardEventUncheckedCreateWithoutSelectorsInput = {
+    id?: string
+    ownerId: string
+    name: string
+    eventType: $Enums.EventType
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    campaigns?: CampaignRewardEventUncheckedCreateNestedManyWithoutRewardEventInput
   }
 
   export type RewardEventCreateOrConnectWithoutSelectorsInput = {
@@ -12620,22 +17497,22 @@ export namespace Prisma {
 
   export type RewardEventUpdateWithoutSelectorsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
     eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
-    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    volumeStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    campaign?: CampaignUpdateOneRequiredWithoutRewardEventsNestedInput
+    owner?: UserUpdateOneRequiredWithoutRewardEventsNestedInput
+    campaigns?: CampaignRewardEventUpdateManyWithoutRewardEventNestedInput
   }
 
   export type RewardEventUncheckedUpdateWithoutSelectorsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    campaignId?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
     eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
-    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    volumeStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaigns?: CampaignRewardEventUncheckedUpdateManyWithoutRewardEventNestedInput
   }
 
   export type UserCreateWithoutParticipationsInput = {
@@ -12646,6 +17523,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     campaignsCreated?: CampaignCreateNestedManyWithoutOwnerInput
+    rewardEvents?: RewardEventCreateNestedManyWithoutOwnerInput
   }
 
   export type UserUncheckedCreateWithoutParticipationsInput = {
@@ -12656,6 +17534,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     campaignsCreated?: CampaignUncheckedCreateNestedManyWithoutOwnerInput
+    rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutOwnerInput
   }
 
   export type UserCreateOrConnectWithoutParticipationsInput = {
@@ -12673,7 +17552,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutCampaignsCreatedInput
-    rewardEvents?: RewardEventCreateNestedManyWithoutCampaignInput
+    rewardEvents?: CampaignRewardEventCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignUncheckedCreateWithoutParticipationsInput = {
@@ -12686,7 +17565,7 @@ export namespace Prisma {
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutCampaignInput
+    rewardEvents?: CampaignRewardEventUncheckedCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignCreateOrConnectWithoutParticipationsInput = {
@@ -12771,6 +17650,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaignsCreated?: CampaignUpdateManyWithoutOwnerNestedInput
+    rewardEvents?: RewardEventUpdateManyWithoutOwnerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutParticipationsInput = {
@@ -12781,6 +17661,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaignsCreated?: CampaignUncheckedUpdateManyWithoutOwnerNestedInput
+    rewardEvents?: RewardEventUncheckedUpdateManyWithoutOwnerNestedInput
   }
 
   export type CampaignUpsertWithoutParticipationsInput = {
@@ -12804,7 +17685,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutCampaignsCreatedNestedInput
-    rewardEvents?: RewardEventUpdateManyWithoutCampaignNestedInput
+    rewardEvents?: CampaignRewardEventUpdateManyWithoutCampaignNestedInput
   }
 
   export type CampaignUncheckedUpdateWithoutParticipationsInput = {
@@ -12817,7 +17698,7 @@ export namespace Prisma {
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rewardEvents?: RewardEventUncheckedUpdateManyWithoutCampaignNestedInput
+    rewardEvents?: CampaignRewardEventUncheckedUpdateManyWithoutCampaignNestedInput
   }
 
   export type TrackingLinkUpsertWithWhereUniqueWithoutParticipationInput = {
@@ -13002,6 +17883,14 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type RewardEventCreateManyOwnerInput = {
+    id?: string
+    name: string
+    eventType: $Enums.EventType
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type ParticipationCreateManyInfluencerInput = {
     id?: string
     campaignId: string
@@ -13019,7 +17908,7 @@ export namespace Prisma {
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rewardEvents?: RewardEventUpdateManyWithoutCampaignNestedInput
+    rewardEvents?: CampaignRewardEventUpdateManyWithoutCampaignNestedInput
     participations?: ParticipationUpdateManyWithoutCampaignNestedInput
   }
 
@@ -13032,7 +17921,7 @@ export namespace Prisma {
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rewardEvents?: RewardEventUncheckedUpdateManyWithoutCampaignNestedInput
+    rewardEvents?: CampaignRewardEventUncheckedUpdateManyWithoutCampaignNestedInput
     participations?: ParticipationUncheckedUpdateManyWithoutCampaignNestedInput
   }
 
@@ -13043,6 +17932,34 @@ export namespace Prisma {
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RewardEventUpdateWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    selectors?: SelectorUpdateManyWithoutRewardEventNestedInput
+    campaigns?: CampaignRewardEventUpdateManyWithoutRewardEventNestedInput
+  }
+
+  export type RewardEventUncheckedUpdateWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    selectors?: SelectorUncheckedUpdateManyWithoutRewardEventNestedInput
+    campaigns?: CampaignRewardEventUncheckedUpdateManyWithoutRewardEventNestedInput
+  }
+
+  export type RewardEventUncheckedUpdateManyWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13075,9 +17992,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type RewardEventCreateManyCampaignInput = {
+  export type CampaignRewardEventCreateManyCampaignInput = {
     id?: string
-    eventType: $Enums.EventType
+    rewardEventId: string
     amount: Decimal | DecimalJsLike | number | string
     volumeStep?: number
     createdAt?: Date | string
@@ -13092,29 +18009,29 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type RewardEventUpdateWithoutCampaignInput = {
+  export type CampaignRewardEventUpdateWithoutCampaignInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     volumeStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    selectors?: SelectorUpdateManyWithoutRewardEventNestedInput
+    rewardEvent?: RewardEventUpdateOneRequiredWithoutCampaignsNestedInput
+    trackedEvents?: TrackedEventUpdateManyWithoutCampaignRewardEventNestedInput
   }
 
-  export type RewardEventUncheckedUpdateWithoutCampaignInput = {
+  export type CampaignRewardEventUncheckedUpdateWithoutCampaignInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    rewardEventId?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     volumeStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    selectors?: SelectorUncheckedUpdateManyWithoutRewardEventNestedInput
+    trackedEvents?: TrackedEventUncheckedUpdateManyWithoutCampaignRewardEventNestedInput
   }
 
-  export type RewardEventUncheckedUpdateManyWithoutCampaignInput = {
+  export type CampaignRewardEventUncheckedUpdateManyWithoutCampaignInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    rewardEventId?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     volumeStep?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13158,6 +18075,15 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type CampaignRewardEventCreateManyRewardEventInput = {
+    id?: string
+    campaignId: string
+    amount: Decimal | DecimalJsLike | number | string
+    volumeStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type SelectorUpdateWithoutRewardEventInput = {
     id?: StringFieldUpdateOperationsInput | string
     selector?: StringFieldUpdateOperationsInput | string
@@ -13181,6 +18107,107 @@ export namespace Prisma {
     selector?: StringFieldUpdateOperationsInput | string
     eventType?: EnumSelectorEventTypeFieldUpdateOperationsInput | $Enums.SelectorEventType
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CampaignRewardEventUpdateWithoutRewardEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaign?: CampaignUpdateOneRequiredWithoutRewardEventsNestedInput
+    trackedEvents?: TrackedEventUpdateManyWithoutCampaignRewardEventNestedInput
+  }
+
+  export type CampaignRewardEventUncheckedUpdateWithoutRewardEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    campaignId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    trackedEvents?: TrackedEventUncheckedUpdateManyWithoutCampaignRewardEventNestedInput
+  }
+
+  export type CampaignRewardEventUncheckedUpdateManyWithoutRewardEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    campaignId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    volumeStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackedEventCreateManyCampaignRewardEventInput = {
+    id?: string
+    clientId: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TrackedEventUpdateWithoutCampaignRewardEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    client?: ClientUpdateOneRequiredWithoutTrackedEventsNestedInput
+  }
+
+  export type TrackedEventUncheckedUpdateWithoutCampaignRewardEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackedEventUncheckedUpdateManyWithoutCampaignRewardEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackedEventCreateManyClientInput = {
+    id?: string
+    campaignRewardEventId: string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TrackedEventUpdateWithoutClientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaignRewardEvent?: CampaignRewardEventUpdateOneRequiredWithoutTrackedEventsNestedInput
+  }
+
+  export type TrackedEventUncheckedUpdateWithoutClientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    campaignRewardEventId?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackedEventUncheckedUpdateManyWithoutClientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    campaignRewardEventId?: StringFieldUpdateOperationsInput | string
+    data?: NullableJsonNullValueInput | InputJsonValue
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

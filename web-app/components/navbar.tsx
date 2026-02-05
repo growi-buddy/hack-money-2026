@@ -14,14 +14,18 @@ interface NavbarProps {
   showMenu?: boolean
   connected?: boolean
   address?: string
+  onConnect?: () => void
+  onDisconnect?: () => void
 }
 
-export function Navbar({ 
-  showBack = false, 
-  onMenuClick, 
+export function Navbar({
+  showBack = false,
+  onMenuClick,
   showMenu = false,
   connected = false,
-  address
+  address,
+  onConnect,
+  onDisconnect
 }: NavbarProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -80,7 +84,12 @@ export function Navbar({
           </Link>
         </div>
         
-        <WalletButton connected={connected} address={address} />
+        <WalletButton
+          connected={connected}
+          address={address}
+          onConnect={onConnect}
+          onDisconnect={onDisconnect}
+        />
       </div>
     </header>
   )

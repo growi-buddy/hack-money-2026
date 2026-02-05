@@ -6,9 +6,9 @@ import { ApiDataResponse, ApiErrorResponse, CampaignRewardEventsDTO, UpdateCampa
 export async function GET(req: Request) {
   return safeRoute(async () => {
     const { searchParams } = new URL(req.url);
-    
+
     const campaignId = searchParams.get('campaignId');
-    
+
     if (!campaignId) {
       const response: ApiErrorResponse = {
         success: false,
@@ -16,9 +16,9 @@ export async function GET(req: Request) {
       };
       return { response, status: 400 };
     }
-    
+
     const campaign = await getCampaignById(campaignId);
-    
+
     if (!campaign) {
       const response: ApiErrorResponse = {
         success: false,
@@ -26,22 +26,16 @@ export async function GET(req: Request) {
       };
       return { response, status: 404 };
     }
-    
+
     const response: ApiDataResponse<CampaignRewardEventsDTO> = {
       success: true,
       data: {
         campaignId: campaign.id,
-        rewardEvents: campaign.rewardEvents.map(event => ({
-          id: event.id,
-          eventType: event.eventType,
-          amount: +event.amount,
-          volumeStep: event.volumeStep,
-          selectors: event.selectors.map(sel => ({
-            id: sel.id,
-            selector: sel.selector,
-            eventType: sel.eventType,
-            isActive: sel.isActive,
-          })),
+        rewardEvents: campaign.rewardEvents.map(cre => ({
+          id: cre.id,
+          rewardEventId: cre.rewardEventId,
+          amount: +cre.amount,
+          volumeStep: cre.volumeStep,
         })),
       },
     };
@@ -52,13 +46,13 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   return safeRoute(async () => {
     const body = await req.json();
-    
+
     const validatedData = UpdateCampaignRewardEventsSchema.parse(body);
-    
+
     const { campaignId, rewardEvents } = validatedData;
-    
+
     const campaign = await getCampaignById(campaignId);
-    
+
     if (!campaign) {
       const response: ApiErrorResponse = {
         success: false,
@@ -66,49 +60,54 @@ export async function POST(req: Request) {
       };
       return { response, status: 404 };
     }
-    
-    await prisma.rewardEvent.deleteMany({
+
+    // Verify all reward events exist
+    const rewardEventIds = rewardEvents.map(re => re.rewardEventId);
+    const existingRewardEvents = await prisma.rewardEvent.findMany({
+      where: { id: { in: rewardEventIds } },
+    });
+
+    if (existingRewardEvents.length !== rewardEventIds.length) {
+      const response: ApiErrorResponse = {
+        success: false,
+        error: { code: 'BAD_REQUEST', message: 'One or more reward events not found' },
+      };
+      return { response, status: 400 };
+    }
+
+    // Delete existing campaign reward events
+    await prisma.campaignRewardEvent.deleteMany({
       where: { campaignId },
     });
-    
-    const createdRewardEvents = await Promise.all(
+
+    // Create new campaign reward event links
+    const createdLinks = await Promise.all(
       rewardEvents.map(event =>
-        prisma.rewardEvent.create({
+        prisma.campaignRewardEvent.create({
           data: {
             campaignId,
-            eventType: event.eventType,
+            rewardEventId: event.rewardEventId,
             amount: event.amount,
             volumeStep: event.volumeStep,
-            selectors: event.selectors
-              ? {
-                create: event.selectors.map(sel => ({
-                  selector: sel.selector,
-                  eventType: sel.eventType,
-                  isActive: sel.isActive,
-                })),
-              }
-              : undefined,
           },
-          include: { selectors: true },
+          include: {
+            rewardEvent: {
+              include: { selectors: true },
+            },
+          },
         }),
       ),
     );
-    
+
     const response: ApiDataResponse<CampaignRewardEventsDTO> = {
       success: true,
       data: {
         campaignId,
-        rewardEvents: createdRewardEvents.map(event => ({
-          id: event.id,
-          eventType: event.eventType,
-          amount: +event.amount,
-          volumeStep: event.volumeStep,
-          selectors: event.selectors.map(sel => ({
-            id: sel.id,
-            selector: sel.selector,
-            eventType: sel.eventType,
-            isActive: sel.isActive,
-          })),
+        rewardEvents: createdLinks.map(cre => ({
+          id: cre.id,
+          rewardEventId: cre.rewardEventId,
+          amount: +cre.amount,
+          volumeStep: cre.volumeStep,
         })),
       },
     };

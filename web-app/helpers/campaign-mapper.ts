@@ -1,58 +1,27 @@
-import { EventType } from '@/lib/db/prisma/generated';
-import { CreateCampaignInput, RewardEventInput } from '@/types';
+import { CreateCampaignInput, CampaignRewardEventInput } from '@/types';
 import { CampaignFormData } from '@/types/campaign-form';
 
+/**
+ * Maps campaign form data to API input.
+ * Requires rewardEventIds to be pre-created and passed in the formData.
+ */
 export function mapCampaignFormToAPI(
   formData: CampaignFormData,
   walletAddress: string,
 ): CreateCampaignInput {
-  const rewardEvents: RewardEventInput[] = [];
-  
-  if (formData.rewards?.landingPageView?.enabled && formData.rewards.landingPageView.pricePerView) {
-    rewardEvents.push({
-      eventType: EventType.VISIT_PAGE,
-      amount: formData.rewards.landingPageView.pricePerView,
-      volumeStep: 1,
-      selectors: [],
-    });
+  const rewardEvents: CampaignRewardEventInput[] = [];
+
+  // Map selected reward events from the form
+  if (formData.selectedRewardEvents) {
+    for (const selectedEvent of formData.selectedRewardEvents) {
+      rewardEvents.push({
+        rewardEventId: selectedEvent.rewardEventId,
+        amount: selectedEvent.amount,
+        volumeStep: selectedEvent.volumeStep || 1,
+      });
+    }
   }
-  
-  if (formData.rewards?.itemView?.enabled && formData.rewards.itemView.pricePerClick) {
-    rewardEvents.push({
-      eventType: EventType.VISIT_PAGE,
-      amount: formData.rewards.itemView.pricePerClick,
-      volumeStep: 1,
-      selectors: [],
-    });
-  }
-  
-  if (formData.rewards?.addToCart?.enabled && formData.rewards.addToCart.pricePerClick) {
-    rewardEvents.push({
-      eventType: EventType.ADD_CART,
-      amount: formData.rewards.addToCart.pricePerClick,
-      volumeStep: 1,
-      selectors: [],
-    });
-  }
-  
-  if (formData.rewards?.checkout?.enabled && formData.rewards.checkout.pricePerClick) {
-    rewardEvents.push({
-      eventType: EventType.BUY_PRODUCT,
-      amount: formData.rewards.checkout.pricePerClick,
-      volumeStep: 1,
-      selectors: [],
-    });
-  }
-  
-  if (formData.rewards?.thankYouView?.enabled && formData.rewards.thankYouView.pricePerView) {
-    rewardEvents.push({
-      eventType: EventType.VISIT_PAGE,
-      amount: formData.rewards.thankYouView.pricePerView,
-      volumeStep: 1,
-      selectors: [],
-    });
-  }
-  
+
   return {
     walletAddress,
     title: formData.name || 'Draft',
