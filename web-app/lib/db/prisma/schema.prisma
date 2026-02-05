@@ -190,5 +190,6 @@ enum CampaignStatus {
   ACTIVE
   PAUSED
   DEPLETED
+  COMPLETED
   DELETED
 }

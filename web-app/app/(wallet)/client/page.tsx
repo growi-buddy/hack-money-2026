@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWallet } from '@/contexts/wallet-context';
@@ -7,7 +8,18 @@ import { pulse, scaleIn, staggerContainer, staggerItem } from '@/lib/animations'
 import { CampaignStatus, EventType } from '@/lib/db/enums';
 import { CampaignSummary } from '@/types';
 import { motion } from 'framer-motion';
-import { ArrowRight, Download, Loader2, Plus, RefreshCw, Sparkles, Wallet } from 'lucide-react';
+import {
+  Archive,
+  ArrowRight,
+  CheckCircle2,
+  Download,
+  Loader2,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  Sparkles,
+  Wallet,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -50,11 +62,29 @@ function groupRewardEventsByType(rewardEvents: CampaignSummary['rewardEvents']) 
     }));
 }
 
+// Get total purchases from campaign
+function getTotalPurchases(campaign: CampaignSummary): number {
+  const grouped = groupRewardEventsByType(campaign.rewardEvents);
+  const purchases = grouped.find(e => e.eventType === EventType.PURCHASE_SUCCESS);
+  return purchases?.trackedEventsCount ?? 0;
+}
+
+// Calculate ROI (simple calculation: (spent / budget) * 100 as percentage of budget used)
+function calculateROI(campaign: CampaignSummary): number {
+  if (campaign.budgetSpent === 0) return 0;
+  const purchases = getTotalPurchases(campaign);
+  // Assume average order value of $50 for demo purposes
+  const estimatedRevenue = purchases * 50;
+  return Math.round((estimatedRevenue / campaign.budgetSpent) * 100);
+}
+
 const REFRESH_INTERVAL = 60_000;
 
 export default function ClientDashboard() {
   const { address, isConnected, connect } = useWallet();
-  const [ campaigns, setCampaigns ] = useState<CampaignSummary[]>([]);
+  const [ activeCampaigns, setActiveCampaigns ] = useState<CampaignSummary[]>([]);
+  const [ completedCampaigns, setCompletedCampaigns ] = useState<CampaignSummary[]>([]);
+  const [ deletedCampaigns, setDeletedCampaigns ] = useState<CampaignSummary[]>([]);
   const [ loading, setLoading ] = useState(false);
   const [ refreshing, setRefreshing ] = useState(false);
   const [ error, setError ] = useState<string | null>(null);
@@ -88,7 +118,9 @@ export default function ClientDashboard() {
   
   const fetchCampaigns = useCallback(async (isManualRefresh = false) => {
     if (!address) {
-      setCampaigns([]);
+      setActiveCampaigns([]);
+      setCompletedCampaigns([]);
+      setDeletedCampaigns([]);
       return;
     }
     
@@ -100,18 +132,44 @@ export default function ClientDashboard() {
       }
       setError(null);
       
-      const response = await fetch(`/api/users/wallet/${address}/campaigns?status=${CampaignStatus.ACTIVE}`);
-      const data = await response.json();
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          setCampaigns([]);
-          return;
-        }
-        throw new Error(data.error?.message || 'Failed to fetch campaigns');
+      // Fetch all campaign statuses in parallel (ACTIVE + DEPLETED shown together)
+      const [ activeRes, depletedRes, completedRes, deletedRes ] = await Promise.all([
+        fetch(`/api/users/wallet/${address}/campaigns?status=${CampaignStatus.ACTIVE}`),
+        fetch(`/api/users/wallet/${address}/campaigns?status=${CampaignStatus.DEPLETED}`),
+        fetch(`/api/users/wallet/${address}/campaigns?status=${CampaignStatus.COMPLETED}`),
+        fetch(`/api/users/wallet/${address}/campaigns?status=${CampaignStatus.DELETED}`),
+      ]);
+
+      const [ activeData, depletedData, completedData, deletedData ] = await Promise.all([
+        activeRes.json(),
+        depletedRes.json(),
+        completedRes.json(),
+        deletedRes.json(),
+      ]);
+
+      // Combine ACTIVE and DEPLETED campaigns
+      const activeCampaignsList: CampaignSummary[] = [];
+
+      if (activeRes.ok) {
+        activeCampaignsList.push(...(activeData.data?.campaigns ?? []));
+      } else if (activeRes.status !== 404) {
+        throw new Error(activeData.error?.message || 'Failed to fetch active campaigns');
+      }
+
+      if (depletedRes.ok) {
+        activeCampaignsList.push(...(depletedData.data?.campaigns ?? []));
+      }
+
+      setActiveCampaigns(activeCampaignsList);
+
+      if (completedRes.ok) {
+        setCompletedCampaigns(completedData.data?.campaigns ?? []);
+      }
+
+      if (deletedRes.ok) {
+        setDeletedCampaigns(deletedData.data?.campaigns ?? []);
       }
       
-      setCampaigns(data.data.campaigns);
       setLastUpdated(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -124,7 +182,9 @@ export default function ClientDashboard() {
   // Initial fetch and auto-refresh every minute
   useEffect(() => {
     if (!address) {
-      setCampaigns([]);
+      setActiveCampaigns([]);
+      setCompletedCampaigns([]);
+      setDeletedCampaigns([]);
       setLoading(false);
       return;
     }
@@ -138,7 +198,9 @@ export default function ClientDashboard() {
     return () => clearInterval(interval);
   }, [ address, fetchCampaigns ]);
   
-  const hasCampaigns = campaigns.length > 0;
+  const hasActiveCampaigns = activeCampaigns.length > 0;
+  const hasCompletedCampaigns = completedCampaigns.length > 0;
+  const hasDeletedCampaigns = deletedCampaigns.length > 0;
   
   // Show connect wallet prompt if not connected
   if (!isConnected) {
@@ -188,24 +250,7 @@ export default function ClientDashboard() {
   return (
     <div className="space-y-6">
       {/* Install CTA Card - Show full card only if no reward events configured */}
-      {hasRewardEvents ? (
-        <motion.div
-          variants={scaleIn}
-          initial="hidden"
-          animate="visible"
-          className="flex justify-end"
-        >
-          <Link href="/client/events-tracking">
-            <Button
-              variant="outline"
-              className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Edit Events Tracking
-            </Button>
-          </Link>
-        </motion.div>
-      ) : hasRewardEvents === false ? (
+      {hasRewardEvents === false && (
         <motion.div
           variants={scaleIn}
           initial="hidden"
@@ -229,18 +274,18 @@ export default function ClientDashboard() {
                   </p>
                 </div>
               </div>
-              <Link href="/client/events-tracking">
+              <Link href="/client/setup">
                 <Button className="bg-growi-blue text-white hover:bg-growi-blue/90">
-                  Setup Events Tracking
+                  Setup Tracking
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </CardContent>
           </Card>
         </motion.div>
-      ) : null}
+      )}
       
-      {/* Campaigns Section */}
+      {/* Active Campaigns Section */}
       <div>
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -292,23 +337,29 @@ export default function ClientDashboard() {
               </Button>
             </CardContent>
           </Card>
-        ) : hasCampaigns ? (
+        ) : hasActiveCampaigns ? (
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
             className="grid gap-4 md:grid-cols-2"
           >
-            {campaigns.map((campaign) => (
+            {activeCampaigns.map((campaign) => (
               <motion.div key={campaign.id} variants={staggerItem}>
                 <Link href={`/client/campaign/${campaign.id}`}>
                   <Card className="cursor-pointer transition-colors hover:border-growi-blue/50">
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-foreground">{campaign.title}</CardTitle>
-                        <span className="rounded-full bg-growi-success/20 px-2 py-1 text-xs font-medium text-growi-success">
-                          {campaign.status}
-                        </span>
+                        {campaign.status === CampaignStatus.DEPLETED ? (
+                          <span className="rounded-full bg-amber-500/20 px-2 py-1 text-xs font-medium text-amber-600">
+                            Depleted
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-growi-success/20 px-2 py-1 text-xs font-medium text-growi-success">
+                            Active
+                          </span>
+                        )}
                       </div>
                       <CardDescription>
                         Budget: ${campaign.budgetTotal.toLocaleString()} | Spent:
@@ -393,6 +444,128 @@ export default function ClientDashboard() {
           </motion.div>
         )}
       </div>
+      
+      {/* Completed Campaigns Section */}
+      {hasCompletedCampaigns && (
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+              <CheckCircle2 className="h-5 w-5 text-growi-success" />
+              Completed Campaigns
+            </h2>
+            <Badge variant="outline">{completedCampaigns.length} completed</Badge>
+          </div>
+          
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid gap-4 md:grid-cols-2"
+          >
+            {completedCampaigns.map((campaign) => (
+              <motion.div key={campaign.id} variants={staggerItem}>
+                <Card className="transition-colors hover:border-growi-success/50">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-foreground">{campaign.title}</CardTitle>
+                      <Badge className="bg-growi-success/20 text-growi-success border-transparent">
+                        Completed
+                      </Badge>
+                    </div>
+                    <CardDescription>
+                      Budget: ${campaign.budgetTotal.toLocaleString()} | Spent: ${campaign.budgetSpent.toLocaleString()}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <p className="text-lg font-bold text-foreground">{getTotalPurchases(campaign)}</p>
+                        <p className="text-xs text-muted-foreground">Purchases</p>
+                      </div>
+                      <div>
+                        <p className="text-lg font-bold text-growi-success">{calculateROI(campaign)}%</p>
+                        <p className="text-xs text-muted-foreground">ROI</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          {new Date(campaign.updatedAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </p>
+                        <p className="text-xs text-muted-foreground">End Date</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex gap-2">
+                      <Link href={`/client/campaign/${campaign.id}`} className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full bg-transparent">
+                          View Summary
+                        </Button>
+                      </Link>
+                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                        <Archive className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      )}
+      
+      {/* Archived/Deleted Campaigns Section */}
+      {hasDeletedCampaigns && (
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-muted-foreground">
+              <Archive className="h-5 w-5" />
+              Archived Campaigns
+            </h2>
+            <Badge variant="secondary">{deletedCampaigns.length} archived</Badge>
+          </div>
+          
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+          >
+            {deletedCampaigns.map((campaign) => (
+              <motion.div key={campaign.id} variants={staggerItem}>
+                <Card className="opacity-60 hover:opacity-100 transition-opacity">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base text-foreground">{campaign.title}</CardTitle>
+                      <Badge variant="secondary" className="text-xs">Archived</Badge>
+                    </div>
+                    <CardDescription className="text-xs">
+                      Ended: {new Date(campaign.updatedAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm">
+                        <span className="font-semibold text-foreground">{getTotalPurchases(campaign)}</span>
+                        <span className="text-muted-foreground"> purchases</span>
+                      </div>
+                      <Button variant="ghost" size="sm" className="h-8 text-xs">
+                        <RotateCcw className="mr-1 h-3 w-3" />
+                        Restore
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

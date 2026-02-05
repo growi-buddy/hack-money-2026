@@ -249,6 +249,7 @@ exports.CampaignStatus = exports.$Enums.CampaignStatus = {
   ACTIVE: 'ACTIVE',
   PAUSED: 'PAUSED',
   DEPLETED: 'DEPLETED',
+  COMPLETED: 'COMPLETED',
   DELETED: 'DELETED'
 };
 

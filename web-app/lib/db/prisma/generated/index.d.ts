@@ -93,6 +93,7 @@ export const CampaignStatus: {
   ACTIVE: 'ACTIVE',
   PAUSED: 'PAUSED',
   DEPLETED: 'DEPLETED',
+  COMPLETED: 'COMPLETED',
   DELETED: 'DELETED'
 };
 
