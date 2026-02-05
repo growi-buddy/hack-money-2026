@@ -222,7 +222,7 @@ export default function LandingPage() {
         >
           {/* Client Card */}
           <motion.div variants={staggerItem} className="h-full">
-            <Link href="/client" className="block h-full">
+            <Link href="/client/profile" className="block h-full">
               <motion.div
                 whileHover={{ scale: 1.02, y: -4 }}
                 whileTap={{ scale: 0.98 }}
@@ -252,7 +252,7 @@ export default function LandingPage() {
 
           {/* Influencer Card */}
           <motion.div variants={staggerItem} className="h-full">
-            <Link href="/influencer" className="block h-full">
+            <Link href="/influencer/profile" className="block h-full">
               <motion.div
                 whileHover={{ scale: 1.02, y: -4 }}
                 whileTap={{ scale: 0.98 }}

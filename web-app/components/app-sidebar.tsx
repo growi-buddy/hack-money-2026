@@ -36,6 +36,7 @@ const clientLinks = [
   { href: '/client/create', icon: PlusCircle, label: 'Create Campaign' },
   { href: '/client/influencers', icon: Users, label: 'Influencers' },
   { href: '/client/inbox', icon: Inbox, label: 'Inbox' },
+  { href: '/client/profile', icon: UserCircle, label: 'Profile' },
 ];
 
 const influencerLinks = [
@@ -122,7 +123,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
       </AnimatePresence>
       
       {/* Desktop Sidebar */}
-      <aside className="hidden w-56 shrink-0 border-r border-border bg-card md:block lg:w-64">
+      <aside className="fixed left-0 top-16 bottom-0 z-40 hidden w-56 overflow-y-auto border-r border-border bg-card md:block lg:w-64">
         <nav className="space-y-1 p-4">
           {links.map((link) => {
             const isActive = pathname === link.href || (link.href !== '/client' && link.href !== '/influencer' && pathname.startsWith(link.href));

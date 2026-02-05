@@ -287,11 +287,11 @@ export default function CreateCampaignPage() {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 items-stretch">
         {/* Chat Panel */}
         <motion.div variants={scaleIn} initial="hidden" animate="visible">
-          <Card className="flex h-[600px] flex-col overflow-hidden">
-            <CardHeader className="border-b border-border bg-secondary/30">
+          <Card className="flex h-[calc(100vh-220px)] flex-col overflow-hidden p-0 gap-0">
+            <CardHeader className="border-b border-border bg-secondary/30 pt-5 min-h-[100px]">
               <div className="flex items-center gap-4">
                 <motion.div variants={float} initial="initial" animate="animate" className="relative">
                   <div className="flex h-14 w-14 items-center justify-center rounded-full bg-growi-blue/20">
@@ -435,8 +435,8 @@ export default function CreateCampaignPage() {
           animate="visible"
           transition={{ delay: 0.1 }}
         >
-          <Card className="flex h-[600px] flex-col overflow-hidden">
-            <CardHeader className="border-b border-border bg-growi-blue/10">
+          <Card className="flex h-[calc(100vh-220px)] flex-col overflow-hidden p-0 gap-0">
+            <CardHeader className="border-b border-border bg-growi-blue/10 pt-5 min-h-[100px]">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-foreground">Campaign Preview</CardTitle>
                 <span className="text-sm text-muted-foreground">{completeness}% complete</span>

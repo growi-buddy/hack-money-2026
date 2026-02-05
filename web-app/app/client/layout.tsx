@@ -31,17 +31,15 @@ function ClientLayoutContent({
         onDisconnect={disconnect}
       />
 
-      <div className="flex flex-1">
-        <AppSidebar
-          type="client"
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
+      <AppSidebar
+        type="client"
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-        <main className="flex-1 overflow-auto p-4 md:p-6">
-          {children}
-        </main>
-      </div>
+      <main className="flex-1 overflow-y-auto p-4 md:ml-56 md:p-6 lg:ml-64">
+        {children}
+      </main>
     </div>
   )
 }
