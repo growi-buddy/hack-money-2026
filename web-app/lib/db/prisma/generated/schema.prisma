@@ -80,6 +80,7 @@ model CampaignRewardEvent {
 
 model Client {
   id        String  @id @default(cuid())
+  sessionId String  @unique
   userAgent String?
   ipAddress String?
 

@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   const { messages, campaignData }: { messages: UIMessage[], campaignData: unknown } = await req.json();
   
   const result = streamText({
-    model: 'anthropic/claude-sonnet-4.5',
+    model: 'anthropic/claude-3-haiku',
     system: `Eres un experto en marketing digital y configuración de campañas publicitarias.
 
 Tu objetivo es ayudar al usuario a configurar una campaña de marketing completa recopilando la siguiente información:
@@ -88,7 +88,7 @@ ${JSON.stringify(campaignData, null, 2)}
           startDate: z.string().optional(),
           endDate: z.string().optional(),
           targetAudience: z.object({
-            gender: z.array(z.enum(['male', 'female', 'non-binary', 'all'])).optional(),
+            gender: z.array(z.enum([ 'male', 'female', 'non-binary', 'all' ])).optional(),
             ageMin: z.number().optional(),
             ageMax: z.number().optional(),
           }).optional(),

@@ -6601,6 +6601,7 @@ export namespace Prisma {
 
   export type ClientMinAggregateOutputType = {
     id: string | null
+    sessionId: string | null
     userAgent: string | null
     ipAddress: string | null
     createdAt: Date | null
@@ -6609,6 +6610,7 @@ export namespace Prisma {
 
   export type ClientMaxAggregateOutputType = {
     id: string | null
+    sessionId: string | null
     userAgent: string | null
     ipAddress: string | null
     createdAt: Date | null
@@ -6617,6 +6619,7 @@ export namespace Prisma {
 
   export type ClientCountAggregateOutputType = {
     id: number
+    sessionId: number
     userAgent: number
     ipAddress: number
     createdAt: number
@@ -6627,6 +6630,7 @@ export namespace Prisma {
 
   export type ClientMinAggregateInputType = {
     id?: true
+    sessionId?: true
     userAgent?: true
     ipAddress?: true
     createdAt?: true
@@ -6635,6 +6639,7 @@ export namespace Prisma {
 
   export type ClientMaxAggregateInputType = {
     id?: true
+    sessionId?: true
     userAgent?: true
     ipAddress?: true
     createdAt?: true
@@ -6643,6 +6648,7 @@ export namespace Prisma {
 
   export type ClientCountAggregateInputType = {
     id?: true
+    sessionId?: true
     userAgent?: true
     ipAddress?: true
     createdAt?: true
@@ -6724,6 +6730,7 @@ export namespace Prisma {
 
   export type ClientGroupByOutputType = {
     id: string
+    sessionId: string
     userAgent: string | null
     ipAddress: string | null
     createdAt: Date
@@ -6749,6 +6756,7 @@ export namespace Prisma {
 
   export type ClientSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    sessionId?: boolean
     userAgent?: boolean
     ipAddress?: boolean
     createdAt?: boolean
@@ -6759,6 +6767,7 @@ export namespace Prisma {
 
   export type ClientSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    sessionId?: boolean
     userAgent?: boolean
     ipAddress?: boolean
     createdAt?: boolean
@@ -6767,6 +6776,7 @@ export namespace Prisma {
 
   export type ClientSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    sessionId?: boolean
     userAgent?: boolean
     ipAddress?: boolean
     createdAt?: boolean
@@ -6775,13 +6785,14 @@ export namespace Prisma {
 
   export type ClientSelectScalar = {
     id?: boolean
+    sessionId?: boolean
     userAgent?: boolean
     ipAddress?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ClientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userAgent" | "ipAddress" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
+  export type ClientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sessionId" | "userAgent" | "ipAddress" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
   export type ClientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     trackedEvents?: boolean | Client$trackedEventsArgs<ExtArgs>
     _count?: boolean | ClientCountOutputTypeDefaultArgs<ExtArgs>
@@ -6796,6 +6807,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      sessionId: string
       userAgent: string | null
       ipAddress: string | null
       createdAt: Date
@@ -7225,6 +7237,7 @@ export namespace Prisma {
    */
   interface ClientFieldRefs {
     readonly id: FieldRef<"Client", 'String'>
+    readonly sessionId: FieldRef<"Client", 'String'>
     readonly userAgent: FieldRef<"Client", 'String'>
     readonly ipAddress: FieldRef<"Client", 'String'>
     readonly createdAt: FieldRef<"Client", 'DateTime'>
@@ -13281,6 +13294,7 @@ export namespace Prisma {
 
   export const ClientScalarFieldEnum: {
     id: 'id',
+    sessionId: 'sessionId',
     userAgent: 'userAgent',
     ipAddress: 'ipAddress',
     createdAt: 'createdAt',
@@ -13831,6 +13845,7 @@ export namespace Prisma {
     OR?: ClientWhereInput[]
     NOT?: ClientWhereInput | ClientWhereInput[]
     id?: StringFilter<"Client"> | string
+    sessionId?: StringFilter<"Client"> | string
     userAgent?: StringNullableFilter<"Client"> | string | null
     ipAddress?: StringNullableFilter<"Client"> | string | null
     createdAt?: DateTimeFilter<"Client"> | Date | string
@@ -13840,6 +13855,7 @@ export namespace Prisma {
 
   export type ClientOrderByWithRelationInput = {
     id?: SortOrder
+    sessionId?: SortOrder
     userAgent?: SortOrderInput | SortOrder
     ipAddress?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -13849,6 +13865,7 @@ export namespace Prisma {
 
   export type ClientWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    sessionId?: string
     AND?: ClientWhereInput | ClientWhereInput[]
     OR?: ClientWhereInput[]
     NOT?: ClientWhereInput | ClientWhereInput[]
@@ -13857,10 +13874,11 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Client"> | Date | string
     updatedAt?: DateTimeFilter<"Client"> | Date | string
     trackedEvents?: TrackedEventListRelationFilter
-  }, "id">
+  }, "id" | "sessionId">
 
   export type ClientOrderByWithAggregationInput = {
     id?: SortOrder
+    sessionId?: SortOrder
     userAgent?: SortOrderInput | SortOrder
     ipAddress?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -13875,6 +13893,7 @@ export namespace Prisma {
     OR?: ClientScalarWhereWithAggregatesInput[]
     NOT?: ClientScalarWhereWithAggregatesInput | ClientScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Client"> | string
+    sessionId?: StringWithAggregatesFilter<"Client"> | string
     userAgent?: StringNullableWithAggregatesFilter<"Client"> | string | null
     ipAddress?: StringNullableWithAggregatesFilter<"Client"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Client"> | Date | string
@@ -14534,6 +14553,7 @@ export namespace Prisma {
 
   export type ClientCreateInput = {
     id?: string
+    sessionId: string
     userAgent?: string | null
     ipAddress?: string | null
     createdAt?: Date | string
@@ -14543,6 +14563,7 @@ export namespace Prisma {
 
   export type ClientUncheckedCreateInput = {
     id?: string
+    sessionId: string
     userAgent?: string | null
     ipAddress?: string | null
     createdAt?: Date | string
@@ -14552,6 +14573,7 @@ export namespace Prisma {
 
   export type ClientUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14561,6 +14583,7 @@ export namespace Prisma {
 
   export type ClientUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14570,6 +14593,7 @@ export namespace Prisma {
 
   export type ClientCreateManyInput = {
     id?: string
+    sessionId: string
     userAgent?: string | null
     ipAddress?: string | null
     createdAt?: Date | string
@@ -14578,6 +14602,7 @@ export namespace Prisma {
 
   export type ClientUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14586,6 +14611,7 @@ export namespace Prisma {
 
   export type ClientUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15347,6 +15373,7 @@ export namespace Prisma {
 
   export type ClientCountOrderByAggregateInput = {
     id?: SortOrder
+    sessionId?: SortOrder
     userAgent?: SortOrder
     ipAddress?: SortOrder
     createdAt?: SortOrder
@@ -15355,6 +15382,7 @@ export namespace Prisma {
 
   export type ClientMaxOrderByAggregateInput = {
     id?: SortOrder
+    sessionId?: SortOrder
     userAgent?: SortOrder
     ipAddress?: SortOrder
     createdAt?: SortOrder
@@ -15363,6 +15391,7 @@ export namespace Prisma {
 
   export type ClientMinOrderByAggregateInput = {
     id?: SortOrder
+    sessionId?: SortOrder
     userAgent?: SortOrder
     ipAddress?: SortOrder
     createdAt?: SortOrder
@@ -17382,6 +17411,7 @@ export namespace Prisma {
 
   export type ClientCreateWithoutTrackedEventsInput = {
     id?: string
+    sessionId: string
     userAgent?: string | null
     ipAddress?: string | null
     createdAt?: Date | string
@@ -17390,6 +17420,7 @@ export namespace Prisma {
 
   export type ClientUncheckedCreateWithoutTrackedEventsInput = {
     id?: string
+    sessionId: string
     userAgent?: string | null
     ipAddress?: string | null
     createdAt?: Date | string
@@ -17445,6 +17476,7 @@ export namespace Prisma {
 
   export type ClientUpdateWithoutTrackedEventsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17453,6 +17485,7 @@ export namespace Prisma {
 
   export type ClientUncheckedUpdateWithoutTrackedEventsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

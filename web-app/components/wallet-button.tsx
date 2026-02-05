@@ -1,62 +1,53 @@
-"use client"
+'use client';
 
-import { motion } from "framer-motion"
-import { Wallet, ChevronDown, LogOut, Copy, ExternalLink } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useState, useCallback } from "react"
+} from '@/components/ui/dropdown-menu';
+import { useWallet } from '@/contexts/wallet-context';
+import { motion } from 'framer-motion';
+import { ChevronDown, Copy, ExternalLink, LogOut, Wallet } from 'lucide-react';
+import { useCallback, useState } from 'react';
 
-interface WalletButtonProps {
-  connected?: boolean
-  address?: string
-  onConnect?: () => void
-  onDisconnect?: () => void
-}
-
-export function WalletButton({ 
-  connected = false, 
-  address = "0x1234...5678",
-  onConnect,
-  onDisconnect 
-}: WalletButtonProps) {
-  const [isHovered, setIsHovered] = useState(false)
-  const [copied, setCopied] = useState(false)
-
+export function WalletButton() {
+  
+  const { address, isConnected, connect, disconnect } = useWallet();
+  const [ isHovered, setIsHovered ] = useState(false);
+  const [ copied, setCopied ] = useState(false);
+  console.log({ address, isConnected, connect, disconnect });
   const copyAddress = useCallback(async () => {
-    if (!address) return
+    if (!address) return;
     try {
-      await navigator.clipboard.writeText(address)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error("Failed to copy address:", err)
+      console.error('Failed to copy address:', err);
     }
-  }, [address])
-
-  if (!connected) {
+  }, [ address ]);
+  
+  if (!isConnected) {
     return (
       <motion.div
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
         <Button
-          onClick={onConnect}
+          onClick={connect}
           className="relative overflow-hidden bg-growi-blue text-white hover:bg-growi-blue/90"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           <motion.div
             className="absolute inset-0 bg-white/20"
-            initial={{ x: "-100%", opacity: 0 }}
-            animate={{ 
-              x: isHovered ? "100%" : "-100%",
-              opacity: isHovered ? 1 : 0
+            initial={{ x: '-100%', opacity: 0 }}
+            animate={{
+              x: isHovered ? '100%' : '-100%',
+              opacity: isHovered ? 1 : 0,
             }}
             transition={{ duration: 0.5 }}
           />
@@ -64,9 +55,9 @@ export function WalletButton({
           Connect Wallet
         </Button>
       </motion.div>
-    )
+    );
   }
-
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -79,18 +70,18 @@ export function WalletButton({
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem onClick={copyAddress}>
           <Copy className="mr-2 h-4 w-4" />
-          {copied ? "Copied!" : "Copy Address"}
+          {copied ? 'Copied!' : 'Copy Address'}
         </DropdownMenuItem>
         <DropdownMenuItem>
           <ExternalLink className="mr-2 h-4 w-4" />
           View on Explorer
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onDisconnect} className="text-destructive">
+        <DropdownMenuItem onClick={disconnect} className="text-destructive">
           <LogOut className="mr-2 h-4 w-4" />
           Disconnect
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

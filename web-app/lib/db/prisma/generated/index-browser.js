@@ -162,6 +162,7 @@ exports.Prisma.CampaignRewardEventScalarFieldEnum = {
 
 exports.Prisma.ClientScalarFieldEnum = {
   id: 'id',
+  sessionId: 'sessionId',
   userAgent: 'userAgent',
   ipAddress: 'ipAddress',
   createdAt: 'createdAt',

@@ -4,12 +4,12 @@ import { useState } from 'react';
 
 export default function HumanTechPage() {
   // Wallet state
-  const [address, setAddress] = useState<string>('');
-  const [signature, setSignature] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState(false);
-  const [loginType, setLoginType] = useState<'human' | 'walletconnect' | 'injected' | null>(null);
-
+  const [ address, setAddress ] = useState<string>('');
+  const [ signature, setSignature ] = useState<string>('');
+  const [ error, setError ] = useState<string>('');
+  const [ loading, setLoading ] = useState(false);
+  const [ loginType, setLoginType ] = useState<'human' | 'walletconnect' | 'injected' | null>(null);
+  
   // Connect Wallet (abre el modal de WaaP)
   const handleConnect = async () => {
     setLoading(true);
@@ -18,7 +18,7 @@ export default function HumanTechPage() {
       if (!window.waap) {
         throw new Error('WaaP no está inicializado');
       }
-
+      
       // Abre el modal de WaaP - el usuario elige Google, MetaMask, Email, etc.
       const type = await window.waap.login();
       setLoginType(type);
@@ -38,7 +38,7 @@ export default function HumanTechPage() {
       setLoading(false);
     }
   };
-
+  
   // Logout
   const handleLogout = async () => {
     try {
@@ -56,7 +56,7 @@ export default function HumanTechPage() {
       console.error('Logout error:', error);
     }
   };
-
+  
   // Sign Message
   const handleSign = async () => {
     setLoading(true);
@@ -65,13 +65,13 @@ export default function HumanTechPage() {
       if (!window.waap || !address) {
         throw new Error('Debes conectarte primero');
       }
-
+      
       const message = `Firmando desde Human.Tech POC\nTimestamp: ${Date.now()}`;
       const sig = await window.waap.request({
         method: 'personal_sign',
-        params: [message, address],
+        params: [ message, address ],
       });
-
+      
       setSignature(typeof sig === 'string' ? sig : sig[0]);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Error al firmar mensaje';
@@ -81,7 +81,7 @@ export default function HumanTechPage() {
       setLoading(false);
     }
   };
-
+  
   // Determinar el nombre del método de login
   const getLoginMethodName = () => {
     if (!loginType) return '';
@@ -96,7 +96,7 @@ export default function HumanTechPage() {
         return 'Wallet';
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-8">
       <div className="max-w-4xl mx-auto">
@@ -106,19 +106,20 @@ export default function HumanTechPage() {
         <p className="text-slate-600 dark:text-slate-400 mb-8">
           Integración de wallets y funcionalidades
         </p>
-
+        
         <div className="grid gap-6">
           {/* WALLET CARD */}
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-200 dark:border-slate-700">
             <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
               💰 Wallet
             </h2>
-
+            
             <div className="space-y-4">
               {!address ? (
                 <div>
                   <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
-                    Conecta tu wallet usando el modal de Human.Tech WaaP. Podrás elegir entre Google, MetaMask, Email y otras opciones.
+                    Conecta tu wallet usando el modal de Human.Tech WaaP. Podrás elegir entre Google, MetaMask, Email y
+                    otras opciones.
                   </p>
                   <button
                     onClick={handleConnect}
@@ -136,7 +137,7 @@ export default function HumanTechPage() {
                       ✓ Conectado con {getLoginMethodName()}
                     </span>
                   </div>
-
+                  
                   {/* Address Display */}
                   <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
                     <p className="text-xs text-slate-600 dark:text-slate-400 mb-2 font-semibold">
@@ -146,7 +147,7 @@ export default function HumanTechPage() {
                       {address}
                     </p>
                   </div>
-
+                  
                   {/* Action Buttons */}
                   <div className="grid grid-cols-2 gap-3">
                     <button
@@ -163,7 +164,7 @@ export default function HumanTechPage() {
                       🚪 Logout
                     </button>
                   </div>
-
+                  
                   {/* Signature Display */}
                   {signature && (
                     <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
@@ -177,7 +178,7 @@ export default function HumanTechPage() {
                   )}
                 </div>
               )}
-
+              
               {/* Error Display */}
               {error && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -188,7 +189,7 @@ export default function HumanTechPage() {
               )}
             </div>
           </div>
-
+          
           {/* ESCROW CARD (placeholder) */}
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-200 dark:border-slate-700 opacity-60">
             <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
@@ -214,7 +215,7 @@ export default function HumanTechPage() {
               </div>
             </div>
           </div>
-
+          
           {/* YELLOW CARD (placeholder) */}
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 border border-slate-200 dark:border-slate-700 opacity-60">
             <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">

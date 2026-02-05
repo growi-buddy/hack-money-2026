@@ -1,13 +1,11 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { WaaPProvider } from "@/components/WaaPProvider";
-import React from "react"
-import { Analytics } from '@vercel/analytics/next'
-import './globals.css'
+import { Analytics } from '@vercel/analytics/next';
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+import React from 'react';
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const _geist = Geist({ subsets: [ 'latin' ] });
+const _geistMono = Geist_Mono({ subsets: [ 'latin' ] });
 
 export const metadata: Metadata = {
   title: 'GROWI - Web3 Influencer Marketing Platform',
@@ -30,21 +28,19 @@ export const metadata: Metadata = {
     ],
     apple: '/apple-icon.png',
   },
-}
+};
 
 export default function RootLayout({
-  children,
-}: Readonly<{
+                                     children,
+                                   }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
-        <WaaPProvider>
-          {children}
-        </WaaPProvider>
-        <Analytics />
-      </body>
+    <body className={`font-sans antialiased`}>
+    {children}
+    <Analytics />
+    </body>
     </html>
-  )
+  );
 }

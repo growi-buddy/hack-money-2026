@@ -1,38 +1,26 @@
-"use client"
+'use client';
 
-import { usePathname, useRouter } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import { ArrowLeft, Menu } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { WalletButton } from "@/components/wallet-button"
-import { motion } from "framer-motion"
+import { Button } from '@/components/ui/button';
+import { WalletButton } from '@/components/wallet-button';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Menu } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface NavbarProps {
-  showBack?: boolean
-  onMenuClick?: () => void
-  showMenu?: boolean
-  connected?: boolean
-  address?: string
-  onConnect?: () => void
-  onDisconnect?: () => void
+  showBack?: boolean;
+  onMenuClick?: () => void;
+  showMenu?: boolean;
 }
 
-export function Navbar({
-  showBack = false,
-  onMenuClick,
-  showMenu = false,
-  connected = false,
-  address,
-  onConnect,
-  onDisconnect
-}: NavbarProps) {
-  const router = useRouter()
-  const pathname = usePathname()
+export function Navbar({ showBack = false, onMenuClick, showMenu = false }: NavbarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   
   // Determine if we should show back button
-  const isSubPage = pathname !== "/" && pathname.split("/").length > 2
-
+  const isSubPage = pathname !== '/' && pathname.split('/').length > 2;
+  
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
@@ -84,13 +72,8 @@ export function Navbar({
           </Link>
         </div>
         
-        <WalletButton
-          connected={connected}
-          address={address}
-          onConnect={onConnect}
-          onDisconnect={onDisconnect}
-        />
+        <WalletButton />
       </div>
     </header>
-  )
+  );
 }
