@@ -1,22 +1,23 @@
 "use client"
 
-import { useState } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Instagram, 
-  Twitter, 
-  Youtube, 
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Instagram,
+  Twitter,
+  Youtube,
   Link as LinkIcon,
   Save,
   Plus,
   Trash2,
   ExternalLink,
-  Star
+  Star,
+  X
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -59,6 +60,21 @@ const affinityOptions = [
 
 export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false)
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false)
+
+  // Show welcome modal on first visit
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem("growi-influencer-welcome-seen")
+    if (!hasSeenWelcome) {
+      setShowWelcomeModal(true)
+    }
+  }, [])
+
+  const closeWelcomeModal = () => {
+    setShowWelcomeModal(false)
+    localStorage.setItem("growi-influencer-welcome-seen", "true")
+  }
+
   const [profile, setProfile] = useState({
     fullName: "Alex Chen",
     email: "alex.chen@email.com",
@@ -132,6 +148,46 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
+      {/* Welcome Modal */}
+      <AnimatePresence>
+        {showWelcomeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={closeWelcomeModal}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative mx-4 w-full max-w-md rounded-2xl bg-background p-8 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={closeWelcomeModal}
+                className="absolute right-4 top-4 rounded-full p-1 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <div className="text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-growi-blue/10">
+                  <User className="h-8 w-8 text-growi-blue" />
+                </div>
+                <h2 className="mb-2 text-2xl font-bold text-foreground">
+                  Welcome to the Influencer Portal
+                </h2>
+                <p className="text-muted-foreground">
+                  Complete your profile details
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

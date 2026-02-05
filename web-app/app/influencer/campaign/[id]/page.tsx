@@ -7,7 +7,6 @@ import Image from "next/image"
 import { Eye, ShoppingCart, DollarSign, Check, ArrowRight, Package, CreditCard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { staggerContainer, staggerItem } from "@/lib/animations"
 
@@ -37,17 +36,9 @@ const campaignDetails = {
 
 export default function CampaignDetailsPage() {
   const router = useRouter()
-  const [selectedBounties, setSelectedBounties] = useState<string[]>([])
   const [showSuccess, setShowSuccess] = useState(false)
 
-  const toggleBounty = (id: string) => {
-    setSelectedBounties(prev =>
-      prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]
-    )
-  }
-
   const handleApply = async () => {
-    if (selectedBounties.length === 0) return
     setShowSuccess(true)
     await new Promise(resolve => setTimeout(resolve, 2000))
     router.push(`/influencer/campaign/${campaignDetails.id}/qr`)
@@ -131,50 +122,22 @@ export default function CampaignDetailsPage() {
 
               {/* Bounty Selection */}
               <motion.div variants={staggerItem}>
-                <h3 className="mb-3 font-semibold text-foreground">Select Bounties</h3>
+                <h3 className="mb-3 font-semibold text-foreground">Available Bounties</h3>
                 <div className="space-y-3">
-                  {campaignDetails.bounties.map((bounty) => {
-                    const isSelected = selectedBounties.includes(bounty.id)
-                    return (
-                      <motion.div
-                        key={bounty.id}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                        onClick={() => toggleBounty(bounty.id)}
-                        className={`flex cursor-pointer items-center gap-4 rounded-lg border p-4 transition-colors ${
-                          isSelected
-                            ? "border-growi-blue bg-growi-blue/10"
-                            : "border-border bg-secondary/30 hover:border-growi-blue/50"
-                        }`}
-                      >
-                        <motion.div
-                          animate={isSelected ? { scale: [1, 1.2, 1] } : {}}
-                          transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                        >
-                          <Checkbox
-                            checked={isSelected}
-                            className="border-growi-blue data-[state=checked]:bg-growi-blue"
-                          />
-                        </motion.div>
-                        <bounty.icon className={`h-5 w-5 ${isSelected ? "text-growi-blue" : "text-muted-foreground"}`} />
-                        <div className="flex-1">
-                          <p className={`font-medium ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
-                            {bounty.label}
-                          </p>
-                          <p className="text-sm text-growi-money">{bounty.rate}</p>
-                        </div>
-                        {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="flex h-6 w-6 items-center justify-center rounded-full bg-growi-blue"
-                          >
-                            <Check className="h-4 w-4 text-white" />
-                          </motion.div>
-                        )}
-                      </motion.div>
-                    )
-                  })}
+                  {campaignDetails.bounties.map((bounty) => (
+                    <div
+                      key={bounty.id}
+                      className="flex items-center gap-4 rounded-lg border border-border bg-secondary/30 p-4"
+                    >
+                      <bounty.icon className="h-5 w-5 text-growi-blue" />
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">
+                          {bounty.label}
+                        </p>
+                        <p className="text-sm text-growi-money">{bounty.rate}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </motion.div>
 
@@ -186,8 +149,7 @@ export default function CampaignDetailsPage() {
                 >
                   <Button
                     onClick={handleApply}
-                    disabled={selectedBounties.length === 0}
-                    className="relative w-full overflow-hidden bg-growi-blue text-white hover:bg-growi-blue/90 disabled:opacity-50"
+                    className="relative w-full overflow-hidden bg-growi-blue text-white hover:bg-growi-blue/90"
                   >
                     <motion.div
                       className="absolute inset-0 bg-growi-lime/30"

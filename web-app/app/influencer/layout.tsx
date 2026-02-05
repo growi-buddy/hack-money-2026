@@ -22,17 +22,15 @@ export default function InfluencerLayout({
         address="0x1234...5678" 
       />
       
-      <div className="flex flex-1">
-        <AppSidebar 
-          type="influencer" 
-          isOpen={sidebarOpen} 
-          onClose={() => setSidebarOpen(false)} 
-        />
-        
-        <main className="flex-1 overflow-auto p-4 md:p-6">
-          {children}
-        </main>
-      </div>
+      <AppSidebar
+        type="influencer"
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      <main className="flex-1 overflow-y-auto p-4 md:ml-56 md:p-6 lg:ml-64">
+        {children}
+      </main>
     </div>
   )
 }
