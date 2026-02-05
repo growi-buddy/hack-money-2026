@@ -117,3 +117,44 @@ export const UserCampaignsResponseSchema = z.object({
 })
 
 export type UserCampaignsResponse = z.infer<typeof UserCampaignsResponseSchema>;
+
+// --- Influencer campaign types ---
+
+export const CampaignOwnerSchema = z.object({
+  id: z.string(),
+  name: z.string().nullable(),
+  walletAddress: z.string(),
+});
+
+export type CampaignOwner = z.infer<typeof CampaignOwnerSchema>;
+
+export const InfluencerCampaignDetailSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  status: z.nativeEnum(CampaignStatus),
+  budgetTotal: z.number(),
+  budgetSpent: z.number(),
+  owner: CampaignOwnerSchema,
+  rewardEvents: z.array(RewardEventSummarySchema),
+  participationsCount: z.number(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type InfluencerCampaignDetail = z.infer<typeof InfluencerCampaignDetailSchema>;
+
+export const InfluencerCampaignSummarySchema = z.object({
+  participationId: z.string(),
+  currentBalance: z.number(),
+  totalEvents: z.number(),
+  campaign: InfluencerCampaignDetailSchema,
+});
+
+export type InfluencerCampaignSummary = z.infer<typeof InfluencerCampaignSummarySchema>;
+
+export const InfluencerCampaignsResponseSchema = z.object({
+  campaigns: z.array(InfluencerCampaignSummarySchema),
+  total: z.number(),
+});
+
+export type InfluencerCampaignsResponse = z.infer<typeof InfluencerCampaignsResponseSchema>;
