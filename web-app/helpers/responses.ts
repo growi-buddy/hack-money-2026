@@ -35,6 +35,7 @@ export async function safeRoute(cb: () => Promise<{
     const { response, status } = await cb();
     return NextResponse.json(response, { status });
   } catch (error) {
+    console.log(error);
     return responseError(error);
   }
 }

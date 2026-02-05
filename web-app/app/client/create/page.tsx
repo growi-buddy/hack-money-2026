@@ -27,6 +27,16 @@ import { DefaultChatTransport } from "ai"
 import { CampaignFormData } from "@/types/campaign-form"
 import { mapCampaignFormToAPI, validateCampaignForm } from "@/helpers/campaign-mapper"
 import { useWallet } from "@/contexts/wallet-context"
+import { RewardEventDTO } from "@/types"
+import { EventType } from "@/lib/db/prisma/generated"
+
+const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  [EventType.LANDING_PAGE_VIEW]: "Landing Page View",
+  [EventType.VIEW_ITEM]: "View Item",
+  [EventType.ADD_TO_CART]: "Add to Cart",
+  [EventType.CHECKOUT]: "Checkout",
+  [EventType.PURCHASE_SUCCESS]: "Purchase Success",
+}
 
 const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
   name: "",
@@ -45,13 +55,7 @@ const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
   },
   interests: [],
   budget: undefined,
-  rewards: {
-    landingPageView: { enabled: false, pricePerView: undefined },
-    itemView: { enabled: false, pricePerClick: undefined },
-    addToCart: { enabled: false, pricePerClick: undefined },
-    checkout: { enabled: false, pricePerClick: undefined },
-    thankYouView: { enabled: false, pricePerView: undefined },
-  },
+  selectedRewardEvents: [],
 }
 
 const QUICK_PROMPTS = [
@@ -87,6 +91,36 @@ export default function CreateCampaignPage() {
   const [lastUpdatedField, setLastUpdatedField] = useState<string | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Reward Events state
+  const [rewardEvents, setRewardEvents] = useState<RewardEventDTO[]>([])
+  const [loadingRewardEvents, setLoadingRewardEvents] = useState(false)
+
+  // Fetch reward events
+  useEffect(() => {
+    const fetchRewardEvents = async () => {
+      if (!address) {
+        setRewardEvents([])
+        return
+      }
+
+      try {
+        setLoadingRewardEvents(true)
+        const response = await fetch(`/api/reward-events?walletAddress=${address}`)
+        const data = await response.json()
+
+        if (response.ok) {
+          setRewardEvents(data.data)
+        }
+      } catch (err) {
+        console.error("Error fetching reward events:", err)
+      } finally {
+        setLoadingRewardEvents(false)
+      }
+    }
+
+    fetchRewardEvents()
+  }, [address])
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
@@ -188,8 +222,11 @@ export default function CreateCampaignPage() {
     if (campaignData.interests?.length) filled++
     if (campaignData.budget) filled++
 
-    const rewardsEnabled = Object.values(campaignData.rewards || {}).filter((r) => r?.enabled).length
-    if (rewardsEnabled > 0) filled++
+    // Check selected reward events instead of legacy rewards
+    const rewardEventsSelected = (campaignData.selectedRewardEvents || []).filter(
+      (e) => e.amount > 0
+    ).length
+    if (rewardEventsSelected > 0) filled++
 
     return Math.round((filled / total) * 100)
   }
@@ -549,122 +586,73 @@ export default function CreateCampaignPage() {
                 />
               </InfoCard>
 
-              <InfoCard icon={<Zap className="h-4 w-4" />} title="Rewards" color="amber">
-                <RewardField
-                  label="Landing Page View"
-                  enabled={campaignData.rewards?.landingPageView?.enabled}
-                  price={campaignData.rewards?.landingPageView?.pricePerView}
-                  onToggle={(enabled) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        landingPageView: { ...prev.rewards?.landingPageView, enabled },
-                      },
-                    }))
-                  }
-                  onPriceChange={(price) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        landingPageView: { ...prev.rewards?.landingPageView, pricePerView: price },
-                      },
-                    }))
-                  }
-                />
-                <RewardField
-                  label="Item View"
-                  enabled={campaignData.rewards?.itemView?.enabled}
-                  price={campaignData.rewards?.itemView?.pricePerClick}
-                  onToggle={(enabled) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        itemView: { ...prev.rewards?.itemView, enabled },
-                      },
-                    }))
-                  }
-                  onPriceChange={(price) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        itemView: { ...prev.rewards?.itemView, pricePerClick: price },
-                      },
-                    }))
-                  }
-                />
-                <RewardField
-                  label="Add to Cart"
-                  enabled={campaignData.rewards?.addToCart?.enabled}
-                  price={campaignData.rewards?.addToCart?.pricePerClick}
-                  onToggle={(enabled) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        addToCart: { ...prev.rewards?.addToCart, enabled },
-                      },
-                    }))
-                  }
-                  onPriceChange={(price) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        addToCart: { ...prev.rewards?.addToCart, pricePerClick: price },
-                      },
-                    }))
-                  }
-                />
-                <RewardField
-                  label="Checkout"
-                  enabled={campaignData.rewards?.checkout?.enabled}
-                  price={campaignData.rewards?.checkout?.pricePerClick}
-                  onToggle={(enabled) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        checkout: { ...prev.rewards?.checkout, enabled },
-                      },
-                    }))
-                  }
-                  onPriceChange={(price) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        checkout: { ...prev.rewards?.checkout, pricePerClick: price },
-                      },
-                    }))
-                  }
-                />
-                <RewardField
-                  label="Purchase Success"
-                  enabled={campaignData.rewards?.thankYouView?.enabled}
-                  price={campaignData.rewards?.thankYouView?.pricePerView}
-                  onToggle={(enabled) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        thankYouView: { ...prev.rewards?.thankYouView, enabled },
-                      },
-                    }))
-                  }
-                  onPriceChange={(price) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      rewards: {
-                        ...prev.rewards,
-                        thankYouView: { ...prev.rewards?.thankYouView, pricePerView: price },
-                      },
-                    }))
-                  }
-                />
+              <InfoCard icon={<Zap className="h-4 w-4" />} title="Reward Events" color="amber">
+                {loadingRewardEvents ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-5 w-5 animate-spin text-growi-blue" />
+                  </div>
+                ) : rewardEvents.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      No tienes eventos de recompensa configurados
+                    </p>
+                    <a
+                      href="/client/events-tracking"
+                      className="text-sm text-growi-blue hover:underline"
+                    >
+                      Configurar eventos →
+                    </a>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {rewardEvents.map((event) => {
+                      const isSelected = campaignData.selectedRewardEvents?.some(
+                        (e) => e.rewardEventId === event.id
+                      )
+                      const selectedEvent = campaignData.selectedRewardEvents?.find(
+                        (e) => e.rewardEventId === event.id
+                      )
+
+                      return (
+                        <RewardEventField
+                          key={event.id}
+                          label={event.name}
+                          eventType={EVENT_TYPE_LABELS[event.eventType]}
+                          enabled={isSelected}
+                          amount={selectedEvent?.amount}
+                          onToggle={(enabled) => {
+                            setCampaignData((prev) => {
+                              if (enabled) {
+                                return {
+                                  ...prev,
+                                  selectedRewardEvents: [
+                                    ...(prev.selectedRewardEvents || []),
+                                    { rewardEventId: event.id!, amount: 0.01, volumeStep: 1 },
+                                  ],
+                                }
+                              } else {
+                                return {
+                                  ...prev,
+                                  selectedRewardEvents: (prev.selectedRewardEvents || []).filter(
+                                    (e) => e.rewardEventId !== event.id
+                                  ),
+                                }
+                              }
+                            })
+                          }}
+                          onAmountChange={(amount) => {
+                            setCampaignData((prev) => ({
+                              ...prev,
+                              selectedRewardEvents: (prev.selectedRewardEvents || []).map((e) =>
+                                e.rewardEventId === event.id ? { ...e, amount } : e
+                              ),
+                            }))
+                          }}
+                        />
+                      )
+                    })}
+                  </div>
+                )}
               </InfoCard>
             </div>
 
@@ -832,18 +820,20 @@ function Field({
   )
 }
 
-function RewardField({
+function RewardEventField({
   label,
+  eventType,
   enabled,
-  price,
+  amount,
   onToggle,
-  onPriceChange,
+  onAmountChange,
 }: {
   label: string
+  eventType: string
   enabled?: boolean
-  price?: number
+  amount?: number
   onToggle?: (enabled: boolean) => void
-  onPriceChange?: (price: number) => void
+  onAmountChange?: (amount: number) => void
 }) {
   return (
     <div
@@ -858,11 +848,14 @@ function RewardField({
           onChange={(e) => onToggle?.(e.target.checked)}
           className="h-4 w-4 rounded text-growi-blue focus:ring-2 focus:ring-growi-blue/50"
         />
-        <span
-          className={`text-sm ${enabled ? "font-medium text-foreground" : "text-muted-foreground"}`}
-        >
-          {label}
-        </span>
+        <div className="flex flex-col">
+          <span
+            className={`text-sm ${enabled ? "font-medium text-foreground" : "text-muted-foreground"}`}
+          >
+            {label}
+          </span>
+          <span className="text-xs text-muted-foreground">{eventType}</span>
+        </div>
       </label>
       {enabled && (
         <div className="flex items-center gap-1 rounded bg-secondary px-2 py-1">
@@ -870,9 +863,9 @@ function RewardField({
           <input
             type="number"
             step="0.001"
-            min="0"
-            value={price || 0}
-            onChange={(e) => onPriceChange?.(parseFloat(e.target.value) || 0)}
+            min="0.001"
+            value={amount || 0.01}
+            onChange={(e) => onAmountChange?.(parseFloat(e.target.value) || 0.01)}
             className="w-16 bg-transparent text-sm text-foreground focus:outline-none"
           />
         </div>

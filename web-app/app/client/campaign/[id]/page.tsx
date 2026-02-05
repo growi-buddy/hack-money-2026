@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
+import { useParams } from "next/navigation"
 import { motion } from "framer-motion"
-import Image from "next/image"
-import { Eye, ShoppingCart, DollarSign, TrendingUp, Users, Package, CreditCard, Star, MessageSquare, Sparkles, ArrowRight } from "lucide-react"
+import { Eye, ShoppingCart, DollarSign, TrendingUp, Users, Package, CreditCard, Star, MessageSquare, Sparkles, ArrowRight, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { MetricCard } from "@/components/metric-card"
 import { staggerContainer, staggerItem } from "@/lib/animations"
+import { CampaignStatus, EventType } from "@/lib/db/prisma/generated"
+import { CampaignDashboardData } from "@/app/api/campaigns/services"
 import {
   BarChart,
   Bar,
@@ -26,45 +28,141 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line
 } from "recharts"
 
-const timelineData = [
-  { date: "Feb 10", landingViews: 5000, viewItems: 2800, addToCart: 320, checkout: 120, purchases: 12 },
-  { date: "Feb 11", landingViews: 12000, viewItems: 6500, addToCart: 780, checkout: 290, purchases: 28 },
-  { date: "Feb 12", landingViews: 18000, viewItems: 9800, addToCart: 1100, checkout: 420, purchases: 45 },
-  { date: "Feb 13", landingViews: 25000, viewItems: 13500, addToCart: 1600, checkout: 580, purchases: 62 },
-  { date: "Feb 14", landingViews: 35000, viewItems: 18900, addToCart: 2200, checkout: 810, purchases: 85 },
-  { date: "Feb 15", landingViews: 48000, viewItems: 26000, addToCart: 3100, checkout: 1100, purchases: 120 },
-  { date: "Feb 16", landingViews: 62000, viewItems: 33500, addToCart: 4000, checkout: 1450, purchases: 158 },
+// Event type order and labels
+const EVENT_TYPE_ORDER: EventType[] = [
+  EventType.LANDING_PAGE_VIEW,
+  EventType.VIEW_ITEM,
+  EventType.ADD_TO_CART,
+  EventType.CHECKOUT,
+  EventType.PURCHASE_SUCCESS,
 ]
 
-const funnelData = [
-  { name: "Landing Page Views", value: 125000, color: "#4A90E2" },
-  { name: "View Items", value: 67500, color: "#60a5fa" },
-  { name: "Add to Cart", value: 8500, color: "#FFB347" },
-  { name: "Checkout", value: 2100, color: "#9ACD32" },
-  { name: "Purchase", value: 342, color: "#34d399" },
-]
+const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  [EventType.LANDING_PAGE_VIEW]: "Landing Page Views",
+  [EventType.VIEW_ITEM]: "View Items",
+  [EventType.ADD_TO_CART]: "Add to Cart",
+  [EventType.CHECKOUT]: "Checkout",
+  [EventType.PURCHASE_SUCCESS]: "Purchases",
+}
 
-const influencers = [
-  { id: 1, name: "Alex Chen", avatar: "/growi-mascot.png", rate: "$0.007/unit", progress: 100, isHot: true, completed: true, rating: 4.8 },
-  { id: 2, name: "Sarah Kim", avatar: "/growi-mascot.png", rate: "$0.005/unit", progress: 45, isHot: false, completed: false, rating: null },
-  { id: 3, name: "Jordan Lee", avatar: "/growi-mascot.png", rate: "$0.008/unit", progress: 100, isHot: true, completed: true, rating: null },
-  { id: 4, name: "Emma Wilson", avatar: "/growi-mascot.png", rate: "$0.006/unit", progress: 33, isHot: false, completed: false, rating: null },
-]
+const EVENT_TYPE_ICONS: Record<EventType, React.ReactNode> = {
+  [EventType.LANDING_PAGE_VIEW]: <Eye className="h-5 w-5" />,
+  [EventType.VIEW_ITEM]: <Package className="h-5 w-5" />,
+  [EventType.ADD_TO_CART]: <ShoppingCart className="h-5 w-5" />,
+  [EventType.CHECKOUT]: <CreditCard className="h-5 w-5" />,
+  [EventType.PURCHASE_SUCCESS]: <DollarSign className="h-5 w-5" />,
+}
+
+const FUNNEL_COLORS: Record<EventType, string> = {
+  [EventType.LANDING_PAGE_VIEW]: "#4A90E2",
+  [EventType.VIEW_ITEM]: "#60a5fa",
+  [EventType.ADD_TO_CART]: "#FFB347",
+  [EventType.CHECKOUT]: "#9ACD32",
+  [EventType.PURCHASE_SUCCESS]: "#34d399",
+}
+
+const STATUS_STYLES: Record<CampaignStatus, { bg: string; text: string }> = {
+  [CampaignStatus.ACTIVE]: { bg: "bg-growi-success/20", text: "text-growi-success" },
+  [CampaignStatus.PAUSED]: { bg: "bg-yellow-500/20", text: "text-yellow-500" },
+  [CampaignStatus.DRAFT]: { bg: "bg-gray-500/20", text: "text-gray-500" },
+  [CampaignStatus.DEPLETED]: { bg: "bg-red-500/20", text: "text-red-500" },
+  [CampaignStatus.DELETED]: { bg: "bg-red-500/20", text: "text-red-500" },
+}
+
+// Helper to aggregate reward events by type
+function aggregateEventsByType(rewardEvents: CampaignDashboardData['rewardEvents']) {
+  const aggregated = rewardEvents.reduce((acc, event) => {
+    if (!acc[event.eventType]) {
+      acc[event.eventType] = { count: 0, amount: 0 }
+    }
+    acc[event.eventType].count += event.trackedEventsCount
+    acc[event.eventType].amount += event.amount
+    return acc
+  }, {} as Record<EventType, { count: number; amount: number }>)
+
+  return EVENT_TYPE_ORDER.map(type => ({
+    eventType: type,
+    label: EVENT_TYPE_LABELS[type],
+    icon: EVENT_TYPE_ICONS[type],
+    count: aggregated[type]?.count ?? 0,
+    amount: aggregated[type]?.amount ?? 0,
+    color: FUNNEL_COLORS[type],
+  })).filter(e => e.count > 0 || rewardEvents.some(re => re.eventType === e.eventType))
+}
 
 export default function CampaignDashboardPage() {
+  const params = useParams()
+  const campaignId = params.id as string
+
+  const [campaign, setCampaign] = useState<CampaignDashboardData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("overview")
   const [showRatingModal, setShowRatingModal] = useState(false)
-  const [selectedInfluencer, setSelectedInfluencer] = useState<typeof influencers[0] | null>(null)
+  const [selectedInfluencer, setSelectedInfluencer] = useState<CampaignDashboardData['participations'][0] | null>(null)
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
   const [review, setReview] = useState("")
   const [ratingSubmitted, setRatingSubmitted] = useState(false)
 
-  const handleRateInfluencer = (influencer: typeof influencers[0]) => {
+  // Fetch campaign data
+  useEffect(() => {
+    const fetchCampaign = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await fetch(`/api/campaigns/${campaignId}?dashboard=true`)
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error?.message || 'Failed to fetch campaign')
+        }
+
+        setCampaign(data.data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (campaignId) {
+      fetchCampaign()
+    }
+  }, [campaignId])
+
+  // Aggregated metrics
+  const metrics = useMemo(() => {
+    if (!campaign) return []
+    return aggregateEventsByType(campaign.rewardEvents)
+  }, [campaign])
+
+  // Funnel data for charts
+  const funnelData = useMemo(() => {
+    return metrics.map(m => ({
+      name: m.label,
+      value: m.count,
+      color: m.color,
+    }))
+  }, [metrics])
+
+  // Timeline data (placeholder - would need actual time-series data from backend)
+  const timelineData = useMemo(() => {
+    // For now, create a simple distribution based on total counts
+    const dates = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
+    return dates.map((date, i) => {
+      const factor = (i + 1) / 7
+      const result: Record<string, string | number> = { date }
+      metrics.forEach(m => {
+        result[m.eventType] = Math.round(m.count * factor * (0.8 + Math.random() * 0.4))
+      })
+      return result
+    })
+  }, [metrics])
+
+  const handleRateInfluencer = (influencer: CampaignDashboardData['participations'][0]) => {
     setSelectedInfluencer(influencer)
     setShowRatingModal(true)
     setRating(0)
@@ -81,6 +179,33 @@ export default function CampaignDashboardPage() {
     }, 1500)
   }
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
+      </div>
+    )
+  }
+
+  // Error state
+  if (error || !campaign) {
+    return (
+      <Card className="border-destructive/50">
+        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+          <p className="text-destructive">{error || 'Campaign not found'}</p>
+          <Link href="/client">
+            <Button variant="outline" className="mt-4">
+              Back to Dashboard
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const statusStyle = STATUS_STYLES[campaign.status]
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -91,18 +216,18 @@ export default function CampaignDashboardPage() {
       >
         <div>
           <h1 className="text-2xl font-bold text-foreground">Campaign Dashboard</h1>
-          <p className="text-muted-foreground">Nike Summer Collection</p>
+          <p className="text-muted-foreground">{campaign.title}</p>
         </div>
         <motion.div
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           className="flex items-center gap-2"
         >
-          <Badge className="bg-growi-success/20 text-growi-success hover:bg-growi-success/30">
-            Active
+          <Badge className={`${statusStyle.bg} ${statusStyle.text} hover:${statusStyle.bg}`}>
+            {campaign.status}
           </Badge>
           <Badge variant="outline" className="border-growi-blue/50 text-growi-blue">
-            Budget: $5,000
+            Budget: ${campaign.budgetTotal.toLocaleString()}
           </Badge>
         </motion.div>
       </motion.div>
@@ -114,39 +239,17 @@ export default function CampaignDashboardPage() {
         animate="visible"
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
       >
-        <MetricCard
-          title="Landing Page Views"
-          value={125000}
-          icon={<Eye className="h-5 w-5" />}
-          trend={{ value: 23.5, positive: true }}
-        />
-        <MetricCard
-          title="View Items"
-          value={67500}
-          icon={<Package className="h-5 w-5" />}
-          trend={{ value: 19.2, positive: true }}
-        />
-        <MetricCard
-          title="Add to Cart"
-          value={8500}
-          icon={<ShoppingCart className="h-5 w-5" />}
-          trend={{ value: 18.2, positive: true }}
-        />
-        <MetricCard
-          title="Checkout"
-          value={2100}
-          icon={<CreditCard className="h-5 w-5" />}
-          trend={{ value: 15.1, positive: true }}
-        />
-        <MetricCard
-          title="Purchases"
-          value={342}
-          icon={<DollarSign className="h-5 w-5" />}
-          trend={{ value: 12.8, positive: true }}
-        />
+        {metrics.map((metric) => (
+          <MetricCard
+            key={metric.eventType}
+            title={metric.label}
+            value={metric.count}
+            icon={metric.icon}
+          />
+        ))}
         <MetricCard
           title="Budget Spent"
-          value={2450}
+          value={campaign.budgetSpent}
           prefix="$"
           icon={<TrendingUp className="h-5 w-5" />}
         />
@@ -176,10 +279,12 @@ export default function CampaignDashboardPage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={timelineData}>
                       <defs>
-                        <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#4A90E2" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#4A90E2" stopOpacity={0}/>
-                        </linearGradient>
+                        {metrics.map((m) => (
+                          <linearGradient key={m.eventType} id={`color-${m.eventType}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={m.color} stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor={m.color} stopOpacity={0}/>
+                          </linearGradient>
+                        ))}
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                       <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />
@@ -192,14 +297,18 @@ export default function CampaignDashboardPage() {
                         }}
                         labelStyle={{ color: "#f1f5f9" }}
                       />
-                      <Area
-                        type="monotone"
-                        dataKey="landingViews"
-                        stroke="#4A90E2"
-                        fillOpacity={1}
-                        fill="url(#colorViews)"
-                        strokeWidth={2}
-                      />
+                      {metrics.slice(0, 1).map((m) => (
+                        <Area
+                          key={m.eventType}
+                          type="monotone"
+                          dataKey={m.eventType}
+                          stroke={m.color}
+                          fillOpacity={1}
+                          fill={`url(#color-${m.eventType})`}
+                          strokeWidth={2}
+                          name={m.label}
+                        />
+                      ))}
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -227,35 +336,25 @@ export default function CampaignDashboardPage() {
                         }}
                         labelStyle={{ color: "#f1f5f9" }}
                       />
-                      <Bar dataKey="landingViews" fill="#4A90E2" name="Landing Views" radius={[2, 2, 0, 0]} />
-                      <Bar dataKey="viewItems" fill="#60a5fa" name="View Items" radius={[2, 2, 0, 0]} />
-                      <Bar dataKey="addToCart" fill="#FFB347" name="Add to Cart" radius={[2, 2, 0, 0]} />
-                      <Bar dataKey="checkout" fill="#9ACD32" name="Checkout" radius={[2, 2, 0, 0]} />
-                      <Bar dataKey="purchases" fill="#34d399" name="Purchases" radius={[2, 2, 0, 0]} />
+                      {metrics.map((m) => (
+                        <Bar
+                          key={m.eventType}
+                          dataKey={m.eventType}
+                          fill={m.color}
+                          name={m.label}
+                          radius={[2, 2, 0, 0]}
+                        />
+                      ))}
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="mt-4 flex flex-wrap justify-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: "#4A90E2" }} />
-                    <span className="text-xs text-muted-foreground">Landing Views</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: "#60a5fa" }} />
-                    <span className="text-xs text-muted-foreground">View Items</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: "#FFB347" }} />
-                    <span className="text-xs text-muted-foreground">Add to Cart</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: "#9ACD32" }} />
-                    <span className="text-xs text-muted-foreground">Checkout</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: "#34d399" }} />
-                    <span className="text-xs text-muted-foreground">Purchases</span>
-                  </div>
+                  {metrics.map((m) => (
+                    <div key={m.eventType} className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: m.color }} />
+                      <span className="text-xs text-muted-foreground">{m.label}</span>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -332,98 +431,87 @@ export default function CampaignDashboardPage() {
               <Users className="h-5 w-5 text-growi-blue" />
               Active Influencers
             </CardTitle>
-            <Badge variant="outline">{influencers.length} active</Badge>
+            <Badge variant="outline">{campaign.participations.length} active</Badge>
           </div>
         </CardHeader>
         <CardContent>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="grid gap-4 md:grid-cols-2"
-          >
-            {influencers.map((influencer) => (
-              <motion.div
-                key={influencer.id}
-                variants={staggerItem}
-                whileHover={{ y: -2, transition: { duration: 0.2 } }}
-                className="flex items-center gap-4 rounded-lg border border-border bg-secondary/30 p-4 transition-colors hover:border-growi-blue/50"
-              >
-                <div className="relative">
-                  <Image
-                    src={influencer.avatar || "/placeholder.svg"}
-                    alt={influencer.name}
-                    width={48}
-                    height={48}
-                    className="rounded-full"
-                  />
-                  {influencer.isHot && (
-                    <motion.div
-                      animate={{
-                        scale: [1, 1.1, 1],
-                        rotate: [0, 5, -5, 0]
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      className="absolute -right-1 -top-1"
-                    >
-                      <Badge className="bg-orange-500 px-1 py-0 text-[10px] text-white hover:bg-orange-600">
-                        HOT
-                      </Badge>
-                    </motion.div>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium text-foreground">{influencer.name}</h4>
-                    {influencer.completed && (
-                      <Badge className="bg-growi-success/20 text-growi-success text-xs">Completed</Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-growi-money">{influencer.rate}</p>
-                  {influencer.rating ? (
-                    <div className="mt-1 flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-3 w-3 ${i < Math.floor(influencer.rating!) ? "fill-growi-yellow text-growi-yellow" : "text-muted-foreground/30"}`}
-                        />
-                      ))}
-                      <span className="ml-1 text-xs text-muted-foreground">{influencer.rating}</span>
-                    </div>
-                  ) : influencer.completed ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="mt-2 h-7 text-xs bg-transparent"
-                      onClick={() => handleRateInfluencer(influencer)}
-                    >
-                      <Star className="mr-1 h-3 w-3" />
-                      Rate Influencer
-                    </Button>
-                  ) : (
-                    <div className="mt-2">
-                      <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                        <span>Progress</span>
-                        <span>{influencer.progress}%</span>
+          {campaign.participations.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <Users className="h-12 w-12 text-muted-foreground/30 mb-3" />
+              <p className="text-muted-foreground">No influencers have joined this campaign yet</p>
+            </div>
+          ) : (
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="grid gap-4 md:grid-cols-2"
+            >
+              {campaign.participations.map((participation) => {
+                const isTopPerformer = participation.totalEvents > 100
+                const displayName = participation.influencer.name || `${participation.influencer.walletAddress.slice(0, 6)}...${participation.influencer.walletAddress.slice(-4)}`
+
+                return (
+                  <motion.div
+                    key={participation.id}
+                    variants={staggerItem}
+                    whileHover={{ y: -2, transition: { duration: 0.2 } }}
+                    className="flex items-center gap-4 rounded-lg border border-border bg-secondary/30 p-4 transition-colors hover:border-growi-blue/50"
+                  >
+                    <div className="relative">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-growi-blue/20 text-growi-blue font-semibold">
+                        {displayName.charAt(0).toUpperCase()}
                       </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+                      {isTopPerformer && (
                         <motion.div
-                          className="h-full bg-growi-blue"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${influencer.progress}%` }}
-                          transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.5 }}
-                        />
-                      </div>
+                          animate={{
+                            scale: [1, 1.1, 1],
+                            rotate: [0, 5, -5, 0]
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                          className="absolute -right-1 -top-1"
+                        >
+                          <Badge className="bg-orange-500 px-1 py-0 text-[10px] text-white hover:bg-orange-600">
+                            TOP
+                          </Badge>
+                        </motion.div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium text-foreground">{displayName}</h4>
+                        {participation.totalEvents > 0 && (
+                          <Badge className="bg-growi-blue/20 text-growi-blue text-xs">
+                            {participation.totalEvents} events
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-growi-money">
+                        Balance: ${participation.currentBalance.toLocaleString()}
+                      </p>
+                      {participation.events.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {participation.events.slice(0, 3).map((event) => (
+                            <Badge
+                              key={event.type}
+                              variant="outline"
+                              className="text-[10px] px-1.5 py-0"
+                            >
+                              {EVENT_TYPE_LABELS[event.type].split(' ')[0]}: {event.count}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          )}
         </CardContent>
       </Card>
 
@@ -433,10 +521,10 @@ export default function CampaignDashboardPage() {
           <DialogHeader>
             <DialogTitle>Rate Influencer</DialogTitle>
             <DialogDescription>
-              Share your experience working with {selectedInfluencer?.name}
+              Share your experience working with {selectedInfluencer?.influencer.name || selectedInfluencer?.influencer.walletAddress.slice(0, 10)}
             </DialogDescription>
           </DialogHeader>
-          
+
           {ratingSubmitted ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -459,16 +547,14 @@ export default function CampaignDashboardPage() {
               {/* Selected Influencer Info */}
               {selectedInfluencer && (
                 <div className="flex items-center gap-3 rounded-lg border border-border bg-secondary/30 p-3">
-                  <Image
-                    src={selectedInfluencer.avatar || "/placeholder.svg"}
-                    alt={selectedInfluencer.name}
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                  />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-growi-blue/20 text-growi-blue font-semibold">
+                    {(selectedInfluencer.influencer.name || selectedInfluencer.influencer.walletAddress).charAt(0).toUpperCase()}
+                  </div>
                   <div>
-                    <p className="font-medium text-foreground">{selectedInfluencer.name}</p>
-                    <p className="text-sm text-muted-foreground">{selectedInfluencer.rate}</p>
+                    <p className="font-medium text-foreground">
+                      {selectedInfluencer.influencer.name || `${selectedInfluencer.influencer.walletAddress.slice(0, 6)}...${selectedInfluencer.influencer.walletAddress.slice(-4)}`}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Balance: ${selectedInfluencer.currentBalance.toLocaleString()}</p>
                   </div>
                 </div>
               )}

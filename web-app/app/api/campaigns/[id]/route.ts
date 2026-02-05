@@ -1,4 +1,4 @@
-import { getCampaignById } from '@/app/api/campaigns/services';
+import { getCampaignById, getCampaignDashboard, CampaignDashboardData } from '@/app/api/campaigns/services';
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
 import { Campaign, CampaignStatus } from '@/lib/db/prisma/generated';
@@ -6,11 +6,31 @@ import { ApiDataResponse, ApiErrorResponse, UpdateCampaignDTO } from '@/types';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   return safeRoute(async () => {
-    
     const { id } = await params;
-    
+    const { searchParams } = new URL(req.url);
+    const dashboard = searchParams.get('dashboard') === 'true';
+
+    if (dashboard) {
+      const campaignData = await getCampaignDashboard(id);
+
+      if (!campaignData) {
+        const response: ApiErrorResponse = {
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Campaign not found' },
+        };
+        return { response, status: 404 };
+      }
+
+      const response: ApiDataResponse<CampaignDashboardData> = {
+        success: true,
+        data: campaignData,
+      };
+
+      return { response };
+    }
+
     const campaign = await getCampaignById(id);
-    
+
     if (!campaign) {
       const response: ApiErrorResponse = {
         success: false,
@@ -18,12 +38,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       };
       return { response, status: 404 };
     }
-    
+
     const response: ApiDataResponse<Campaign> = {
       success: true,
       data: campaign,
     };
-    
+
     return { response };
   });
 }

@@ -51,15 +51,13 @@ export function validateCampaignForm(formData: CampaignFormData): {
     errors.push('La descripción es requerida');
   }
   
-  // Validar que al menos un reward esté habilitado
-  const hasRewards = Object.values(formData.rewards || {}).some(
-    (reward) => reward?.enabled && reward && 'pricePerView' in reward
-      ? reward.pricePerView && reward.pricePerView > 0
-      : reward && 'pricePerClick' in reward && reward.pricePerClick && reward.pricePerClick > 0,
-  );
-  
-  if (!hasRewards) {
-    errors.push('Debes habilitar al menos un tipo de recompensa');
+  // Validar que al menos un reward event esté seleccionado con amount > 0
+  const hasRewardEvents = formData.selectedRewardEvents &&
+    formData.selectedRewardEvents.length > 0 &&
+    formData.selectedRewardEvents.some(e => e.amount > 0);
+
+  if (!hasRewardEvents) {
+    errors.push('Debes seleccionar al menos un evento de recompensa con un monto mayor a 0');
   }
   
   // Validar fechas
@@ -82,29 +80,22 @@ export function validateCampaignForm(formData: CampaignFormData): {
  * Calcula estadísticas útiles de la campaña
  */
 export function calculateCampaignStats(formData: CampaignFormData) {
-  const enabledRewards = Object.entries(formData.rewards || {}).filter(
-    ([ , reward ]) => reward?.enabled,
-  );
-  
-  const totalRewardsCost = enabledRewards.reduce((sum, [ , reward ]) => {
-    const price = reward && 'pricePerView' in reward
-      ? reward.pricePerView || 0
-      : reward && 'pricePerClick' in reward
-        ? reward.pricePerClick || 0
-        : 0;
-    return sum + price;
+  const selectedEvents = formData.selectedRewardEvents || [];
+
+  const totalRewardsCost = selectedEvents.reduce((sum, event) => {
+    return sum + (event.amount || 0);
   }, 0);
-  
-  const averageRewardPrice = enabledRewards.length > 0
-    ? totalRewardsCost / enabledRewards.length
+
+  const averageRewardPrice = selectedEvents.length > 0
+    ? totalRewardsCost / selectedEvents.length
     : 0;
-  
+
   const estimatedActions = formData.budget && averageRewardPrice > 0
     ? Math.floor(formData.budget / averageRewardPrice)
     : 0;
-  
+
   return {
-    enabledRewardsCount: enabledRewards.length,
+    enabledRewardsCount: selectedEvents.length,
     totalRewardsCost,
     averageRewardPrice,
     estimatedActions,

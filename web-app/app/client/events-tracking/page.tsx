@@ -9,7 +9,6 @@ import { CampaignSummary, RewardEventDTO, SelectorDTO } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
-  ArrowRight,
   Check,
   CheckCircle2,
   Code,
@@ -19,7 +18,6 @@ import {
   Pencil,
   Plus,
   Save,
-  Sparkles,
   Trash2,
   Wallet,
   X,
@@ -84,7 +82,7 @@ export default function RewardEventsPage() {
   const [ showScript, setShowScript ] = useState(false);
   const [ copied, setCopied ] = useState(false);
   const [ displayedScript, setDisplayedScript ] = useState('');
-
+  
   // Campaign selection state
   const [ campaigns, setCampaigns ] = useState<CampaignSummary[]>([]);
   const [ selectedCampaignId, setSelectedCampaignId ] = useState<string | null>(null);
@@ -120,16 +118,16 @@ export default function RewardEventsPage() {
       setCampaigns([]);
       return;
     }
-
+    
     try {
       setLoadingCampaigns(true);
       const response = await fetch(`/api/users/wallet/${address}/campaigns`);
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.error?.message || 'Failed to fetch campaigns');
       }
-
+      
       setCampaigns(data.data.campaigns);
     } catch (err) {
       console.error('Error fetching campaigns:', err);
@@ -137,7 +135,7 @@ export default function RewardEventsPage() {
       setLoadingCampaigns(false);
     }
   }, [ address ]);
-
+  
   useEffect(() => {
     fetchRewardEvents();
     fetchCampaigns();
@@ -286,15 +284,15 @@ export default function RewardEventsPage() {
     if (!selectedCampaignId) return '';
     return `<script src="https://growi-hack-money-2026.vercel.app/api/scripts/client?id=${selectedCampaignId}"></script>`;
   };
-
+  
   const generateScript = () => {
     if (!selectedCampaignId) return;
-
+    
     const script = getScriptContent();
-
+    
     setShowScript(true);
     setDisplayedScript('');
-
+    
     // Typewriter effect
     let i = 0;
     const interval = setInterval(() => {
@@ -306,11 +304,11 @@ export default function RewardEventsPage() {
       }
     }, 10);
   };
-
+  
   const copyScript = async () => {
     const script = getScriptContent();
     if (!script) return;
-
+    
     await navigator.clipboard.writeText(script);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -577,7 +575,7 @@ export default function RewardEventsPage() {
                   </p>
                 )}
               </div>
-
+              
               <motion.div
                 whileHover={{ scale: selectedCampaignId ? 1.01 : 1 }}
                 whileTap={{ scale: selectedCampaignId ? 0.99 : 1 }}
@@ -661,23 +659,6 @@ export default function RewardEventsPage() {
                         <code className="rounded bg-secondary px-1 py-0.5 font-mono text-growi-blue">{'</head>'}</code>{' '}
                         tag in your website.
                       </p>
-                    </motion.div>
-                    
-                    {/* Continue to Campaign Creation Button */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.8 }}
-                    >
-                      <Button
-                        onClick={() => router.push('/client/create')}
-                        className="w-full bg-growi-lime text-foreground hover:bg-growi-lime/90"
-                        size="lg"
-                      >
-                        <Sparkles className="mr-2 h-5 w-5" />
-                        Create Campaign with AI Assistant
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </Button>
                     </motion.div>
                   </motion.div>
                 )}
