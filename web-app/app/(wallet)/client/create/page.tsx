@@ -57,6 +57,7 @@ const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
   },
   interests: [],
   budget: undefined,
+  slots: 10,
   selectedRewardEvents: [],
 };
 
@@ -209,8 +210,8 @@ export default function CreateCampaignPage() {
   
   const calculateCompleteness = () => {
     let filled = 0;
-    const total = 13;
-    
+    const total = 14;
+
     if (campaignData.name) filled++;
     if (campaignData.description) filled++;
     if (campaignData.duration) filled++;
@@ -223,13 +224,14 @@ export default function CreateCampaignPage() {
     if (campaignData.geographic?.countries?.length) filled++;
     if (campaignData.interests?.length) filled++;
     if (campaignData.budget) filled++;
-    
+    if (campaignData.slots) filled++;
+
     // Check selected reward events instead of legacy rewards
     const rewardEventsSelected = (campaignData.selectedRewardEvents || []).filter(
       (e) => e.amount > 0,
     ).length;
     if (rewardEventsSelected > 0) filled++;
-    
+
     return Math.round((filled / total) * 100);
   };
   
@@ -574,7 +576,7 @@ export default function CreateCampaignPage() {
                 />
               </InfoCard>
               
-              <InfoCard icon={<DollarSign className="h-4 w-4" />} title="Budget" color="emerald">
+              <InfoCard icon={<DollarSign className="h-4 w-4" />} title="Budget & Slots" color="emerald">
                 <Field
                   label="Total Budget ($)"
                   value={campaignData.budget?.toString()}
@@ -583,6 +585,17 @@ export default function CreateCampaignPage() {
                     setCampaignData((prev) => ({
                       ...prev,
                       budget: value ? parseFloat(value) : undefined,
+                    }))
+                  }
+                />
+                <Field
+                  label="Influencer Slots"
+                  value={campaignData.slots?.toString()}
+                  type="number"
+                  onChange={(value) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      slots: value ? parseInt(value) : undefined,
                     }))
                   }
                 />

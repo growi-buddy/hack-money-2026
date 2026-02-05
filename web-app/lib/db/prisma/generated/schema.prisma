@@ -9,17 +9,39 @@ generator client {
 }
 
 model User {
-  id            String  @id @default(cuid())
-  walletAddress String  @unique
+  id            String   @id @default(cuid())
+  walletAddress String   @unique
   name          String?
-  email         String? @unique
+  email         String?  @unique
+  phone         String?
+  location      String?
+  bio           String?
+  avatar        String?
+  interests     String[] @default([])
+  affinities    String[] @default([])
 
+  socialMedias     SocialMedia[]
   campaignsCreated Campaign[]      @relation("UserCampaigns")
   rewardEvents     RewardEvent[]   @relation("UserRewardEvents")
   participations   Participation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model SocialMedia {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform  SocialMediaPlatform
+  username  String
+  followers String?
+  url       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, platform, username])
 }
 
 model Campaign {
@@ -29,8 +51,16 @@ model Campaign {
   owner   User   @relation("UserCampaigns", fields: [ownerId], references: [id])
 
   title         String
+  description   String?
   escrowAddress String
   budgetTotal   Decimal
+
+  // Campaign settings
+  isHot     Boolean   @default(false)
+  slots     Int       @default(10)
+  interests String[]  @default([])
+  startDate DateTime?
+  endDate   DateTime?
 
   rewardEvents CampaignRewardEvent[]
 
@@ -183,6 +213,14 @@ enum SelectorEventType {
   ONCLICK
   HOVER
   DOUBLE_CLICK
+}
+
+enum SocialMediaPlatform {
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+  TWITTER
+  OTHER
 }
 
 enum CampaignStatus {

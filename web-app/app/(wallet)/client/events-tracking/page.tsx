@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { WalletButton } from '@/components/wallet-button';
+import { API_BASE_URL } from '@/config/envs';
 import { useWallet } from '@/contexts/wallet-context';
 import { scaleIn, staggerContainer, staggerItem } from '@/lib/animations';
 import { EventType, SelectorEventType } from '@/lib/db/enums';
@@ -254,7 +255,7 @@ export default function RewardEventsPage() {
     return `<script>
   (function() {
     const script = document.createElement('script');
-    script.src = 'https://growi-hack-money-2026.vercel.app/api/scripts/client?v=' + Date.now();
+    script.src = '${API_BASE_URL}/api/scripts/client?v=' + Date.now();
     script.async = true;
     document.head.appendChild(script);
   })();

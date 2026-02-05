@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model SocialMedia
+ * 
+ */
+export type SocialMedia = $Result.DefaultSelection<Prisma.$SocialMediaPayload>
+/**
  * Model Campaign
  * 
  */
@@ -88,6 +93,17 @@ export const SelectorEventType: {
 export type SelectorEventType = (typeof SelectorEventType)[keyof typeof SelectorEventType]
 
 
+export const SocialMediaPlatform: {
+  INSTAGRAM: 'INSTAGRAM',
+  TIKTOK: 'TIKTOK',
+  YOUTUBE: 'YOUTUBE',
+  TWITTER: 'TWITTER',
+  OTHER: 'OTHER'
+};
+
+export type SocialMediaPlatform = (typeof SocialMediaPlatform)[keyof typeof SocialMediaPlatform]
+
+
 export const CampaignStatus: {
   DRAFT: 'DRAFT',
   ACTIVE: 'ACTIVE',
@@ -108,6 +124,10 @@ export const EventType: typeof $Enums.EventType
 export type SelectorEventType = $Enums.SelectorEventType
 
 export const SelectorEventType: typeof $Enums.SelectorEventType
+
+export type SocialMediaPlatform = $Enums.SocialMediaPlatform
+
+export const SocialMediaPlatform: typeof $Enums.SocialMediaPlatform
 
 export type CampaignStatus = $Enums.CampaignStatus
 
@@ -239,6 +259,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.socialMedia`: Exposes CRUD operations for the **SocialMedia** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SocialMedias
+    * const socialMedias = await prisma.socialMedia.findMany()
+    * ```
+    */
+  get socialMedia(): Prisma.SocialMediaDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.campaign`: Exposes CRUD operations for the **Campaign** model.
@@ -764,6 +794,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    SocialMedia: 'SocialMedia',
     Campaign: 'Campaign',
     RewardEvent: 'RewardEvent',
     CampaignRewardEvent: 'CampaignRewardEvent',
@@ -788,7 +819,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "campaign" | "rewardEvent" | "campaignRewardEvent" | "client" | "trackedEvent" | "selector" | "participation" | "trackingLink" | "analyticsEvent"
+      modelProps: "user" | "socialMedia" | "campaign" | "rewardEvent" | "campaignRewardEvent" | "client" | "trackedEvent" | "selector" | "participation" | "trackingLink" | "analyticsEvent"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -863,6 +894,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      SocialMedia: {
+        payload: Prisma.$SocialMediaPayload<ExtArgs>
+        fields: Prisma.SocialMediaFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SocialMediaFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SocialMediaFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload>
+          }
+          findFirst: {
+            args: Prisma.SocialMediaFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SocialMediaFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload>
+          }
+          findMany: {
+            args: Prisma.SocialMediaFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload>[]
+          }
+          create: {
+            args: Prisma.SocialMediaCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload>
+          }
+          createMany: {
+            args: Prisma.SocialMediaCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SocialMediaCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload>[]
+          }
+          delete: {
+            args: Prisma.SocialMediaDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload>
+          }
+          update: {
+            args: Prisma.SocialMediaUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload>
+          }
+          deleteMany: {
+            args: Prisma.SocialMediaDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SocialMediaUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SocialMediaUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload>[]
+          }
+          upsert: {
+            args: Prisma.SocialMediaUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SocialMediaPayload>
+          }
+          aggregate: {
+            args: Prisma.SocialMediaAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSocialMedia>
+          }
+          groupBy: {
+            args: Prisma.SocialMediaGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SocialMediaGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SocialMediaCountArgs<ExtArgs>
+            result: $Utils.Optional<SocialMediaCountAggregateOutputType> | number
           }
         }
       }
@@ -1641,6 +1746,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    socialMedia?: SocialMediaOmit
     campaign?: CampaignOmit
     rewardEvent?: RewardEventOmit
     campaignRewardEvent?: CampaignRewardEventOmit
@@ -1730,12 +1836,14 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
+    socialMedias: number
     campaignsCreated: number
     rewardEvents: number
     participations: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    socialMedias?: boolean | UserCountOutputTypeCountSocialMediasArgs
     campaignsCreated?: boolean | UserCountOutputTypeCountCampaignsCreatedArgs
     rewardEvents?: boolean | UserCountOutputTypeCountRewardEventsArgs
     participations?: boolean | UserCountOutputTypeCountParticipationsArgs
@@ -1750,6 +1858,13 @@ export namespace Prisma {
      * Select specific fields to fetch from the UserCountOutputType
      */
     select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSocialMediasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SocialMediaWhereInput
   }
 
   /**
@@ -1975,6 +2090,10 @@ export namespace Prisma {
     walletAddress: string | null
     name: string | null
     email: string | null
+    phone: string | null
+    location: string | null
+    bio: string | null
+    avatar: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1984,6 +2103,10 @@ export namespace Prisma {
     walletAddress: string | null
     name: string | null
     email: string | null
+    phone: string | null
+    location: string | null
+    bio: string | null
+    avatar: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1993,6 +2116,12 @@ export namespace Prisma {
     walletAddress: number
     name: number
     email: number
+    phone: number
+    location: number
+    bio: number
+    avatar: number
+    interests: number
+    affinities: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2004,6 +2133,10 @@ export namespace Prisma {
     walletAddress?: true
     name?: true
     email?: true
+    phone?: true
+    location?: true
+    bio?: true
+    avatar?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2013,6 +2146,10 @@ export namespace Prisma {
     walletAddress?: true
     name?: true
     email?: true
+    phone?: true
+    location?: true
+    bio?: true
+    avatar?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2022,6 +2159,12 @@ export namespace Prisma {
     walletAddress?: true
     name?: true
     email?: true
+    phone?: true
+    location?: true
+    bio?: true
+    avatar?: true
+    interests?: true
+    affinities?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2104,6 +2247,12 @@ export namespace Prisma {
     walletAddress: string
     name: string | null
     email: string | null
+    phone: string | null
+    location: string | null
+    bio: string | null
+    avatar: string | null
+    interests: string[]
+    affinities: string[]
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -2130,8 +2279,15 @@ export namespace Prisma {
     walletAddress?: boolean
     name?: boolean
     email?: boolean
+    phone?: boolean
+    location?: boolean
+    bio?: boolean
+    avatar?: boolean
+    interests?: boolean
+    affinities?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    socialMedias?: boolean | User$socialMediasArgs<ExtArgs>
     campaignsCreated?: boolean | User$campaignsCreatedArgs<ExtArgs>
     rewardEvents?: boolean | User$rewardEventsArgs<ExtArgs>
     participations?: boolean | User$participationsArgs<ExtArgs>
@@ -2143,6 +2299,12 @@ export namespace Prisma {
     walletAddress?: boolean
     name?: boolean
     email?: boolean
+    phone?: boolean
+    location?: boolean
+    bio?: boolean
+    avatar?: boolean
+    interests?: boolean
+    affinities?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2152,6 +2314,12 @@ export namespace Prisma {
     walletAddress?: boolean
     name?: boolean
     email?: boolean
+    phone?: boolean
+    location?: boolean
+    bio?: boolean
+    avatar?: boolean
+    interests?: boolean
+    affinities?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2161,12 +2329,19 @@ export namespace Prisma {
     walletAddress?: boolean
     name?: boolean
     email?: boolean
+    phone?: boolean
+    location?: boolean
+    bio?: boolean
+    avatar?: boolean
+    interests?: boolean
+    affinities?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "walletAddress" | "name" | "email" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "walletAddress" | "name" | "email" | "phone" | "location" | "bio" | "avatar" | "interests" | "affinities" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    socialMedias?: boolean | User$socialMediasArgs<ExtArgs>
     campaignsCreated?: boolean | User$campaignsCreatedArgs<ExtArgs>
     rewardEvents?: boolean | User$rewardEventsArgs<ExtArgs>
     participations?: boolean | User$participationsArgs<ExtArgs>
@@ -2178,6 +2353,7 @@ export namespace Prisma {
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
+      socialMedias: Prisma.$SocialMediaPayload<ExtArgs>[]
       campaignsCreated: Prisma.$CampaignPayload<ExtArgs>[]
       rewardEvents: Prisma.$RewardEventPayload<ExtArgs>[]
       participations: Prisma.$ParticipationPayload<ExtArgs>[]
@@ -2187,6 +2363,12 @@ export namespace Prisma {
       walletAddress: string
       name: string | null
       email: string | null
+      phone: string | null
+      location: string | null
+      bio: string | null
+      avatar: string | null
+      interests: string[]
+      affinities: string[]
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -2583,6 +2765,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    socialMedias<T extends User$socialMediasArgs<ExtArgs> = {}>(args?: Subset<T, User$socialMediasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     campaignsCreated<T extends User$campaignsCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$campaignsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     rewardEvents<T extends User$rewardEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$rewardEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RewardEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     participations<T extends User$participationsArgs<ExtArgs> = {}>(args?: Subset<T, User$participationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ParticipationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2619,6 +2802,12 @@ export namespace Prisma {
     readonly walletAddress: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
+    readonly phone: FieldRef<"User", 'String'>
+    readonly location: FieldRef<"User", 'String'>
+    readonly bio: FieldRef<"User", 'String'>
+    readonly avatar: FieldRef<"User", 'String'>
+    readonly interests: FieldRef<"User", 'String[]'>
+    readonly affinities: FieldRef<"User", 'String[]'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -3009,6 +3198,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.socialMedias
+   */
+  export type User$socialMediasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    where?: SocialMediaWhereInput
+    orderBy?: SocialMediaOrderByWithRelationInput | SocialMediaOrderByWithRelationInput[]
+    cursor?: SocialMediaWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SocialMediaScalarFieldEnum | SocialMediaScalarFieldEnum[]
+  }
+
+  /**
    * User.campaignsCreated
    */
   export type User$campaignsCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3100,6 +3313,1103 @@ export namespace Prisma {
 
 
   /**
+   * Model SocialMedia
+   */
+
+  export type AggregateSocialMedia = {
+    _count: SocialMediaCountAggregateOutputType | null
+    _min: SocialMediaMinAggregateOutputType | null
+    _max: SocialMediaMaxAggregateOutputType | null
+  }
+
+  export type SocialMediaMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    platform: $Enums.SocialMediaPlatform | null
+    username: string | null
+    followers: string | null
+    url: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SocialMediaMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    platform: $Enums.SocialMediaPlatform | null
+    username: string | null
+    followers: string | null
+    url: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SocialMediaCountAggregateOutputType = {
+    id: number
+    userId: number
+    platform: number
+    username: number
+    followers: number
+    url: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SocialMediaMinAggregateInputType = {
+    id?: true
+    userId?: true
+    platform?: true
+    username?: true
+    followers?: true
+    url?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SocialMediaMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    platform?: true
+    username?: true
+    followers?: true
+    url?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SocialMediaCountAggregateInputType = {
+    id?: true
+    userId?: true
+    platform?: true
+    username?: true
+    followers?: true
+    url?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SocialMediaAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SocialMedia to aggregate.
+     */
+    where?: SocialMediaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SocialMedias to fetch.
+     */
+    orderBy?: SocialMediaOrderByWithRelationInput | SocialMediaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SocialMediaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SocialMedias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SocialMedias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SocialMedias
+    **/
+    _count?: true | SocialMediaCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SocialMediaMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SocialMediaMaxAggregateInputType
+  }
+
+  export type GetSocialMediaAggregateType<T extends SocialMediaAggregateArgs> = {
+        [P in keyof T & keyof AggregateSocialMedia]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSocialMedia[P]>
+      : GetScalarType<T[P], AggregateSocialMedia[P]>
+  }
+
+
+
+
+  export type SocialMediaGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SocialMediaWhereInput
+    orderBy?: SocialMediaOrderByWithAggregationInput | SocialMediaOrderByWithAggregationInput[]
+    by: SocialMediaScalarFieldEnum[] | SocialMediaScalarFieldEnum
+    having?: SocialMediaScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SocialMediaCountAggregateInputType | true
+    _min?: SocialMediaMinAggregateInputType
+    _max?: SocialMediaMaxAggregateInputType
+  }
+
+  export type SocialMediaGroupByOutputType = {
+    id: string
+    userId: string
+    platform: $Enums.SocialMediaPlatform
+    username: string
+    followers: string | null
+    url: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SocialMediaCountAggregateOutputType | null
+    _min: SocialMediaMinAggregateOutputType | null
+    _max: SocialMediaMaxAggregateOutputType | null
+  }
+
+  type GetSocialMediaGroupByPayload<T extends SocialMediaGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SocialMediaGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SocialMediaGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SocialMediaGroupByOutputType[P]>
+            : GetScalarType<T[P], SocialMediaGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SocialMediaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    platform?: boolean
+    username?: boolean
+    followers?: boolean
+    url?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["socialMedia"]>
+
+  export type SocialMediaSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    platform?: boolean
+    username?: boolean
+    followers?: boolean
+    url?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["socialMedia"]>
+
+  export type SocialMediaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    platform?: boolean
+    username?: boolean
+    followers?: boolean
+    url?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["socialMedia"]>
+
+  export type SocialMediaSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    platform?: boolean
+    username?: boolean
+    followers?: boolean
+    url?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SocialMediaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "platform" | "username" | "followers" | "url" | "createdAt" | "updatedAt", ExtArgs["result"]["socialMedia"]>
+  export type SocialMediaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SocialMediaIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SocialMediaIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SocialMediaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SocialMedia"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      platform: $Enums.SocialMediaPlatform
+      username: string
+      followers: string | null
+      url: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["socialMedia"]>
+    composites: {}
+  }
+
+  type SocialMediaGetPayload<S extends boolean | null | undefined | SocialMediaDefaultArgs> = $Result.GetResult<Prisma.$SocialMediaPayload, S>
+
+  type SocialMediaCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SocialMediaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SocialMediaCountAggregateInputType | true
+    }
+
+  export interface SocialMediaDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SocialMedia'], meta: { name: 'SocialMedia' } }
+    /**
+     * Find zero or one SocialMedia that matches the filter.
+     * @param {SocialMediaFindUniqueArgs} args - Arguments to find a SocialMedia
+     * @example
+     * // Get one SocialMedia
+     * const socialMedia = await prisma.socialMedia.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SocialMediaFindUniqueArgs>(args: SelectSubset<T, SocialMediaFindUniqueArgs<ExtArgs>>): Prisma__SocialMediaClient<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SocialMedia that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SocialMediaFindUniqueOrThrowArgs} args - Arguments to find a SocialMedia
+     * @example
+     * // Get one SocialMedia
+     * const socialMedia = await prisma.socialMedia.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SocialMediaFindUniqueOrThrowArgs>(args: SelectSubset<T, SocialMediaFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SocialMediaClient<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SocialMedia that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SocialMediaFindFirstArgs} args - Arguments to find a SocialMedia
+     * @example
+     * // Get one SocialMedia
+     * const socialMedia = await prisma.socialMedia.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SocialMediaFindFirstArgs>(args?: SelectSubset<T, SocialMediaFindFirstArgs<ExtArgs>>): Prisma__SocialMediaClient<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SocialMedia that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SocialMediaFindFirstOrThrowArgs} args - Arguments to find a SocialMedia
+     * @example
+     * // Get one SocialMedia
+     * const socialMedia = await prisma.socialMedia.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SocialMediaFindFirstOrThrowArgs>(args?: SelectSubset<T, SocialMediaFindFirstOrThrowArgs<ExtArgs>>): Prisma__SocialMediaClient<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SocialMedias that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SocialMediaFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SocialMedias
+     * const socialMedias = await prisma.socialMedia.findMany()
+     * 
+     * // Get first 10 SocialMedias
+     * const socialMedias = await prisma.socialMedia.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const socialMediaWithIdOnly = await prisma.socialMedia.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SocialMediaFindManyArgs>(args?: SelectSubset<T, SocialMediaFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SocialMedia.
+     * @param {SocialMediaCreateArgs} args - Arguments to create a SocialMedia.
+     * @example
+     * // Create one SocialMedia
+     * const SocialMedia = await prisma.socialMedia.create({
+     *   data: {
+     *     // ... data to create a SocialMedia
+     *   }
+     * })
+     * 
+     */
+    create<T extends SocialMediaCreateArgs>(args: SelectSubset<T, SocialMediaCreateArgs<ExtArgs>>): Prisma__SocialMediaClient<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SocialMedias.
+     * @param {SocialMediaCreateManyArgs} args - Arguments to create many SocialMedias.
+     * @example
+     * // Create many SocialMedias
+     * const socialMedia = await prisma.socialMedia.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SocialMediaCreateManyArgs>(args?: SelectSubset<T, SocialMediaCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SocialMedias and returns the data saved in the database.
+     * @param {SocialMediaCreateManyAndReturnArgs} args - Arguments to create many SocialMedias.
+     * @example
+     * // Create many SocialMedias
+     * const socialMedia = await prisma.socialMedia.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SocialMedias and only return the `id`
+     * const socialMediaWithIdOnly = await prisma.socialMedia.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SocialMediaCreateManyAndReturnArgs>(args?: SelectSubset<T, SocialMediaCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SocialMedia.
+     * @param {SocialMediaDeleteArgs} args - Arguments to delete one SocialMedia.
+     * @example
+     * // Delete one SocialMedia
+     * const SocialMedia = await prisma.socialMedia.delete({
+     *   where: {
+     *     // ... filter to delete one SocialMedia
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SocialMediaDeleteArgs>(args: SelectSubset<T, SocialMediaDeleteArgs<ExtArgs>>): Prisma__SocialMediaClient<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SocialMedia.
+     * @param {SocialMediaUpdateArgs} args - Arguments to update one SocialMedia.
+     * @example
+     * // Update one SocialMedia
+     * const socialMedia = await prisma.socialMedia.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SocialMediaUpdateArgs>(args: SelectSubset<T, SocialMediaUpdateArgs<ExtArgs>>): Prisma__SocialMediaClient<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SocialMedias.
+     * @param {SocialMediaDeleteManyArgs} args - Arguments to filter SocialMedias to delete.
+     * @example
+     * // Delete a few SocialMedias
+     * const { count } = await prisma.socialMedia.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SocialMediaDeleteManyArgs>(args?: SelectSubset<T, SocialMediaDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SocialMedias.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SocialMediaUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SocialMedias
+     * const socialMedia = await prisma.socialMedia.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SocialMediaUpdateManyArgs>(args: SelectSubset<T, SocialMediaUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SocialMedias and returns the data updated in the database.
+     * @param {SocialMediaUpdateManyAndReturnArgs} args - Arguments to update many SocialMedias.
+     * @example
+     * // Update many SocialMedias
+     * const socialMedia = await prisma.socialMedia.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SocialMedias and only return the `id`
+     * const socialMediaWithIdOnly = await prisma.socialMedia.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SocialMediaUpdateManyAndReturnArgs>(args: SelectSubset<T, SocialMediaUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SocialMedia.
+     * @param {SocialMediaUpsertArgs} args - Arguments to update or create a SocialMedia.
+     * @example
+     * // Update or create a SocialMedia
+     * const socialMedia = await prisma.socialMedia.upsert({
+     *   create: {
+     *     // ... data to create a SocialMedia
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SocialMedia we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SocialMediaUpsertArgs>(args: SelectSubset<T, SocialMediaUpsertArgs<ExtArgs>>): Prisma__SocialMediaClient<$Result.GetResult<Prisma.$SocialMediaPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SocialMedias.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SocialMediaCountArgs} args - Arguments to filter SocialMedias to count.
+     * @example
+     * // Count the number of SocialMedias
+     * const count = await prisma.socialMedia.count({
+     *   where: {
+     *     // ... the filter for the SocialMedias we want to count
+     *   }
+     * })
+    **/
+    count<T extends SocialMediaCountArgs>(
+      args?: Subset<T, SocialMediaCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SocialMediaCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SocialMedia.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SocialMediaAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SocialMediaAggregateArgs>(args: Subset<T, SocialMediaAggregateArgs>): Prisma.PrismaPromise<GetSocialMediaAggregateType<T>>
+
+    /**
+     * Group by SocialMedia.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SocialMediaGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SocialMediaGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SocialMediaGroupByArgs['orderBy'] }
+        : { orderBy?: SocialMediaGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SocialMediaGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSocialMediaGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SocialMedia model
+   */
+  readonly fields: SocialMediaFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SocialMedia.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SocialMediaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SocialMedia model
+   */
+  interface SocialMediaFieldRefs {
+    readonly id: FieldRef<"SocialMedia", 'String'>
+    readonly userId: FieldRef<"SocialMedia", 'String'>
+    readonly platform: FieldRef<"SocialMedia", 'SocialMediaPlatform'>
+    readonly username: FieldRef<"SocialMedia", 'String'>
+    readonly followers: FieldRef<"SocialMedia", 'String'>
+    readonly url: FieldRef<"SocialMedia", 'String'>
+    readonly createdAt: FieldRef<"SocialMedia", 'DateTime'>
+    readonly updatedAt: FieldRef<"SocialMedia", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SocialMedia findUnique
+   */
+  export type SocialMediaFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    /**
+     * Filter, which SocialMedia to fetch.
+     */
+    where: SocialMediaWhereUniqueInput
+  }
+
+  /**
+   * SocialMedia findUniqueOrThrow
+   */
+  export type SocialMediaFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    /**
+     * Filter, which SocialMedia to fetch.
+     */
+    where: SocialMediaWhereUniqueInput
+  }
+
+  /**
+   * SocialMedia findFirst
+   */
+  export type SocialMediaFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    /**
+     * Filter, which SocialMedia to fetch.
+     */
+    where?: SocialMediaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SocialMedias to fetch.
+     */
+    orderBy?: SocialMediaOrderByWithRelationInput | SocialMediaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SocialMedias.
+     */
+    cursor?: SocialMediaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SocialMedias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SocialMedias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SocialMedias.
+     */
+    distinct?: SocialMediaScalarFieldEnum | SocialMediaScalarFieldEnum[]
+  }
+
+  /**
+   * SocialMedia findFirstOrThrow
+   */
+  export type SocialMediaFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    /**
+     * Filter, which SocialMedia to fetch.
+     */
+    where?: SocialMediaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SocialMedias to fetch.
+     */
+    orderBy?: SocialMediaOrderByWithRelationInput | SocialMediaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SocialMedias.
+     */
+    cursor?: SocialMediaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SocialMedias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SocialMedias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SocialMedias.
+     */
+    distinct?: SocialMediaScalarFieldEnum | SocialMediaScalarFieldEnum[]
+  }
+
+  /**
+   * SocialMedia findMany
+   */
+  export type SocialMediaFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    /**
+     * Filter, which SocialMedias to fetch.
+     */
+    where?: SocialMediaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SocialMedias to fetch.
+     */
+    orderBy?: SocialMediaOrderByWithRelationInput | SocialMediaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SocialMedias.
+     */
+    cursor?: SocialMediaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SocialMedias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SocialMedias.
+     */
+    skip?: number
+    distinct?: SocialMediaScalarFieldEnum | SocialMediaScalarFieldEnum[]
+  }
+
+  /**
+   * SocialMedia create
+   */
+  export type SocialMediaCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SocialMedia.
+     */
+    data: XOR<SocialMediaCreateInput, SocialMediaUncheckedCreateInput>
+  }
+
+  /**
+   * SocialMedia createMany
+   */
+  export type SocialMediaCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SocialMedias.
+     */
+    data: SocialMediaCreateManyInput | SocialMediaCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SocialMedia createManyAndReturn
+   */
+  export type SocialMediaCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * The data used to create many SocialMedias.
+     */
+    data: SocialMediaCreateManyInput | SocialMediaCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SocialMedia update
+   */
+  export type SocialMediaUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SocialMedia.
+     */
+    data: XOR<SocialMediaUpdateInput, SocialMediaUncheckedUpdateInput>
+    /**
+     * Choose, which SocialMedia to update.
+     */
+    where: SocialMediaWhereUniqueInput
+  }
+
+  /**
+   * SocialMedia updateMany
+   */
+  export type SocialMediaUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SocialMedias.
+     */
+    data: XOR<SocialMediaUpdateManyMutationInput, SocialMediaUncheckedUpdateManyInput>
+    /**
+     * Filter which SocialMedias to update
+     */
+    where?: SocialMediaWhereInput
+    /**
+     * Limit how many SocialMedias to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SocialMedia updateManyAndReturn
+   */
+  export type SocialMediaUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * The data used to update SocialMedias.
+     */
+    data: XOR<SocialMediaUpdateManyMutationInput, SocialMediaUncheckedUpdateManyInput>
+    /**
+     * Filter which SocialMedias to update
+     */
+    where?: SocialMediaWhereInput
+    /**
+     * Limit how many SocialMedias to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SocialMedia upsert
+   */
+  export type SocialMediaUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SocialMedia to update in case it exists.
+     */
+    where: SocialMediaWhereUniqueInput
+    /**
+     * In case the SocialMedia found by the `where` argument doesn't exist, create a new SocialMedia with this data.
+     */
+    create: XOR<SocialMediaCreateInput, SocialMediaUncheckedCreateInput>
+    /**
+     * In case the SocialMedia was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SocialMediaUpdateInput, SocialMediaUncheckedUpdateInput>
+  }
+
+  /**
+   * SocialMedia delete
+   */
+  export type SocialMediaDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+    /**
+     * Filter which SocialMedia to delete.
+     */
+    where: SocialMediaWhereUniqueInput
+  }
+
+  /**
+   * SocialMedia deleteMany
+   */
+  export type SocialMediaDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SocialMedias to delete
+     */
+    where?: SocialMediaWhereInput
+    /**
+     * Limit how many SocialMedias to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SocialMedia without action
+   */
+  export type SocialMediaDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SocialMedia
+     */
+    select?: SocialMediaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SocialMedia
+     */
+    omit?: SocialMediaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SocialMediaInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Campaign
    */
 
@@ -3113,18 +4423,25 @@ export namespace Prisma {
 
   export type CampaignAvgAggregateOutputType = {
     budgetTotal: Decimal | null
+    slots: number | null
   }
 
   export type CampaignSumAggregateOutputType = {
     budgetTotal: Decimal | null
+    slots: number | null
   }
 
   export type CampaignMinAggregateOutputType = {
     id: string | null
     ownerId: string | null
     title: string | null
+    description: string | null
     escrowAddress: string | null
     budgetTotal: Decimal | null
+    isHot: boolean | null
+    slots: number | null
+    startDate: Date | null
+    endDate: Date | null
     yellowChannelId: string | null
     status: $Enums.CampaignStatus | null
     createdAt: Date | null
@@ -3135,8 +4452,13 @@ export namespace Prisma {
     id: string | null
     ownerId: string | null
     title: string | null
+    description: string | null
     escrowAddress: string | null
     budgetTotal: Decimal | null
+    isHot: boolean | null
+    slots: number | null
+    startDate: Date | null
+    endDate: Date | null
     yellowChannelId: string | null
     status: $Enums.CampaignStatus | null
     createdAt: Date | null
@@ -3147,8 +4469,14 @@ export namespace Prisma {
     id: number
     ownerId: number
     title: number
+    description: number
     escrowAddress: number
     budgetTotal: number
+    isHot: number
+    slots: number
+    interests: number
+    startDate: number
+    endDate: number
     yellowChannelId: number
     status: number
     createdAt: number
@@ -3159,18 +4487,25 @@ export namespace Prisma {
 
   export type CampaignAvgAggregateInputType = {
     budgetTotal?: true
+    slots?: true
   }
 
   export type CampaignSumAggregateInputType = {
     budgetTotal?: true
+    slots?: true
   }
 
   export type CampaignMinAggregateInputType = {
     id?: true
     ownerId?: true
     title?: true
+    description?: true
     escrowAddress?: true
     budgetTotal?: true
+    isHot?: true
+    slots?: true
+    startDate?: true
+    endDate?: true
     yellowChannelId?: true
     status?: true
     createdAt?: true
@@ -3181,8 +4516,13 @@ export namespace Prisma {
     id?: true
     ownerId?: true
     title?: true
+    description?: true
     escrowAddress?: true
     budgetTotal?: true
+    isHot?: true
+    slots?: true
+    startDate?: true
+    endDate?: true
     yellowChannelId?: true
     status?: true
     createdAt?: true
@@ -3193,8 +4533,14 @@ export namespace Prisma {
     id?: true
     ownerId?: true
     title?: true
+    description?: true
     escrowAddress?: true
     budgetTotal?: true
+    isHot?: true
+    slots?: true
+    interests?: true
+    startDate?: true
+    endDate?: true
     yellowChannelId?: true
     status?: true
     createdAt?: true
@@ -3292,8 +4638,14 @@ export namespace Prisma {
     id: string
     ownerId: string
     title: string
+    description: string | null
     escrowAddress: string
     budgetTotal: Decimal
+    isHot: boolean
+    slots: number
+    interests: string[]
+    startDate: Date | null
+    endDate: Date | null
     yellowChannelId: string | null
     status: $Enums.CampaignStatus
     createdAt: Date
@@ -3323,8 +4675,14 @@ export namespace Prisma {
     id?: boolean
     ownerId?: boolean
     title?: boolean
+    description?: boolean
     escrowAddress?: boolean
     budgetTotal?: boolean
+    isHot?: boolean
+    slots?: boolean
+    interests?: boolean
+    startDate?: boolean
+    endDate?: boolean
     yellowChannelId?: boolean
     status?: boolean
     createdAt?: boolean
@@ -3339,8 +4697,14 @@ export namespace Prisma {
     id?: boolean
     ownerId?: boolean
     title?: boolean
+    description?: boolean
     escrowAddress?: boolean
     budgetTotal?: boolean
+    isHot?: boolean
+    slots?: boolean
+    interests?: boolean
+    startDate?: boolean
+    endDate?: boolean
     yellowChannelId?: boolean
     status?: boolean
     createdAt?: boolean
@@ -3352,8 +4716,14 @@ export namespace Prisma {
     id?: boolean
     ownerId?: boolean
     title?: boolean
+    description?: boolean
     escrowAddress?: boolean
     budgetTotal?: boolean
+    isHot?: boolean
+    slots?: boolean
+    interests?: boolean
+    startDate?: boolean
+    endDate?: boolean
     yellowChannelId?: boolean
     status?: boolean
     createdAt?: boolean
@@ -3365,15 +4735,21 @@ export namespace Prisma {
     id?: boolean
     ownerId?: boolean
     title?: boolean
+    description?: boolean
     escrowAddress?: boolean
     budgetTotal?: boolean
+    isHot?: boolean
+    slots?: boolean
+    interests?: boolean
+    startDate?: boolean
+    endDate?: boolean
     yellowChannelId?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "title" | "escrowAddress" | "budgetTotal" | "yellowChannelId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["campaign"]>
+  export type CampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "title" | "description" | "escrowAddress" | "budgetTotal" | "isHot" | "slots" | "interests" | "startDate" | "endDate" | "yellowChannelId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["campaign"]>
   export type CampaignInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     rewardEvents?: boolean | Campaign$rewardEventsArgs<ExtArgs>
@@ -3398,8 +4774,14 @@ export namespace Prisma {
       id: string
       ownerId: string
       title: string
+      description: string | null
       escrowAddress: string
       budgetTotal: Prisma.Decimal
+      isHot: boolean
+      slots: number
+      interests: string[]
+      startDate: Date | null
+      endDate: Date | null
       yellowChannelId: string | null
       status: $Enums.CampaignStatus
       createdAt: Date
@@ -3833,8 +5215,14 @@ export namespace Prisma {
     readonly id: FieldRef<"Campaign", 'String'>
     readonly ownerId: FieldRef<"Campaign", 'String'>
     readonly title: FieldRef<"Campaign", 'String'>
+    readonly description: FieldRef<"Campaign", 'String'>
     readonly escrowAddress: FieldRef<"Campaign", 'String'>
     readonly budgetTotal: FieldRef<"Campaign", 'Decimal'>
+    readonly isHot: FieldRef<"Campaign", 'Boolean'>
+    readonly slots: FieldRef<"Campaign", 'Int'>
+    readonly interests: FieldRef<"Campaign", 'String[]'>
+    readonly startDate: FieldRef<"Campaign", 'DateTime'>
+    readonly endDate: FieldRef<"Campaign", 'DateTime'>
     readonly yellowChannelId: FieldRef<"Campaign", 'String'>
     readonly status: FieldRef<"Campaign", 'CampaignStatus'>
     readonly createdAt: FieldRef<"Campaign", 'DateTime'>
@@ -13246,6 +14634,12 @@ export namespace Prisma {
     walletAddress: 'walletAddress',
     name: 'name',
     email: 'email',
+    phone: 'phone',
+    location: 'location',
+    bio: 'bio',
+    avatar: 'avatar',
+    interests: 'interests',
+    affinities: 'affinities',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -13253,12 +14647,32 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+  export const SocialMediaScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    platform: 'platform',
+    username: 'username',
+    followers: 'followers',
+    url: 'url',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SocialMediaScalarFieldEnum = (typeof SocialMediaScalarFieldEnum)[keyof typeof SocialMediaScalarFieldEnum]
+
+
   export const CampaignScalarFieldEnum: {
     id: 'id',
     ownerId: 'ownerId',
     title: 'title',
+    description: 'description',
     escrowAddress: 'escrowAddress',
     budgetTotal: 'budgetTotal',
+    isHot: 'isHot',
+    slots: 'slots',
+    interests: 'interests',
+    startDate: 'startDate',
+    endDate: 'endDate',
     yellowChannelId: 'yellowChannelId',
     status: 'status',
     createdAt: 'createdAt',
@@ -13445,6 +14859,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'SocialMediaPlatform'
+   */
+  export type EnumSocialMediaPlatformFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SocialMediaPlatform'>
+    
+
+
+  /**
+   * Reference to a field of type 'SocialMediaPlatform[]'
+   */
+  export type ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SocialMediaPlatform[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -13455,6 +14883,27 @@ export namespace Prisma {
    * Reference to a field of type 'Decimal[]'
    */
   export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -13487,20 +14936,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -13529,13 +14964,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -13560,8 +14988,15 @@ export namespace Prisma {
     walletAddress?: StringFilter<"User"> | string
     name?: StringNullableFilter<"User"> | string | null
     email?: StringNullableFilter<"User"> | string | null
+    phone?: StringNullableFilter<"User"> | string | null
+    location?: StringNullableFilter<"User"> | string | null
+    bio?: StringNullableFilter<"User"> | string | null
+    avatar?: StringNullableFilter<"User"> | string | null
+    interests?: StringNullableListFilter<"User">
+    affinities?: StringNullableListFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    socialMedias?: SocialMediaListRelationFilter
     campaignsCreated?: CampaignListRelationFilter
     rewardEvents?: RewardEventListRelationFilter
     participations?: ParticipationListRelationFilter
@@ -13572,8 +15007,15 @@ export namespace Prisma {
     walletAddress?: SortOrder
     name?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
+    bio?: SortOrderInput | SortOrder
+    avatar?: SortOrderInput | SortOrder
+    interests?: SortOrder
+    affinities?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    socialMedias?: SocialMediaOrderByRelationAggregateInput
     campaignsCreated?: CampaignOrderByRelationAggregateInput
     rewardEvents?: RewardEventOrderByRelationAggregateInput
     participations?: ParticipationOrderByRelationAggregateInput
@@ -13587,8 +15029,15 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringNullableFilter<"User"> | string | null
+    phone?: StringNullableFilter<"User"> | string | null
+    location?: StringNullableFilter<"User"> | string | null
+    bio?: StringNullableFilter<"User"> | string | null
+    avatar?: StringNullableFilter<"User"> | string | null
+    interests?: StringNullableListFilter<"User">
+    affinities?: StringNullableListFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    socialMedias?: SocialMediaListRelationFilter
     campaignsCreated?: CampaignListRelationFilter
     rewardEvents?: RewardEventListRelationFilter
     participations?: ParticipationListRelationFilter
@@ -13599,6 +15048,12 @@ export namespace Prisma {
     walletAddress?: SortOrder
     name?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
+    bio?: SortOrderInput | SortOrder
+    avatar?: SortOrderInput | SortOrder
+    interests?: SortOrder
+    affinities?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -13614,8 +15069,85 @@ export namespace Prisma {
     walletAddress?: StringWithAggregatesFilter<"User"> | string
     name?: StringNullableWithAggregatesFilter<"User"> | string | null
     email?: StringNullableWithAggregatesFilter<"User"> | string | null
+    phone?: StringNullableWithAggregatesFilter<"User"> | string | null
+    location?: StringNullableWithAggregatesFilter<"User"> | string | null
+    bio?: StringNullableWithAggregatesFilter<"User"> | string | null
+    avatar?: StringNullableWithAggregatesFilter<"User"> | string | null
+    interests?: StringNullableListFilter<"User">
+    affinities?: StringNullableListFilter<"User">
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type SocialMediaWhereInput = {
+    AND?: SocialMediaWhereInput | SocialMediaWhereInput[]
+    OR?: SocialMediaWhereInput[]
+    NOT?: SocialMediaWhereInput | SocialMediaWhereInput[]
+    id?: StringFilter<"SocialMedia"> | string
+    userId?: StringFilter<"SocialMedia"> | string
+    platform?: EnumSocialMediaPlatformFilter<"SocialMedia"> | $Enums.SocialMediaPlatform
+    username?: StringFilter<"SocialMedia"> | string
+    followers?: StringNullableFilter<"SocialMedia"> | string | null
+    url?: StringNullableFilter<"SocialMedia"> | string | null
+    createdAt?: DateTimeFilter<"SocialMedia"> | Date | string
+    updatedAt?: DateTimeFilter<"SocialMedia"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SocialMediaOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    platform?: SortOrder
+    username?: SortOrder
+    followers?: SortOrderInput | SortOrder
+    url?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type SocialMediaWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_platform_username?: SocialMediaUserIdPlatformUsernameCompoundUniqueInput
+    AND?: SocialMediaWhereInput | SocialMediaWhereInput[]
+    OR?: SocialMediaWhereInput[]
+    NOT?: SocialMediaWhereInput | SocialMediaWhereInput[]
+    userId?: StringFilter<"SocialMedia"> | string
+    platform?: EnumSocialMediaPlatformFilter<"SocialMedia"> | $Enums.SocialMediaPlatform
+    username?: StringFilter<"SocialMedia"> | string
+    followers?: StringNullableFilter<"SocialMedia"> | string | null
+    url?: StringNullableFilter<"SocialMedia"> | string | null
+    createdAt?: DateTimeFilter<"SocialMedia"> | Date | string
+    updatedAt?: DateTimeFilter<"SocialMedia"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId_platform_username">
+
+  export type SocialMediaOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    platform?: SortOrder
+    username?: SortOrder
+    followers?: SortOrderInput | SortOrder
+    url?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SocialMediaCountOrderByAggregateInput
+    _max?: SocialMediaMaxOrderByAggregateInput
+    _min?: SocialMediaMinOrderByAggregateInput
+  }
+
+  export type SocialMediaScalarWhereWithAggregatesInput = {
+    AND?: SocialMediaScalarWhereWithAggregatesInput | SocialMediaScalarWhereWithAggregatesInput[]
+    OR?: SocialMediaScalarWhereWithAggregatesInput[]
+    NOT?: SocialMediaScalarWhereWithAggregatesInput | SocialMediaScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SocialMedia"> | string
+    userId?: StringWithAggregatesFilter<"SocialMedia"> | string
+    platform?: EnumSocialMediaPlatformWithAggregatesFilter<"SocialMedia"> | $Enums.SocialMediaPlatform
+    username?: StringWithAggregatesFilter<"SocialMedia"> | string
+    followers?: StringNullableWithAggregatesFilter<"SocialMedia"> | string | null
+    url?: StringNullableWithAggregatesFilter<"SocialMedia"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SocialMedia"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SocialMedia"> | Date | string
   }
 
   export type CampaignWhereInput = {
@@ -13625,8 +15157,14 @@ export namespace Prisma {
     id?: StringFilter<"Campaign"> | string
     ownerId?: StringFilter<"Campaign"> | string
     title?: StringFilter<"Campaign"> | string
+    description?: StringNullableFilter<"Campaign"> | string | null
     escrowAddress?: StringFilter<"Campaign"> | string
     budgetTotal?: DecimalFilter<"Campaign"> | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFilter<"Campaign"> | boolean
+    slots?: IntFilter<"Campaign"> | number
+    interests?: StringNullableListFilter<"Campaign">
+    startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
+    endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableFilter<"Campaign"> | string | null
     status?: EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
     createdAt?: DateTimeFilter<"Campaign"> | Date | string
@@ -13640,8 +15178,14 @@ export namespace Prisma {
     id?: SortOrder
     ownerId?: SortOrder
     title?: SortOrder
+    description?: SortOrderInput | SortOrder
     escrowAddress?: SortOrder
     budgetTotal?: SortOrder
+    isHot?: SortOrder
+    slots?: SortOrder
+    interests?: SortOrder
+    startDate?: SortOrderInput | SortOrder
+    endDate?: SortOrderInput | SortOrder
     yellowChannelId?: SortOrderInput | SortOrder
     status?: SortOrder
     createdAt?: SortOrder
@@ -13658,8 +15202,14 @@ export namespace Prisma {
     NOT?: CampaignWhereInput | CampaignWhereInput[]
     ownerId?: StringFilter<"Campaign"> | string
     title?: StringFilter<"Campaign"> | string
+    description?: StringNullableFilter<"Campaign"> | string | null
     escrowAddress?: StringFilter<"Campaign"> | string
     budgetTotal?: DecimalFilter<"Campaign"> | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFilter<"Campaign"> | boolean
+    slots?: IntFilter<"Campaign"> | number
+    interests?: StringNullableListFilter<"Campaign">
+    startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
+    endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableFilter<"Campaign"> | string | null
     status?: EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
     createdAt?: DateTimeFilter<"Campaign"> | Date | string
@@ -13673,8 +15223,14 @@ export namespace Prisma {
     id?: SortOrder
     ownerId?: SortOrder
     title?: SortOrder
+    description?: SortOrderInput | SortOrder
     escrowAddress?: SortOrder
     budgetTotal?: SortOrder
+    isHot?: SortOrder
+    slots?: SortOrder
+    interests?: SortOrder
+    startDate?: SortOrderInput | SortOrder
+    endDate?: SortOrderInput | SortOrder
     yellowChannelId?: SortOrderInput | SortOrder
     status?: SortOrder
     createdAt?: SortOrder
@@ -13693,8 +15249,14 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Campaign"> | string
     ownerId?: StringWithAggregatesFilter<"Campaign"> | string
     title?: StringWithAggregatesFilter<"Campaign"> | string
+    description?: StringNullableWithAggregatesFilter<"Campaign"> | string | null
     escrowAddress?: StringWithAggregatesFilter<"Campaign"> | string
     budgetTotal?: DecimalWithAggregatesFilter<"Campaign"> | Decimal | DecimalJsLike | number | string
+    isHot?: BoolWithAggregatesFilter<"Campaign"> | boolean
+    slots?: IntWithAggregatesFilter<"Campaign"> | number
+    interests?: StringNullableListFilter<"Campaign">
+    startDate?: DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
+    endDate?: DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableWithAggregatesFilter<"Campaign"> | string | null
     status?: EnumCampaignStatusWithAggregatesFilter<"Campaign"> | $Enums.CampaignStatus
     createdAt?: DateTimeWithAggregatesFilter<"Campaign"> | Date | string
@@ -14249,8 +15811,15 @@ export namespace Prisma {
     walletAddress: string
     name?: string | null
     email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
+    socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
     campaignsCreated?: CampaignCreateNestedManyWithoutOwnerInput
     rewardEvents?: RewardEventCreateNestedManyWithoutOwnerInput
     participations?: ParticipationCreateNestedManyWithoutInfluencerInput
@@ -14261,8 +15830,15 @@ export namespace Prisma {
     walletAddress: string
     name?: string | null
     email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
+    socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
     campaignsCreated?: CampaignUncheckedCreateNestedManyWithoutOwnerInput
     rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutOwnerInput
     participations?: ParticipationUncheckedCreateNestedManyWithoutInfluencerInput
@@ -14273,8 +15849,15 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
     campaignsCreated?: CampaignUpdateManyWithoutOwnerNestedInput
     rewardEvents?: RewardEventUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUpdateManyWithoutInfluencerNestedInput
@@ -14285,8 +15868,15 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
     campaignsCreated?: CampaignUncheckedUpdateManyWithoutOwnerNestedInput
     rewardEvents?: RewardEventUncheckedUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUncheckedUpdateManyWithoutInfluencerNestedInput
@@ -14297,6 +15887,12 @@ export namespace Prisma {
     walletAddress: string
     name?: string | null
     email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14306,6 +15902,12 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14315,6 +15917,88 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SocialMediaCreateInput = {
+    id?: string
+    platform: $Enums.SocialMediaPlatform
+    username: string
+    followers?: string | null
+    url?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSocialMediasInput
+  }
+
+  export type SocialMediaUncheckedCreateInput = {
+    id?: string
+    userId: string
+    platform: $Enums.SocialMediaPlatform
+    username: string
+    followers?: string | null
+    url?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SocialMediaUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
+    username?: StringFieldUpdateOperationsInput | string
+    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSocialMediasNestedInput
+  }
+
+  export type SocialMediaUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
+    username?: StringFieldUpdateOperationsInput | string
+    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SocialMediaCreateManyInput = {
+    id?: string
+    userId: string
+    platform: $Enums.SocialMediaPlatform
+    username: string
+    followers?: string | null
+    url?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SocialMediaUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
+    username?: StringFieldUpdateOperationsInput | string
+    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SocialMediaUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
+    username?: StringFieldUpdateOperationsInput | string
+    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14322,8 +16006,14 @@ export namespace Prisma {
   export type CampaignCreateInput = {
     id?: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -14337,8 +16027,14 @@ export namespace Prisma {
     id?: string
     ownerId: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -14350,8 +16046,14 @@ export namespace Prisma {
   export type CampaignUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14365,8 +16067,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     ownerId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14379,8 +16087,14 @@ export namespace Prisma {
     id?: string
     ownerId: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -14390,8 +16104,14 @@ export namespace Prisma {
   export type CampaignUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14402,8 +16122,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     ownerId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15000,6 +16726,14 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -15009,6 +16743,12 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type SocialMediaListRelationFilter = {
+    every?: SocialMediaWhereInput
+    some?: SocialMediaWhereInput
+    none?: SocialMediaWhereInput
   }
 
   export type CampaignListRelationFilter = {
@@ -15034,6 +16774,10 @@ export namespace Prisma {
     nulls?: NullsOrder
   }
 
+  export type SocialMediaOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type CampaignOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -15051,6 +16795,12 @@ export namespace Prisma {
     walletAddress?: SortOrder
     name?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
+    location?: SortOrder
+    bio?: SortOrder
+    avatar?: SortOrder
+    interests?: SortOrder
+    affinities?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15060,6 +16810,10 @@ export namespace Prisma {
     walletAddress?: SortOrder
     name?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
+    location?: SortOrder
+    bio?: SortOrder
+    avatar?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15069,6 +16823,10 @@ export namespace Prisma {
     walletAddress?: SortOrder
     name?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
+    location?: SortOrder
+    bio?: SortOrder
+    avatar?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15123,6 +16881,67 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type EnumSocialMediaPlatformFilter<$PrismaModel = never> = {
+    equals?: $Enums.SocialMediaPlatform | EnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    in?: $Enums.SocialMediaPlatform[] | ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SocialMediaPlatform[] | ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    not?: NestedEnumSocialMediaPlatformFilter<$PrismaModel> | $Enums.SocialMediaPlatform
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type SocialMediaUserIdPlatformUsernameCompoundUniqueInput = {
+    userId: string
+    platform: $Enums.SocialMediaPlatform
+    username: string
+  }
+
+  export type SocialMediaCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    platform?: SortOrder
+    username?: SortOrder
+    followers?: SortOrder
+    url?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SocialMediaMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    platform?: SortOrder
+    username?: SortOrder
+    followers?: SortOrder
+    url?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SocialMediaMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    platform?: SortOrder
+    username?: SortOrder
+    followers?: SortOrder
+    url?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumSocialMediaPlatformWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SocialMediaPlatform | EnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    in?: $Enums.SocialMediaPlatform[] | ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SocialMediaPlatform[] | ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    not?: NestedEnumSocialMediaPlatformWithAggregatesFilter<$PrismaModel> | $Enums.SocialMediaPlatform
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSocialMediaPlatformFilter<$PrismaModel>
+    _max?: NestedEnumSocialMediaPlatformFilter<$PrismaModel>
+  }
+
   export type DecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
@@ -15134,16 +16953,38 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type EnumCampaignStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.CampaignStatus | EnumCampaignStatusFieldRefInput<$PrismaModel>
     in?: $Enums.CampaignStatus[] | ListEnumCampaignStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.CampaignStatus[] | ListEnumCampaignStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumCampaignStatusFilter<$PrismaModel> | $Enums.CampaignStatus
-  }
-
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
   }
 
   export type CampaignRewardEventListRelationFilter = {
@@ -15160,8 +17001,14 @@ export namespace Prisma {
     id?: SortOrder
     ownerId?: SortOrder
     title?: SortOrder
+    description?: SortOrder
     escrowAddress?: SortOrder
     budgetTotal?: SortOrder
+    isHot?: SortOrder
+    slots?: SortOrder
+    interests?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
     yellowChannelId?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
@@ -15170,14 +17017,20 @@ export namespace Prisma {
 
   export type CampaignAvgOrderByAggregateInput = {
     budgetTotal?: SortOrder
+    slots?: SortOrder
   }
 
   export type CampaignMaxOrderByAggregateInput = {
     id?: SortOrder
     ownerId?: SortOrder
     title?: SortOrder
+    description?: SortOrder
     escrowAddress?: SortOrder
     budgetTotal?: SortOrder
+    isHot?: SortOrder
+    slots?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
     yellowChannelId?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
@@ -15188,8 +17041,13 @@ export namespace Prisma {
     id?: SortOrder
     ownerId?: SortOrder
     title?: SortOrder
+    description?: SortOrder
     escrowAddress?: SortOrder
     budgetTotal?: SortOrder
+    isHot?: SortOrder
+    slots?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
     yellowChannelId?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
@@ -15198,6 +17056,7 @@ export namespace Prisma {
 
   export type CampaignSumOrderByAggregateInput = {
     budgetTotal?: SortOrder
+    slots?: SortOrder
   }
 
   export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
@@ -15214,6 +17073,44 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumCampaignStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -15280,17 +17177,6 @@ export namespace Prisma {
     _max?: NestedEnumEventTypeFilter<$PrismaModel>
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type CampaignScalarRelationFilter = {
     is?: CampaignWhereInput
     isNot?: CampaignWhereInput
@@ -15354,22 +17240,6 @@ export namespace Prisma {
   export type CampaignRewardEventSumOrderByAggregateInput = {
     amount?: SortOrder
     volumeStep?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type ClientCountOrderByAggregateInput = {
@@ -15493,11 +17363,6 @@ export namespace Prisma {
     not?: NestedEnumSelectorEventTypeFilter<$PrismaModel> | $Enums.SelectorEventType
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type SelectorRewardEventIdSelectorCompoundUniqueInput = {
     rewardEventId: string
     selector: string
@@ -15541,14 +17406,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumSelectorEventTypeFilter<$PrismaModel>
     _max?: NestedEnumSelectorEventTypeFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type TrackingLinkListRelationFilter = {
@@ -15611,17 +17468,6 @@ export namespace Prisma {
     currentBalance?: SortOrder
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type ParticipationScalarRelationFilter = {
     is?: ParticipationWhereInput
     isNot?: ParticipationWhereInput
@@ -15655,20 +17501,6 @@ export namespace Prisma {
     expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type AnalyticsEventCountOrderByAggregateInput = {
@@ -15710,6 +17542,21 @@ export namespace Prisma {
     payoutGenerated?: SortOrder
   }
 
+  export type UserCreateinterestsInput = {
+    set: string[]
+  }
+
+  export type UserCreateaffinitiesInput = {
+    set: string[]
+  }
+
+  export type SocialMediaCreateNestedManyWithoutUserInput = {
+    create?: XOR<SocialMediaCreateWithoutUserInput, SocialMediaUncheckedCreateWithoutUserInput> | SocialMediaCreateWithoutUserInput[] | SocialMediaUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SocialMediaCreateOrConnectWithoutUserInput | SocialMediaCreateOrConnectWithoutUserInput[]
+    createMany?: SocialMediaCreateManyUserInputEnvelope
+    connect?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
+  }
+
   export type CampaignCreateNestedManyWithoutOwnerInput = {
     create?: XOR<CampaignCreateWithoutOwnerInput, CampaignUncheckedCreateWithoutOwnerInput> | CampaignCreateWithoutOwnerInput[] | CampaignUncheckedCreateWithoutOwnerInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutOwnerInput | CampaignCreateOrConnectWithoutOwnerInput[]
@@ -15729,6 +17576,13 @@ export namespace Prisma {
     connectOrCreate?: ParticipationCreateOrConnectWithoutInfluencerInput | ParticipationCreateOrConnectWithoutInfluencerInput[]
     createMany?: ParticipationCreateManyInfluencerInputEnvelope
     connect?: ParticipationWhereUniqueInput | ParticipationWhereUniqueInput[]
+  }
+
+  export type SocialMediaUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SocialMediaCreateWithoutUserInput, SocialMediaUncheckedCreateWithoutUserInput> | SocialMediaCreateWithoutUserInput[] | SocialMediaUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SocialMediaCreateOrConnectWithoutUserInput | SocialMediaCreateOrConnectWithoutUserInput[]
+    createMany?: SocialMediaCreateManyUserInputEnvelope
+    connect?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
   }
 
   export type CampaignUncheckedCreateNestedManyWithoutOwnerInput = {
@@ -15760,8 +17614,32 @@ export namespace Prisma {
     set?: string | null
   }
 
+  export type UserUpdateinterestsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type UserUpdateaffinitiesInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type SocialMediaUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SocialMediaCreateWithoutUserInput, SocialMediaUncheckedCreateWithoutUserInput> | SocialMediaCreateWithoutUserInput[] | SocialMediaUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SocialMediaCreateOrConnectWithoutUserInput | SocialMediaCreateOrConnectWithoutUserInput[]
+    upsert?: SocialMediaUpsertWithWhereUniqueWithoutUserInput | SocialMediaUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SocialMediaCreateManyUserInputEnvelope
+    set?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
+    disconnect?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
+    delete?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
+    connect?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
+    update?: SocialMediaUpdateWithWhereUniqueWithoutUserInput | SocialMediaUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SocialMediaUpdateManyWithWhereWithoutUserInput | SocialMediaUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SocialMediaScalarWhereInput | SocialMediaScalarWhereInput[]
   }
 
   export type CampaignUpdateManyWithoutOwnerNestedInput = {
@@ -15806,6 +17684,20 @@ export namespace Prisma {
     deleteMany?: ParticipationScalarWhereInput | ParticipationScalarWhereInput[]
   }
 
+  export type SocialMediaUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SocialMediaCreateWithoutUserInput, SocialMediaUncheckedCreateWithoutUserInput> | SocialMediaCreateWithoutUserInput[] | SocialMediaUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SocialMediaCreateOrConnectWithoutUserInput | SocialMediaCreateOrConnectWithoutUserInput[]
+    upsert?: SocialMediaUpsertWithWhereUniqueWithoutUserInput | SocialMediaUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SocialMediaCreateManyUserInputEnvelope
+    set?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
+    disconnect?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
+    delete?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
+    connect?: SocialMediaWhereUniqueInput | SocialMediaWhereUniqueInput[]
+    update?: SocialMediaUpdateWithWhereUniqueWithoutUserInput | SocialMediaUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SocialMediaUpdateManyWithWhereWithoutUserInput | SocialMediaUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SocialMediaScalarWhereInput | SocialMediaScalarWhereInput[]
+  }
+
   export type CampaignUncheckedUpdateManyWithoutOwnerNestedInput = {
     create?: XOR<CampaignCreateWithoutOwnerInput, CampaignUncheckedCreateWithoutOwnerInput> | CampaignCreateWithoutOwnerInput[] | CampaignUncheckedCreateWithoutOwnerInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutOwnerInput | CampaignCreateOrConnectWithoutOwnerInput[]
@@ -15848,6 +17740,28 @@ export namespace Prisma {
     deleteMany?: ParticipationScalarWhereInput | ParticipationScalarWhereInput[]
   }
 
+  export type UserCreateNestedOneWithoutSocialMediasInput = {
+    create?: XOR<UserCreateWithoutSocialMediasInput, UserUncheckedCreateWithoutSocialMediasInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSocialMediasInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumSocialMediaPlatformFieldUpdateOperationsInput = {
+    set?: $Enums.SocialMediaPlatform
+  }
+
+  export type UserUpdateOneRequiredWithoutSocialMediasNestedInput = {
+    create?: XOR<UserCreateWithoutSocialMediasInput, UserUncheckedCreateWithoutSocialMediasInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSocialMediasInput
+    upsert?: UserUpsertWithoutSocialMediasInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSocialMediasInput, UserUpdateWithoutSocialMediasInput>, UserUncheckedUpdateWithoutSocialMediasInput>
+  }
+
+  export type CampaignCreateinterestsInput = {
+    set: string[]
+  }
+
   export type UserCreateNestedOneWithoutCampaignsCreatedInput = {
     create?: XOR<UserCreateWithoutCampaignsCreatedInput, UserUncheckedCreateWithoutCampaignsCreatedInput>
     connectOrCreate?: UserCreateOrConnectWithoutCampaignsCreatedInput
@@ -15888,6 +17802,27 @@ export namespace Prisma {
     decrement?: Decimal | DecimalJsLike | number | string
     multiply?: Decimal | DecimalJsLike | number | string
     divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type CampaignUpdateinterestsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type EnumCampaignStatusFieldUpdateOperationsInput = {
@@ -16086,14 +18021,6 @@ export namespace Prisma {
     connect?: TrackedEventWhereUniqueInput | TrackedEventWhereUniqueInput[]
   }
 
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type CampaignUpdateOneRequiredWithoutRewardEventsNestedInput = {
     create?: XOR<CampaignCreateWithoutRewardEventsInput, CampaignUncheckedCreateWithoutRewardEventsInput>
     connectOrCreate?: CampaignCreateOrConnectWithoutRewardEventsInput
@@ -16216,10 +18143,6 @@ export namespace Prisma {
 
   export type EnumSelectorEventTypeFieldUpdateOperationsInput = {
     set?: $Enums.SelectorEventType
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type RewardEventUpdateOneRequiredWithoutSelectorsNestedInput = {
@@ -16346,10 +18269,6 @@ export namespace Prisma {
     create?: XOR<ParticipationCreateWithoutLinksInput, ParticipationUncheckedCreateWithoutLinksInput>
     connectOrCreate?: ParticipationCreateOrConnectWithoutLinksInput
     connect?: ParticipationWhereUniqueInput
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type ParticipationUpdateOneRequiredWithoutLinksNestedInput = {
@@ -16483,6 +18402,23 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedEnumSocialMediaPlatformFilter<$PrismaModel = never> = {
+    equals?: $Enums.SocialMediaPlatform | EnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    in?: $Enums.SocialMediaPlatform[] | ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SocialMediaPlatform[] | ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    not?: NestedEnumSocialMediaPlatformFilter<$PrismaModel> | $Enums.SocialMediaPlatform
+  }
+
+  export type NestedEnumSocialMediaPlatformWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SocialMediaPlatform | EnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    in?: $Enums.SocialMediaPlatform[] | ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SocialMediaPlatform[] | ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel>
+    not?: NestedEnumSocialMediaPlatformWithAggregatesFilter<$PrismaModel> | $Enums.SocialMediaPlatform
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSocialMediaPlatformFilter<$PrismaModel>
+    _max?: NestedEnumSocialMediaPlatformFilter<$PrismaModel>
+  }
+
   export type NestedDecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
@@ -16492,6 +18428,22 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedEnumCampaignStatusFilter<$PrismaModel = never> = {
@@ -16517,31 +18469,12 @@ export namespace Prisma {
     _max?: NestedDecimalFilter<$PrismaModel>
   }
 
-  export type NestedEnumCampaignStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.CampaignStatus | EnumCampaignStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.CampaignStatus[] | ListEnumCampaignStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.CampaignStatus[] | ListEnumCampaignStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumCampaignStatusWithAggregatesFilter<$PrismaModel> | $Enums.CampaignStatus
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumCampaignStatusFilter<$PrismaModel>
-    _max?: NestedEnumCampaignStatusFilter<$PrismaModel>
-  }
-
-  export type NestedEnumEventTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumEventTypeFilter<$PrismaModel> | $Enums.EventType
-  }
-
-  export type NestedEnumEventTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.EventType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumEventTypeFilter<$PrismaModel>
-    _max?: NestedEnumEventTypeFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -16569,6 +18502,47 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCampaignStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CampaignStatus | EnumCampaignStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CampaignStatus[] | ListEnumCampaignStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CampaignStatus[] | ListEnumCampaignStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCampaignStatusWithAggregatesFilter<$PrismaModel> | $Enums.CampaignStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCampaignStatusFilter<$PrismaModel>
+    _max?: NestedEnumCampaignStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumEventTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventTypeFilter<$PrismaModel> | $Enums.EventType
+  }
+
+  export type NestedEnumEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.EventType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEventTypeFilter<$PrismaModel>
+    _max?: NestedEnumEventTypeFilter<$PrismaModel>
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -16601,11 +18575,6 @@ export namespace Prisma {
     not?: NestedEnumSelectorEventTypeFilter<$PrismaModel> | $Enums.SelectorEventType
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type NestedEnumSelectorEventTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.SelectorEventType | EnumSelectorEventTypeFieldRefInput<$PrismaModel>
     in?: $Enums.SelectorEventType[] | ListEnumSelectorEventTypeFieldRefInput<$PrismaModel>
@@ -16616,44 +18585,47 @@ export namespace Prisma {
     _max?: NestedEnumSelectorEventTypeFilter<$PrismaModel>
   }
 
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
+  export type SocialMediaCreateWithoutUserInput = {
+    id?: string
+    platform: $Enums.SocialMediaPlatform
+    username: string
+    followers?: string | null
+    url?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  export type SocialMediaUncheckedCreateWithoutUserInput = {
+    id?: string
+    platform: $Enums.SocialMediaPlatform
+    username: string
+    followers?: string | null
+    url?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  export type SocialMediaCreateOrConnectWithoutUserInput = {
+    where: SocialMediaWhereUniqueInput
+    create: XOR<SocialMediaCreateWithoutUserInput, SocialMediaUncheckedCreateWithoutUserInput>
+  }
+
+  export type SocialMediaCreateManyUserInputEnvelope = {
+    data: SocialMediaCreateManyUserInput | SocialMediaCreateManyUserInput[]
+    skipDuplicates?: boolean
   }
 
   export type CampaignCreateWithoutOwnerInput = {
     id?: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -16665,8 +18637,14 @@ export namespace Prisma {
   export type CampaignUncheckedCreateWithoutOwnerInput = {
     id?: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -16745,6 +18723,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SocialMediaUpsertWithWhereUniqueWithoutUserInput = {
+    where: SocialMediaWhereUniqueInput
+    update: XOR<SocialMediaUpdateWithoutUserInput, SocialMediaUncheckedUpdateWithoutUserInput>
+    create: XOR<SocialMediaCreateWithoutUserInput, SocialMediaUncheckedCreateWithoutUserInput>
+  }
+
+  export type SocialMediaUpdateWithWhereUniqueWithoutUserInput = {
+    where: SocialMediaWhereUniqueInput
+    data: XOR<SocialMediaUpdateWithoutUserInput, SocialMediaUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SocialMediaUpdateManyWithWhereWithoutUserInput = {
+    where: SocialMediaScalarWhereInput
+    data: XOR<SocialMediaUpdateManyMutationInput, SocialMediaUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SocialMediaScalarWhereInput = {
+    AND?: SocialMediaScalarWhereInput | SocialMediaScalarWhereInput[]
+    OR?: SocialMediaScalarWhereInput[]
+    NOT?: SocialMediaScalarWhereInput | SocialMediaScalarWhereInput[]
+    id?: StringFilter<"SocialMedia"> | string
+    userId?: StringFilter<"SocialMedia"> | string
+    platform?: EnumSocialMediaPlatformFilter<"SocialMedia"> | $Enums.SocialMediaPlatform
+    username?: StringFilter<"SocialMedia"> | string
+    followers?: StringNullableFilter<"SocialMedia"> | string | null
+    url?: StringNullableFilter<"SocialMedia"> | string | null
+    createdAt?: DateTimeFilter<"SocialMedia"> | Date | string
+    updatedAt?: DateTimeFilter<"SocialMedia"> | Date | string
+  }
+
   export type CampaignUpsertWithWhereUniqueWithoutOwnerInput = {
     where: CampaignWhereUniqueInput
     update: XOR<CampaignUpdateWithoutOwnerInput, CampaignUncheckedUpdateWithoutOwnerInput>
@@ -16768,8 +18776,14 @@ export namespace Prisma {
     id?: StringFilter<"Campaign"> | string
     ownerId?: StringFilter<"Campaign"> | string
     title?: StringFilter<"Campaign"> | string
+    description?: StringNullableFilter<"Campaign"> | string | null
     escrowAddress?: StringFilter<"Campaign"> | string
     budgetTotal?: DecimalFilter<"Campaign"> | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFilter<"Campaign"> | boolean
+    slots?: IntFilter<"Campaign"> | number
+    interests?: StringNullableListFilter<"Campaign">
+    startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
+    endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableFilter<"Campaign"> | string | null
     status?: EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
     createdAt?: DateTimeFilter<"Campaign"> | Date | string
@@ -16832,13 +18846,108 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Participation"> | Date | string
   }
 
+  export type UserCreateWithoutSocialMediasInput = {
+    id?: string
+    walletAddress: string
+    name?: string | null
+    email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    campaignsCreated?: CampaignCreateNestedManyWithoutOwnerInput
+    rewardEvents?: RewardEventCreateNestedManyWithoutOwnerInput
+    participations?: ParticipationCreateNestedManyWithoutInfluencerInput
+  }
+
+  export type UserUncheckedCreateWithoutSocialMediasInput = {
+    id?: string
+    walletAddress: string
+    name?: string | null
+    email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    campaignsCreated?: CampaignUncheckedCreateNestedManyWithoutOwnerInput
+    rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutOwnerInput
+    participations?: ParticipationUncheckedCreateNestedManyWithoutInfluencerInput
+  }
+
+  export type UserCreateOrConnectWithoutSocialMediasInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSocialMediasInput, UserUncheckedCreateWithoutSocialMediasInput>
+  }
+
+  export type UserUpsertWithoutSocialMediasInput = {
+    update: XOR<UserUpdateWithoutSocialMediasInput, UserUncheckedUpdateWithoutSocialMediasInput>
+    create: XOR<UserCreateWithoutSocialMediasInput, UserUncheckedCreateWithoutSocialMediasInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSocialMediasInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSocialMediasInput, UserUncheckedUpdateWithoutSocialMediasInput>
+  }
+
+  export type UserUpdateWithoutSocialMediasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    walletAddress?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaignsCreated?: CampaignUpdateManyWithoutOwnerNestedInput
+    rewardEvents?: RewardEventUpdateManyWithoutOwnerNestedInput
+    participations?: ParticipationUpdateManyWithoutInfluencerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSocialMediasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    walletAddress?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaignsCreated?: CampaignUncheckedUpdateManyWithoutOwnerNestedInput
+    rewardEvents?: RewardEventUncheckedUpdateManyWithoutOwnerNestedInput
+    participations?: ParticipationUncheckedUpdateManyWithoutInfluencerNestedInput
+  }
+
   export type UserCreateWithoutCampaignsCreatedInput = {
     id?: string
     walletAddress: string
     name?: string | null
     email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
+    socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
     rewardEvents?: RewardEventCreateNestedManyWithoutOwnerInput
     participations?: ParticipationCreateNestedManyWithoutInfluencerInput
   }
@@ -16848,8 +18957,15 @@ export namespace Prisma {
     walletAddress: string
     name?: string | null
     email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
+    socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
     rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutOwnerInput
     participations?: ParticipationUncheckedCreateNestedManyWithoutInfluencerInput
   }
@@ -16935,8 +19051,15 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
     rewardEvents?: RewardEventUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUpdateManyWithoutInfluencerNestedInput
   }
@@ -16946,8 +19069,15 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
     rewardEvents?: RewardEventUncheckedUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUncheckedUpdateManyWithoutInfluencerNestedInput
   }
@@ -17002,8 +19132,15 @@ export namespace Prisma {
     walletAddress: string
     name?: string | null
     email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
+    socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
     campaignsCreated?: CampaignCreateNestedManyWithoutOwnerInput
     participations?: ParticipationCreateNestedManyWithoutInfluencerInput
   }
@@ -17013,8 +19150,15 @@ export namespace Prisma {
     walletAddress: string
     name?: string | null
     email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
+    socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
     campaignsCreated?: CampaignUncheckedCreateNestedManyWithoutOwnerInput
     participations?: ParticipationUncheckedCreateNestedManyWithoutInfluencerInput
   }
@@ -17098,8 +19242,15 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
     campaignsCreated?: CampaignUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUpdateManyWithoutInfluencerNestedInput
   }
@@ -17109,8 +19260,15 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
     campaignsCreated?: CampaignUncheckedUpdateManyWithoutOwnerNestedInput
     participations?: ParticipationUncheckedUpdateManyWithoutInfluencerNestedInput
   }
@@ -17163,8 +19321,14 @@ export namespace Prisma {
   export type CampaignCreateWithoutRewardEventsInput = {
     id?: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -17177,8 +19341,14 @@ export namespace Prisma {
     id?: string
     ownerId: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -17258,8 +19428,14 @@ export namespace Prisma {
   export type CampaignUpdateWithoutRewardEventsInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17272,8 +19448,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     ownerId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17554,8 +19736,15 @@ export namespace Prisma {
     walletAddress: string
     name?: string | null
     email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
+    socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
     campaignsCreated?: CampaignCreateNestedManyWithoutOwnerInput
     rewardEvents?: RewardEventCreateNestedManyWithoutOwnerInput
   }
@@ -17565,8 +19754,15 @@ export namespace Prisma {
     walletAddress: string
     name?: string | null
     email?: string | null
+    phone?: string | null
+    location?: string | null
+    bio?: string | null
+    avatar?: string | null
+    interests?: UserCreateinterestsInput | string[]
+    affinities?: UserCreateaffinitiesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
+    socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
     campaignsCreated?: CampaignUncheckedCreateNestedManyWithoutOwnerInput
     rewardEvents?: RewardEventUncheckedCreateNestedManyWithoutOwnerInput
   }
@@ -17579,8 +19775,14 @@ export namespace Prisma {
   export type CampaignCreateWithoutParticipationsInput = {
     id?: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -17593,8 +19795,14 @@ export namespace Prisma {
     id?: string
     ownerId: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -17681,8 +19889,15 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
     campaignsCreated?: CampaignUpdateManyWithoutOwnerNestedInput
     rewardEvents?: RewardEventUpdateManyWithoutOwnerNestedInput
   }
@@ -17692,8 +19907,15 @@ export namespace Prisma {
     walletAddress?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    interests?: UserUpdateinterestsInput | string[]
+    affinities?: UserUpdateaffinitiesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
     campaignsCreated?: CampaignUncheckedUpdateManyWithoutOwnerNestedInput
     rewardEvents?: RewardEventUncheckedUpdateManyWithoutOwnerNestedInput
   }
@@ -17712,8 +19934,14 @@ export namespace Prisma {
   export type CampaignUpdateWithoutParticipationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17726,8 +19954,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     ownerId?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17906,11 +20140,27 @@ export namespace Prisma {
     links?: TrackingLinkUncheckedUpdateManyWithoutParticipationNestedInput
   }
 
+  export type SocialMediaCreateManyUserInput = {
+    id?: string
+    platform: $Enums.SocialMediaPlatform
+    username: string
+    followers?: string | null
+    url?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type CampaignCreateManyOwnerInput = {
     id?: string
     title: string
+    description?: string | null
     escrowAddress: string
     budgetTotal: Decimal | DecimalJsLike | number | string
+    isHot?: boolean
+    slots?: number
+    interests?: CampaignCreateinterestsInput | string[]
+    startDate?: Date | string | null
+    endDate?: Date | string | null
     yellowChannelId?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
@@ -17933,11 +20183,47 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type SocialMediaUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
+    username?: StringFieldUpdateOperationsInput | string
+    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SocialMediaUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
+    username?: StringFieldUpdateOperationsInput | string
+    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SocialMediaUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
+    username?: StringFieldUpdateOperationsInput | string
+    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CampaignUpdateWithoutOwnerInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17949,8 +20235,14 @@ export namespace Prisma {
   export type CampaignUncheckedUpdateWithoutOwnerInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -17962,8 +20254,14 @@ export namespace Prisma {
   export type CampaignUncheckedUpdateManyWithoutOwnerInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     escrowAddress?: StringFieldUpdateOperationsInput | string
     budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    slots?: IntFieldUpdateOperationsInput | number
+    interests?: CampaignUpdateinterestsInput | string[]
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

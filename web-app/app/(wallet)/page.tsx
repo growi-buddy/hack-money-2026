@@ -2,8 +2,8 @@
 
 import { FallingLeaves } from '@/components/falling-leaves';
 import { Navbar } from '@/components/navbar';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { WalletButton } from '@/components/wallet-button';
 import { fadeUp, staggerContainer, staggerItem } from '@/lib/animations';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown, Globe, Shield, TrendingUp, Users, Zap } from 'lucide-react';
@@ -42,19 +42,16 @@ export default function LandingPage() {
   });
   
   // Parallax transforms
-  const heroY = useTransform(scrollYProgress, [ 0, 0.25 ], [ 0, -100 ]);
-  const heroOpacity = useTransform(scrollYProgress, [ 0, 0.15 ], [ 1, 0 ]);
-  const heroScale = useTransform(scrollYProgress, [ 0, 0.15 ], [ 1, 0.95 ]);
+  const heroY = useTransform(scrollYProgress, [ 0, 0.3 ], [ 0, -100 ]);
+  const heroOpacity = useTransform(scrollYProgress, [ 0, 0.2 ], [ 1, 0 ]);
+  const heroScale = useTransform(scrollYProgress, [ 0, 0.2 ], [ 1, 0.95 ]);
   const bgShape1Y = useTransform(scrollYProgress, [ 0, 1 ], [ 0, -200 ]);
   const bgShape2Y = useTransform(scrollYProgress, [ 0, 1 ], [ 0, -150 ]);
-  const cardsY = useTransform(scrollYProgress, [ 0.05, 0.25 ], [ 100, 0 ]);
-  const cardsOpacity = useTransform(scrollYProgress, [ 0.05, 0.2 ], [ 0, 1 ]);
-  const cardsScale = useTransform(scrollYProgress, [ 0.05, 0.25 ], [ 0.95, 1 ]);
-  const featuresY = useTransform(scrollYProgress, [ 0.25, 0.5 ], [ 100, 0 ]);
-  const featuresOpacity = useTransform(scrollYProgress, [ 0.25, 0.4 ], [ 0, 1 ]);
-  const featuresScale = useTransform(scrollYProgress, [ 0.25, 0.5 ], [ 0.95, 1 ]);
-  const footerY = useTransform(scrollYProgress, [ 0.5, 0.75 ], [ 50, 0 ]);
-  const footerOpacity = useTransform(scrollYProgress, [ 0.5, 0.65 ], [ 0, 1 ]);
+  const featuresY = useTransform(scrollYProgress, [ 0.1, 0.35 ], [ 100, 0 ]);
+  const featuresOpacity = useTransform(scrollYProgress, [ 0.1, 0.25 ], [ 0, 1 ]);
+  const featuresScale = useTransform(scrollYProgress, [ 0.1, 0.35 ], [ 0.95, 1 ]);
+  const footerY = useTransform(scrollYProgress, [ 0.35, 0.6 ], [ 50, 0 ]);
+  const footerOpacity = useTransform(scrollYProgress, [ 0.35, 0.5 ], [ 0, 1 ]);
   
   return (
     <div ref={containerRef} className="bg-background">
@@ -122,8 +119,16 @@ export default function LandingPage() {
               Connect clients with influencers through crypto-reward campaigns.
               Create performance-based bounties and earn real-time as you hit goals.
             </motion.p>
-            
-            <WalletButton />
+
+            <motion.div variants={fadeUp} className="mt-6">
+              <Link href="/login">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button size="lg" className="bg-growi-blue text-white hover:bg-growi-blue/90 px-8 py-6 text-lg">
+                    Start Now
+                  </Button>
+                </motion.div>
+              </Link>
+            </motion.div>
           </div>
           
           {/* Right Column - Logo Image (Bigger) */}
@@ -177,101 +182,12 @@ export default function LandingPage() {
         </motion.div>
       </motion.section>
       
-      {/* Role Selection Cards - Appear on Scroll */}
-      <motion.section
-        style={{ y: cardsY, opacity: cardsOpacity, scale: cardsScale }}
-        className="relative z-10 mx-auto max-w-7xl px-4 py-20"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-10 text-center"
-        >
-          <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-            Choose Your Path
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Join as a marketing campaign manager or influencer
-          </p>
-        </motion.div>
-        
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid gap-4 sm:gap-6 md:grid-cols-2"
-        >
-          {/* Client Card */}
-          <motion.div variants={staggerItem} className="h-full">
-            <Link href="/client/profile" className="block h-full">
-              <motion.div
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                className="h-full"
-              >
-                <Card className="group h-full cursor-pointer border-2 border-transparent bg-card transition-colors hover:border-growi-blue hover:shadow-lg">
-                  <CardHeader className="text-center">
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-growi-blue/10 sm:h-16 sm:w-16">
-                      <Users className="h-7 w-7 text-growi-blue sm:h-8 sm:w-8" />
-                    </div>
-                    <CardTitle className="text-xl text-foreground sm:text-2xl">I&apos;m a Marketing Campaign
-                      Manager</CardTitle>
-                    <CardDescription className="text-muted-foreground">
-                      Create crypto-reward campaigns and connect with influencers
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li>Set up performance-based bounties</li>
-                      <li>Track real-time campaign metrics</li>
-                      <li>Pay only for verified results</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Link>
-          </motion.div>
-          
-          {/* Influencer Card */}
-          <motion.div variants={staggerItem} className="h-full">
-            <Link href="/influencer/profile" className="block h-full">
-              <motion.div
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                className="h-full"
-              >
-                <Card className="group h-full cursor-pointer border-2 border-transparent bg-card transition-colors hover:border-growi-lime hover:shadow-lg">
-                  <CardHeader className="text-center">
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-growi-lime/10 sm:h-16 sm:w-16">
-                      <TrendingUp className="h-7 w-7 text-growi-lime sm:h-8 sm:w-8" />
-                    </div>
-                    <CardTitle className="text-xl text-foreground sm:text-2xl">I&apos;m an Influencer</CardTitle>
-                    <CardDescription className="text-muted-foreground">
-                      Earn crypto rewards by promoting products you love
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li>Browse available campaigns</li>
-                      <li>Earn per view, click, or sale</li>
-                      <li>Get paid instantly to your wallet</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Link>
-          </motion.div>
-        </motion.div>
-      </motion.section>
-      
       {/* Features Section - Appear on Scroll */}
       <motion.section
         style={{ y: featuresY, opacity: featuresOpacity, scale: featuresScale }}
-        className="relative z-10 bg-card/50 pb-8 pt-16 md:pb-12 md:pt-20"
+        className="relative z-10 flex min-h-screen flex-col items-center justify-center bg-card/50"
       >
-        <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto w-full max-w-7xl px-4 py-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

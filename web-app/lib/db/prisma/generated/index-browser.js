@@ -125,6 +125,23 @@ exports.Prisma.UserScalarFieldEnum = {
   walletAddress: 'walletAddress',
   name: 'name',
   email: 'email',
+  phone: 'phone',
+  location: 'location',
+  bio: 'bio',
+  avatar: 'avatar',
+  interests: 'interests',
+  affinities: 'affinities',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SocialMediaScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  platform: 'platform',
+  username: 'username',
+  followers: 'followers',
+  url: 'url',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -133,8 +150,14 @@ exports.Prisma.CampaignScalarFieldEnum = {
   id: 'id',
   ownerId: 'ownerId',
   title: 'title',
+  description: 'description',
   escrowAddress: 'escrowAddress',
   budgetTotal: 'budgetTotal',
+  isHot: 'isHot',
+  slots: 'slots',
+  interests: 'interests',
+  startDate: 'startDate',
+  endDate: 'endDate',
   yellowChannelId: 'yellowChannelId',
   status: 'status',
   createdAt: 'createdAt',
@@ -244,6 +267,14 @@ exports.Prisma.JsonNullValueFilter = {
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
+exports.SocialMediaPlatform = exports.$Enums.SocialMediaPlatform = {
+  INSTAGRAM: 'INSTAGRAM',
+  TIKTOK: 'TIKTOK',
+  YOUTUBE: 'YOUTUBE',
+  TWITTER: 'TWITTER',
+  OTHER: 'OTHER'
+};
+
 exports.CampaignStatus = exports.$Enums.CampaignStatus = {
   DRAFT: 'DRAFT',
   ACTIVE: 'ACTIVE',
@@ -269,6 +300,7 @@ exports.SelectorEventType = exports.$Enums.SelectorEventType = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  SocialMedia: 'SocialMedia',
   Campaign: 'Campaign',
   RewardEvent: 'RewardEvent',
   CampaignRewardEvent: 'CampaignRewardEvent',

@@ -1,4 +1,5 @@
 // app/api/scripts/client/route.ts
+import { API_BASE_URL } from '@/config/envs';
 import { corsHeaders, handleOptions } from '@/lib/cors';
 import fs from 'fs';
 import { NextResponse } from 'next/server';
@@ -9,9 +10,6 @@ import { dirname } from 'pathe';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const API_BASE_URL = process.env.API_BASE_URL || 'https://local.growi.app';
-
-// Handle CORS preflight
 export async function OPTIONS() {
   return handleOptions();
 }

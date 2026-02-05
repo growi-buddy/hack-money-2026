@@ -72,7 +72,16 @@ export function Navbar({ showBack = false, onMenuClick, showMenu = false }: Navb
           </Link>
         </div>
         
-        <WalletButton />
+        <div className="flex items-center gap-3">
+          <Link href="/login">
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button className="bg-growi-blue text-white hover:bg-growi-blue/90">
+                Start Now
+              </Button>
+            </motion.div>
+          </Link>
+          <WalletButton />
+        </div>
       </div>
     </header>
   );

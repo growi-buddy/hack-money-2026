@@ -1,4 +1,4 @@
-import { getCampaignById, getCampaignDashboard, CampaignDashboardData } from '@/app/api/campaigns/services';
+import { getCampaignById, getCampaignDashboard, getCampaignForInfluencer, CampaignDashboardData, InfluencerCampaignView } from '@/app/api/campaigns/services';
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
 import { Campaign, CampaignStatus } from '@/lib/db/prisma/generated';
@@ -9,6 +9,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     const { searchParams } = new URL(req.url);
     const dashboard = searchParams.get('dashboard') === 'true';
+    const view = searchParams.get('view');
 
     if (dashboard) {
       const campaignData = await getCampaignDashboard(id);
@@ -22,6 +23,26 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       }
 
       const response: ApiDataResponse<CampaignDashboardData> = {
+        success: true,
+        data: campaignData,
+      };
+
+      return { response };
+    }
+
+    // Influencer view - includes owner info and formatted reward events
+    if (view === 'influencer') {
+      const campaignData = await getCampaignForInfluencer(id);
+
+      if (!campaignData) {
+        const response: ApiErrorResponse = {
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Campaign not found' },
+        };
+        return { response, status: 404 };
+      }
+
+      const response: ApiDataResponse<InfluencerCampaignView> = {
         success: true,
         data: campaignData,
       };

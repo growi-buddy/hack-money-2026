@@ -25,7 +25,12 @@ export function mapCampaignFormToAPI(
   return {
     walletAddress,
     title: formData.name || 'Draft',
+    description: formData.description,
     budgetTotal: formData.budget || 0,
+    slots: formData.slots || 10,
+    interests: formData.interests || [],
+    startDate: formData.startDate ? new Date(formData.startDate).toISOString() : null,
+    endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
     rewardEvents,
   };
 }

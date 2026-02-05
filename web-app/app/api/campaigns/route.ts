@@ -57,8 +57,13 @@ export async function POST(req: Request) {
         data: {
           ownerId: user.id,
           title: validatedData.title,
+          description: validatedData.description,
           escrowAddress: '',
           budgetTotal: validatedData.budgetTotal,
+          slots: validatedData.slots ?? 10,
+          interests: validatedData.interests ?? [],
+          startDate: validatedData.startDate ? new Date(validatedData.startDate) : null,
+          endDate: validatedData.endDate ? new Date(validatedData.endDate) : null,
           rewardEvents: {
             create: validatedData.rewardEvents.map(event => ({
               rewardEventId: event.rewardEventId,

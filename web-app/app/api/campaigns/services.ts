@@ -1,6 +1,91 @@
 import { prisma } from '@/lib/db';
 import { CampaignStatus, EventType } from '@/lib/db/enums';
 
+// Type for influencer campaign detail view
+export type InfluencerCampaignView = {
+  id: string;
+  title: string;
+  description: string | null;
+  status: CampaignStatus;
+  budgetTotal: number;
+  isHot: boolean;
+  slots: number;
+  filledSlots: number;
+  interests: string[];
+  startDate: string | null;
+  endDate: string | null;
+  owner: {
+    id: string;
+    name: string | null;
+    walletAddress: string;
+    avatar: string | null;
+  };
+  rewardEvents: {
+    id: string;
+    name: string;
+    eventType: EventType;
+    amount: number;
+    volumeStep: number;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const getCampaignForInfluencer = async (campaignId: string): Promise<InfluencerCampaignView | null> => {
+  const campaign = await prisma.campaign.findUnique({
+    where: {
+      id: campaignId,
+      status: { not: CampaignStatus.DELETED },
+    },
+    include: {
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          walletAddress: true,
+          avatar: true,
+        },
+      },
+      rewardEvents: {
+        include: {
+          rewardEvent: true,
+        },
+      },
+      _count: {
+        select: {
+          participations: true,
+        },
+      },
+    },
+  });
+
+  if (!campaign) return null;
+
+  return {
+    id: campaign.id,
+    title: campaign.title,
+    description: campaign.description,
+    status: campaign.status,
+    budgetTotal: Number(campaign.budgetTotal),
+    isHot: campaign.isHot,
+    slots: campaign.slots,
+    filledSlots: campaign._count.participations,
+    interests: campaign.interests,
+    startDate: campaign.startDate?.toISOString() ?? null,
+    endDate: campaign.endDate?.toISOString() ?? null,
+    owner: campaign.owner,
+    rewardEvents: campaign.rewardEvents.map((cre) => ({
+      id: cre.id,
+      name: cre.rewardEvent.name,
+      eventType: cre.rewardEvent.eventType,
+      amount: Number(cre.amount),
+      volumeStep: cre.volumeStep,
+    })),
+    createdAt: campaign.createdAt.toISOString(),
+    updatedAt: campaign.updatedAt.toISOString(),
+  };
+};
+
 export const getCampaignById = (campaignId: string) => {
   return prisma.campaign.findUnique({
     where: {
