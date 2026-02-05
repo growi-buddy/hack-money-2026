@@ -28,6 +28,9 @@ export const CampaignFormDataSchema = z.object({
   
   // Budget
   budget: z.number().optional(),
+
+  // Slots - number of influencers that can join
+  slots: z.number().int().positive().optional(),
   
   // Legacy rewards (deprecated - use selectedRewardEvents instead)
   rewards: z.object({

@@ -94,7 +94,8 @@ const STATUS_STYLES: Record<CampaignStatus, { bg: string; text: string }> = {
   [CampaignStatus.ACTIVE]: { bg: 'bg-growi-success/20', text: 'text-growi-success' },
   [CampaignStatus.PAUSED]: { bg: 'bg-yellow-500/20', text: 'text-yellow-500' },
   [CampaignStatus.DRAFT]: { bg: 'bg-gray-500/20', text: 'text-gray-500' },
-  [CampaignStatus.DEPLETED]: { bg: 'bg-red-500/20', text: 'text-red-500' },
+  [CampaignStatus.DEPLETED]: { bg: 'bg-amber-500/20', text: 'text-amber-500' },
+  [CampaignStatus.COMPLETED]: { bg: 'bg-growi-blue/20', text: 'text-growi-blue' },
   [CampaignStatus.DELETED]: { bg: 'bg-red-500/20', text: 'text-red-500' },
 };
 

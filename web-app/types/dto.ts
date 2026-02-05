@@ -3,14 +3,14 @@ export type ApiDataResponse<T = never> = {
   data: T;
 };
 
-export type ApiListResponse<T = never> = {
+export type ApiListResponse<T = never, M = object> = {
   success: true;
   data: T[];
   meta: {
     total: number;
     page: number;
     limit: number;
-  };
+  } & M;
 };
 
 export type ApiErrorResponse = {

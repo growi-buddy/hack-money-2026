@@ -28,3 +28,13 @@ export const CampaignStatus = {
 } as const;
 
 export type CampaignStatus = (typeof CampaignStatus)[keyof typeof CampaignStatus];
+
+export const SocialMediaPlatform = {
+  INSTAGRAM: 'INSTAGRAM',
+  TIKTOK: 'TIKTOK',
+  YOUTUBE: 'YOUTUBE',
+  TWITTER: 'TWITTER',
+  OTHER: 'OTHER',
+} as const;
+
+export type SocialMediaPlatform = (typeof SocialMediaPlatform)[keyof typeof SocialMediaPlatform];

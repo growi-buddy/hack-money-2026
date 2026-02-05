@@ -45,7 +45,12 @@ export type CampaignRewardEventInput = z.infer<typeof CampaignRewardEventSchema>
 export const CreateCampaignDTO = z.object({
   walletAddress: z.string(),
   title: z.string(),
+  description: z.string().optional(),
   budgetTotal: z.string().or(z.number()),
+  slots: z.number().int().positive().optional().default(10),
+  interests: z.array(z.string()).optional().default([]),
+  startDate: z.string().datetime().optional().nullable(),
+  endDate: z.string().datetime().optional().nullable(),
   rewardEvents: z.array(CampaignRewardEventSchema),
 });
 
@@ -99,9 +104,15 @@ export type RewardEventSummary = z.infer<typeof RewardEventSummarySchema>;
 export const CampaignSummarySchema = z.object({
   id: z.string(),
   title: z.string(),
+  description: z.string().optional().nullable(),
   status: z.nativeEnum(CampaignStatus),
   budgetTotal: z.number(),
   budgetSpent: z.number(),
+  isHot: z.boolean().optional(),
+  slots: z.number().optional(),
+  interests: z.array(z.string()).optional(),
+  startDate: z.string().optional().nullable(),
+  endDate: z.string().optional().nullable(),
   rewardEvents: z.array(RewardEventSummarySchema),
   participationsCount: z.number(),
   createdAt: z.string(),
