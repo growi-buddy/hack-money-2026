@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db';
-import { CampaignStatus } from '@/lib/db/prisma/generated';
+import { CampaignStatus } from '@/lib/db/enums';
 
 export const getCampaignById = (campaignId: string) => {
   return prisma.campaign.findUnique({

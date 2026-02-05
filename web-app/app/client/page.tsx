@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWallet } from '@/contexts/wallet-context';
 import { pulse, scaleIn, staggerContainer, staggerItem } from '@/lib/animations';
-import { CampaignStatus, EventType } from '@/lib/db/prisma/generated';
+import { CampaignStatus, EventType } from '@/lib/db/enums';
 import { CampaignSummary } from '@/types';
 import { motion } from 'framer-motion';
 import { ArrowRight, Download, Loader2, Plus, RefreshCw, Sparkles, Wallet } from 'lucide-react';

@@ -1,6 +1,6 @@
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
-import { CampaignStatus } from '@/lib/db/prisma/generated';
+import { CampaignStatus } from '@/lib/db/enums';
 import { getOrCreateUserByWallet } from '@/lib/services/user.service';
 import { ApiDataResponse, UserCampaignsResponse } from '@/types';
 

@@ -2,7 +2,7 @@ import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
 import { getOrCreateUserByWallet } from '@/lib/services/user.service';
 import { ApiDataResponse, ApiErrorResponse, RewardEventDTO, SelectorSchema } from '@/types';
-import { EventType } from '@/lib/db/prisma/generated';
+import { EventType } from '';
 import { z } from 'zod';
 
 const UpdateRewardEventSchema = z.object({

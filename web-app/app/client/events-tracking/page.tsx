@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWallet } from '@/contexts/wallet-context';
 import { scaleIn, staggerContainer, staggerItem } from '@/lib/animations';
-import { EventType, SelectorEventType } from '@/lib/db/prisma/generated';
+import { EventType, SelectorEventType } from '@/lib/db/enums';
 import { CampaignSummary, RewardEventDTO, SelectorDTO } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import {

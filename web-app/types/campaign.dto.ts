@@ -1,4 +1,4 @@
-import { CampaignStatus, EventType, SelectorEventType } from '@/lib/db/prisma/generated';
+import { CampaignStatus, EventType, SelectorEventType } from '@/lib/db/enums';
 import { z } from 'zod';
 
 export const EventTypeEnum = z.nativeEnum(EventType);

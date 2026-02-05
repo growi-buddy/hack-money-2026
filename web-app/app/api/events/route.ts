@@ -1,6 +1,6 @@
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
-import { TrackedEvent } from '@/lib/db/prisma/generated';
+import { TrackedEvent } from '';
 import { ApiDataResponse, ApiErrorResponse } from '@/types';
 import { z } from 'zod';
 
