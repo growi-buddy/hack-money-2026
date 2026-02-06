@@ -1,0 +1,10 @@
+{
+  "code": "NIKE26",
+  "campaignId": "camp_clz8p9k4j0001js0g12345678",
+  "campaignName": "Nike February Rewards",
+  "description": "Earn rewards for every Nike purchase during February 2026",
+  "startDate": 1738800000,
+  "endDate": 1739404800,
+  "campaignManager": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "yellowChannelId": "channel-nike-feb-2026"
+}

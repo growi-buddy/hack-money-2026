@@ -11,16 +11,16 @@ function getEnvVar(name: string): string {
   return value;
 }
 
-// Private key del wallet que firmará transacciones
+// Private key of the wallet that will sign transactions
 export const ENS_WRITER_PRIVATE_KEY = getEnvVar("ENS_WRITER_PRIVATE_KEY") as `0x${string}`;
 
-// URL del RPC
+// RPC URL
 export const RPC_URL = getEnvVar("RPC_URL");
 
-// Chain ID (ej: 1 = mainnet, 11155111 = sepolia)
+// Chain ID (e.g., 1 = mainnet, 11155111 = sepolia)
 export const CHAIN_ID = parseInt(getEnvVar("CHAIN_ID"), 10);
 
-// Nombre raíz de ENS
+// ENS root name
 export const ENS_ROOT_NAME = getEnvVar("ENS_ROOT_NAME");
 
 // Validar formato de private key
@@ -37,7 +37,7 @@ if (isNaN(CHAIN_ID) || CHAIN_ID <= 0) {
   throw new Error("CHAIN_ID must be a positive number");
 }
 
-// Logging de configuración (sin exponer la private key)
+// Log configuration (without exposing private key)
 console.log("🔗 Chain Config:", {
   chainId: CHAIN_ID,
   rpcUrl: RPC_URL,

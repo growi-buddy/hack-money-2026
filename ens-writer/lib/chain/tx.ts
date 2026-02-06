@@ -43,7 +43,7 @@ export async function writeSafeContract<TAbi extends Abi>(
       args: params.args,
     });
 
-    // 1. Simular transacción para verificar que no va a revertir
+    // 1. Simulate transaction to verify it won't revert
     const { request } = await publicClient.simulateContract({
       address: params.address,
       abi: params.abi,
@@ -55,7 +55,7 @@ export async function writeSafeContract<TAbi extends Abi>(
 
     console.log("✅ Simulation successful, sending transaction...");
 
-    // 2. Enviar transacción
+    // 2. Send transaction
     const hash = await walletClient.writeContract(request as any);
 
     console.log("📤 Transaction sent:", hash);
@@ -90,9 +90,9 @@ export async function writeSafeContract<TAbi extends Abi>(
   } catch (error) {
     console.error("❌ Error writing contract:", error);
 
-    // Extraer mensaje de error útil
+    // Extract useful error message
     if (error instanceof Error) {
-      // Si la simulación falló, el error suele contener el motivo del revert
+      // If simulation failed, error usually contains the revert reason
       throw new Error(`Contract call failed: ${error.message}`);
     }
 

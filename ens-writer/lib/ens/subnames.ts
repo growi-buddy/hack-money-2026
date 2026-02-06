@@ -58,24 +58,24 @@ export async function ensureCampaignSubname(params: {
 
     const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-    // Si el owner es address(0), el subdominio está "abandonado" - podemos reclamarlo
+    // If owner is address(0), the subdomain is "abandoned" - we can reclaim it
     if (existingOwner.toLowerCase() === ZERO_ADDRESS.toLowerCase()) {
       console.log("⚠️  Subname exists but is abandoned (owner is 0x0), will attempt to reclaim");
-      // Continuamos con la creación para reclamarlo
+      // Continue with creation to reclaim it
     }
-    // Si ya existe y somos el owner, perfecto (idempotente)
+    // If it already exists and we are the owner, perfect (idempotent)
     else if (existingOwner.toLowerCase() === account.address.toLowerCase()) {
       console.log("✅ Subname already owned by us, skipping creation");
       return { fqdn: normalizedFqdn, node };
     }
-    // Si existe con otro owner real, error
+    // If it exists with another real owner, error
     else {
       throw new Error(
         `SUBNAME_TAKEN: ${normalizedFqdn} already exists with owner ${existingOwner}`
       );
     }
   } catch (error: any) {
-    // Si el error es que no existe (revert típico de ERC721), continuamos con la creación
+    // If the error is that it doesn't exist (typical ERC721 revert), continue with creation
     const isNotFoundError =
       error.message?.includes("ERC721") ||
       error.message?.includes("does not exist") ||
@@ -83,22 +83,22 @@ export async function ensureCampaignSubname(params: {
 
     if (!isNotFoundError && !error.message?.includes("SUBNAME_TAKEN")) {
       console.warn("⚠️  Unexpected error checking ownership:", error.message);
-      // Continuamos de todas formas, intentaremos crear
+      // Continue anyway, we'll try to create
     } else if (error.message?.includes("SUBNAME_TAKEN")) {
-      // Re-lanzar errores de SUBNAME_TAKEN
+      // Re-throw SUBNAME_TAKEN errors
       throw error;
     }
   }
 
-  // 3. Crear el subdominio usando setSubnodeRecord
+  // 3. Create the subdomain using setSubnodeRecord
   console.log("🔨 Creating wrapped subname with setSubnodeRecord...");
 
-  // Parámetros para crear el subname
+  // Parameters to create the subname
   const owner = account.address;
   const resolver = ENS_PUBLIC_RESOLVER_ADDRESS;
-  const ttl = BigInt(0); // TTL 0 = usar default
-  const fuses = 0; // Sin fuses especiales por ahora
-  const expiry = BigInt(Math.floor(Date.now() / 1000) + 31536000); // 1 año desde ahora
+  const ttl = BigInt(0); // TTL 0 = use default
+  const fuses = 0; // No special fuses for now
+  const expiry = BigInt(Math.floor(Date.now() / 1000) + 31536000); // 1 year from now
 
   try {
     const result = await writeSafeContract(

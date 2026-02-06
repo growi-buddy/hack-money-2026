@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCampaignOnEns } from "@/lib/ensWriter";
+import { generateTermsWithHash, type CampaignMetadata } from "@/lib/terms/canonical";
+import { uploadTermsJson } from "@/lib/pinata/upload";
+import { upsertCampaign } from "@/app/lib/repo";
+import { ENS_ROOT_NAME } from "@/lib/chain/config";
+import { normalize } from "viem/ens";
 
 interface CreateCampaignBody {
   code: string;
-  termsURI: string;
-  termsHash: string;
+  campaignId: string;
+  campaignName: string;
+  description: string;
+  startDate: number;
+  endDate: number;
+  campaignManager: string;
   yellowChannelId?: string;
 }
 
@@ -23,40 +32,70 @@ function validateCode(code: unknown): ValidationError | null {
   if (code.length < 3 || code.length > 10) {
     return { field: "code", message: "Code must be between 3 and 10 characters" };
   }
-  if (!/^[A-Z0-9]+$/.test(code)) {
-    return { field: "code", message: "Code must be uppercase alphanumeric" };
+  return null;
+}
+
+/**
+ * Valida campaignId
+ */
+function validateCampaignId(campaignId: unknown): ValidationError | null {
+  if (typeof campaignId !== "string") {
+    return { field: "campaignId", message: "campaignId must be a string" };
+  }
+  if (campaignId.trim().length === 0) {
+    return { field: "campaignId", message: "campaignId cannot be empty" };
   }
   return null;
 }
 
 /**
- * Valida el termsURI
+ * Valida campaignName
  */
-function validateTermsURI(termsURI: unknown): ValidationError | null {
-  if (typeof termsURI !== "string") {
-    return { field: "termsURI", message: "termsURI must be a string" };
+function validateCampaignName(campaignName: unknown): ValidationError | null {
+  if (typeof campaignName !== "string") {
+    return { field: "campaignName", message: "campaignName must be a string" };
   }
-  if (termsURI.trim().length === 0) {
-    return { field: "termsURI", message: "termsURI cannot be empty" };
+  if (campaignName.trim().length === 0) {
+    return { field: "campaignName", message: "campaignName cannot be empty" };
   }
   return null;
 }
 
 /**
- * Valida el termsHash (0x + 64 caracteres hex = 66 total)
+ * Valida description
  */
-function validateTermsHash(termsHash: unknown): ValidationError | null {
-  if (typeof termsHash !== "string") {
-    return { field: "termsHash", message: "termsHash must be a string" };
+function validateDescription(description: unknown): ValidationError | null {
+  if (typeof description !== "string") {
+    return { field: "description", message: "description must be a string" };
   }
-  if (!termsHash.startsWith("0x")) {
-    return { field: "termsHash", message: "termsHash must start with 0x" };
+  if (description.trim().length === 0) {
+    return { field: "description", message: "description cannot be empty" };
   }
-  if (termsHash.length !== 66) {
-    return { field: "termsHash", message: "termsHash must be 66 characters (0x + 64 hex)" };
+  return null;
+}
+
+/**
+ * Valida timestamps (startDate, endDate)
+ */
+function validateTimestamp(value: unknown, field: string): ValidationError | null {
+  if (typeof value !== "number") {
+    return { field, message: `${field} must be a number (Unix timestamp)` };
   }
-  if (!/^0x[0-9a-fA-F]{64}$/.test(termsHash)) {
-    return { field: "termsHash", message: "termsHash must be valid hex" };
+  if (value <= 0) {
+    return { field, message: `${field} must be a positive timestamp` };
+  }
+  return null;
+}
+
+/**
+ * Valida campaignManager (wallet address)
+ */
+function validateCampaignManager(campaignManager: unknown): ValidationError | null {
+  if (typeof campaignManager !== "string") {
+    return { field: "campaignManager", message: "campaignManager must be a string" };
+  }
+  if (campaignManager.length > 42) {
+    return { field: "campaignManager", message: "campaignManager must be less than 42 characters (name)" };
   }
   return null;
 }
@@ -123,11 +162,23 @@ export async function POST(request: NextRequest) {
     const codeError = validateCode(body.code);
     if (codeError) errors.push(codeError);
     
-    const termsURIError = validateTermsURI(body.termsURI);
-    if (termsURIError) errors.push(termsURIError);
+    const campaignIdError = validateCampaignId(body.campaignId);
+    if (campaignIdError) errors.push(campaignIdError);
     
-    const termsHashError = validateTermsHash(body.termsHash);
-    if (termsHashError) errors.push(termsHashError);
+    const campaignNameError = validateCampaignName(body.campaignName);
+    if (campaignNameError) errors.push(campaignNameError);
+    
+    const descriptionError = validateDescription(body.description);
+    if (descriptionError) errors.push(descriptionError);
+    
+    const startDateError = validateTimestamp(body.startDate, "startDate");
+    if (startDateError) errors.push(startDateError);
+    
+    const endDateError = validateTimestamp(body.endDate, "endDate");
+    if (endDateError) errors.push(endDateError);
+    
+    const campaignManagerError = validateCampaignManager(body.campaignManager);
+    if (campaignManagerError) errors.push(campaignManagerError);
     
     const yellowChannelIdError = validateYellowChannelId(body.yellowChannelId);
     if (yellowChannelIdError) errors.push(yellowChannelIdError);
@@ -139,28 +190,109 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear campaña en ENS
-    const result = await createCampaignOnEns({
+    // Validar que endDate > startDate
+    if (body.endDate <= body.startDate) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "VALIDATION_ERROR",
+          details: [{ field: "endDate", message: "endDate must be after startDate" }],
+        },
+        { status: 400 }
+      );
+    }
+
+    console.log("🚀 Creating campaign:", body.code);
+
+    // 1. Generar terms.json canonical + hash
+    const metadata: CampaignMetadata = {
+      campaignId: body.campaignId,
+      campaignName: body.campaignName,
+      description: body.description,
+      startDate: body.startDate,
+      endDate: body.endDate,
+      campaignManager: body.campaignManager,
+      yellowChannelId: body.yellowChannelId,
+    };
+
+    const { terms, hash: termsHash } = generateTermsWithHash(metadata);
+    console.log("✅ Terms generated:", { termsHash });
+
+    // 2. Subir terms.json a Pinata
+    const { ipfsUri: termsURI, ipfsHash } = await uploadTermsJson(
+      terms,
+      body.code
+    );
+    console.log("✅ Terms uploaded to Pinata:", { termsURI, ipfsHash });
+
+    // 3. Crear campaña en ENS (on-chain)
+    const ensResult = await createCampaignOnEns({
       code: body.code,
-      termsURI: body.termsURI,
-      termsHash: body.termsHash,
+      termsURI,
+      termsHash,
       yellowChannelId: body.yellowChannelId,
     });
+    console.log("✅ Campaign created on ENS:", {
+      fqdn: ensResult.fqdn,
+      node: ensResult.node,
+      txCount: ensResult.txHashes.length,
+    });
+
+    // 4. Guardar en Supabase
+    const normalizedCode = body.code.toLowerCase();
+    const normalizedFqdn = normalize(ensResult.fqdn);
+    
+    await upsertCampaign({
+      code: normalizedCode,
+      ens_root_name: ENS_ROOT_NAME,
+      fqdn: normalizedFqdn,
+      node: ensResult.node,
+      owner_wallet: body.campaignManager,
+      yellow_channel_id: body.yellowChannelId,
+      terms_uri: termsURI,
+      terms_hash: termsHash,
+      status: "ACTIVE",
+    });
+    console.log("✅ Campaign saved to Supabase:", normalizedCode);
 
     return NextResponse.json(
       {
         ok: true,
-        code: body.code,
-        fqdn: result.fqdn,
-        node: result.node,
-        txHashes: result.txHashes,
+        code: normalizedCode,
+        fqdn: ensResult.fqdn,
+        node: ensResult.node,
+        termsURI,
+        termsHash,
+        txHashes: ensResult.txHashes,
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error creating campaign:", error);
+    console.error("❌ Error creating campaign:", error);
+    
+    // Determinar tipo de error para respuesta más específica
+    let errorMessage = "INTERNAL_ERROR";
+    let errorDetails = "Unknown error occurred";
+    
+    if (error instanceof Error) {
+      errorDetails = error.message;
+      
+      // Errores específicos
+      if (error.message.includes("Pinata")) {
+        errorMessage = "PINATA_ERROR";
+      } else if (error.message.includes("ENS") || error.message.includes("transaction")) {
+        errorMessage = "ENS_ERROR";
+      } else if (error.message.includes("Supabase") || error.message.includes("database")) {
+        errorMessage = "DATABASE_ERROR";
+      }
+    }
+    
     return NextResponse.json(
-      { ok: false, error: "INTERNAL_ERROR" },
+      {
+        ok: false,
+        error: errorMessage,
+        details: errorDetails,
+      },
       { status: 500 }
     );
   }
