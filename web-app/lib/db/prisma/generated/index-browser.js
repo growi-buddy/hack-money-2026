@@ -242,6 +242,27 @@ exports.Prisma.AnalyticsEventScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ChatRoomScalarFieldEnum = {
+  id: 'id',
+  userOneId: 'userOneId',
+  userTwoId: 'userTwoId',
+  campaignId: 'campaignId',
+  ablyRoomId: 'ablyRoomId',
+  lastActivityAt: 'lastActivityAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ChatMessageScalarFieldEnum = {
+  id: 'id',
+  chatRoomId: 'chatRoomId',
+  senderId: 'senderId',
+  text: 'text',
+  ablySerial: 'ablySerial',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -309,7 +330,9 @@ exports.Prisma.ModelName = {
   Selector: 'Selector',
   Participation: 'Participation',
   TrackingLink: 'TrackingLink',
-  AnalyticsEvent: 'AnalyticsEvent'
+  AnalyticsEvent: 'AnalyticsEvent',
+  ChatRoom: 'ChatRoom',
+  ChatMessage: 'ChatMessage'
 };
 
 /**
