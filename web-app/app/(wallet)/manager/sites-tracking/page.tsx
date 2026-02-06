@@ -319,25 +319,23 @@ export default function RewardEventsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
-      >
-        <div>
+      <div>
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Sites Tracking</h1>
-          <p className="mt-1 text-muted-foreground">
-            Manage your reward event templates for campaigns
-          </p>
+          <Button
+            onClick={openCreateForm}
+            variant="outline"
+            size="sm"
+            className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            New Event
+          </Button>
         </div>
-        <Button
-          onClick={openCreateForm}
-          className="bg-growi-blue text-white hover:bg-growi-blue/90"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          New Event
-        </Button>
-      </motion.div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage your reward event templates for campaigns
+        </p>
+      </div>
       
       {/* Success Message */}
       <AnimatePresence>

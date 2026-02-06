@@ -139,17 +139,10 @@ export default function ClientProfilePage() {
       </AnimatePresence>
 
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div>
+      <div>
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Edit Profile</h1>
-          <p className="text-muted-foreground">Manage your campaign manager profile</p>
-        </div>
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button onClick={handleSave} disabled={isSaving} className="bg-growi-blue text-white hover:bg-growi-blue/90">
+          <Button onClick={handleSave} disabled={isSaving} variant="outline" size="sm" className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent">
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -162,8 +155,11 @@ export default function ClientProfilePage() {
               </>
             )}
           </Button>
-        </motion.div>
-      </motion.div>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage your campaign manager profile
+        </p>
+      </div>
 
       {error && <div className="rounded-lg bg-destructive/10 p-4 text-destructive">{error}</div>}
 

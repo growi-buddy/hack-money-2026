@@ -284,12 +284,12 @@ export default function CreateCampaignPage() {
   
   return (
     <div className="relative mx-auto max-w-7xl space-y-6">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <div>
         <h1 className="text-2xl font-bold text-foreground">AI Campaign Creator</h1>
-        <p className="mt-2 text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground">
           Tell our AI about your campaign goals and let it create the perfect structure for you
         </p>
-      </motion.div>
+      </div>
       
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 items-stretch">
         {/* Chat Panel */}

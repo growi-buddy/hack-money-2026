@@ -74,14 +74,13 @@ const campaigns = [
 export default function ClientDashboardPage() {
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Dashboard Overview</h1>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Dashboard Overview</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Monitor your campaign performance and key metrics
+        </p>
       </div>
       
-      {/* Budget Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

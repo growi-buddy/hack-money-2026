@@ -18,6 +18,7 @@ import {
   RefreshCw,
   RotateCcw,
   Sparkles,
+  TrendingUp,
   Wallet,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -242,6 +243,43 @@ export default function ClientDashboard() {
   
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-foreground">Campaigns</h1>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => fetchCampaigns(true)}
+              disabled={refreshing}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              title="Refresh campaigns"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            {lastUpdated && (
+              <span className="text-xs text-muted-foreground">
+                Updated {lastUpdated.toLocaleTimeString()}
+              </span>
+            )}
+            <Link href="/manager/create">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                New Campaign
+              </Button>
+            </Link>
+          </div>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          View and manage all your campaigns in one place
+        </p>
+      </div>
+
       {/* Install CTA Card - Show full card only if no reward events configured */}
       {hasRewardEvents === false && (
         <motion.div
@@ -277,37 +315,16 @@ export default function ClientDashboard() {
           </Card>
         </motion.div>
       )}
-      
+
       <div>
         <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-foreground">My Campaigns</h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => fetchCampaigns(true)}
-              disabled={refreshing}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-              title="Refresh campaigns"
-            >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            </Button>
-            {lastUpdated && (
-              <span className="text-xs text-muted-foreground">
-                Updated {lastUpdated.toLocaleTimeString()}
-              </span>
-            )}
-          </div>
-          <Link href="/manager/create">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              New Campaign
-            </Button>
-          </Link>
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+            <TrendingUp className="h-5 w-5 text-growi-success" />
+            Active Campaigns
+          </h2>
+          {hasActiveCampaigns && (
+            <Badge className="bg-growi-success/20 text-growi-success border-transparent">{activeCampaigns.length} active</Badge>
+          )}
         </div>
         
         {loading ? (
@@ -442,10 +459,10 @@ export default function ClientDashboard() {
         <div>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-              <CheckCircle2 className="h-5 w-5 text-growi-success" />
+              <CheckCircle2 className="h-5 w-5 text-growi-blue" />
               Completed Campaigns
             </h2>
-            <Badge variant="outline">{completedCampaigns.length} completed</Badge>
+            <Badge className="bg-growi-blue/20 text-growi-blue border-transparent">{completedCampaigns.length} completed</Badge>
           </div>
           
           <motion.div
@@ -460,7 +477,7 @@ export default function ClientDashboard() {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-foreground">{campaign.title}</CardTitle>
-                      <Badge className="bg-growi-success/20 text-growi-success border-transparent">
+                      <Badge className="bg-growi-blue/20 text-growi-blue border-transparent">
                         Completed
                       </Badge>
                     </div>
