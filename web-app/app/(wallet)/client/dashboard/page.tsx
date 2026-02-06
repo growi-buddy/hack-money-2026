@@ -16,55 +16,58 @@ const campaignData = {
   availableBudget: 1985.40,
 };
 
-// Last 24h metrics
-const last24hMetrics = [
-  { label: 'VIEWS', icon: Eye, value: 45.0, suffix: '00K', progress: 85, color: 'bg-foreground' },
-  { label: 'ADD TO CART', icon: ShoppingCart, value: 48.0, suffix: '00K', progress: 90, color: 'bg-growi-lime' },
-  { label: 'BUY', icon: CreditCard, value: 45.0, suffix: '00K', progress: 40, color: 'bg-growi-blue' },
+// Performance metrics
+const performanceMetrics = [
+  { label: 'Landing Page View', icon: Eye, value: '45K', progress: 90, color: 'bg-foreground' },
+  { label: 'View Item', icon: Eye, value: '38K', progress: 75, color: 'bg-foreground' },
+  { label: 'Add to Cart', icon: ShoppingCart, value: '24K', progress: 55, color: 'bg-growi-lime' },
+  { label: 'Checkout', icon: CreditCard, value: '12K', progress: 35, color: 'bg-growi-blue' },
+  { label: 'Purchase', icon: DollarSign, value: '8K', progress: 25, color: 'bg-growi-lime' },
 ];
 
 // Weekly timeline data
 const timelineData = [
-  { day: 'Lun', value: 4800 },
-  { day: 'Mar', value: 5200 },
-  { day: 'Mié', value: 6800 },
-  { day: 'Jue', value: 7200 },
-  { day: 'Vie', value: 8500 },
-  { day: 'Sáb', value: 6200 },
-  { day: 'Dom', value: 7800 },
+  { day: 'Mon', value: 4800 },
+  { day: 'Tue', value: 5200 },
+  { day: 'Wed', value: 6800 },
+  { day: 'Thu', value: 7200 },
+  { day: 'Fri', value: 8500 },
+  { day: 'Sat', value: 6200 },
+  { day: 'Sun', value: 7800 },
 ];
 
 // Funnel data
 const funnelData = [
-  { stage: 'Views', value: 45000, color: '#6B7280' },
-  { stage: 'Add to Cart', value: 28000, color: '#9CA3AF' },
-  { stage: 'Checkout', value: 12000, color: '#D1D5DB' },
-  { stage: 'Buy', value: 8000, color: '#1F2937' },
+  { stage: 'Landing Page View', value: 45000, color: '#6B7280' },
+  { stage: 'View Item', value: 38000, color: '#9CA3AF' },
+  { stage: 'Add to Cart', value: 24000, color: '#D1D5DB' },
+  { stage: 'Checkout', value: 12000, color: '#6B7280' },
+  { stage: 'Purchase', value: 8000, color: '#1F2937' },
 ];
 
 // Campaign cards data
 const campaigns = [
   {
     id: '1',
-    name: 'nike summer',
+    name: 'Nike Summer',
     expiresIn: 3,
-    status: 'activo',
+    status: 'active',
     lastUpdate: 'Mar 27 2026 6:00am',
     influencers: 2,
   },
   {
     id: '2',
-    name: 'Nombre de la campaña 2',
+    name: 'Campaign 2',
     expiresIn: 5,
-    status: 'activo',
+    status: 'active',
     lastUpdate: 'Mar 27 2026 6:00am',
     influencers: 2,
   },
   {
     id: '3',
-    name: 'Nombre de la campaña 3',
+    name: 'Campaign 3',
     expiresIn: 5,
-    status: 'activo',
+    status: 'active',
     lastUpdate: 'Mar 27 2026 6:00am',
     influencers: 2,
   },
@@ -81,7 +84,7 @@ export default function ClientDashboardPage() {
         </div>
         <Badge className="bg-foreground text-background hover:bg-foreground/90">
           <span className="mr-1.5 h-2 w-2 rounded-full bg-growi-lime animate-pulse" />
-          En vivo
+          Live
         </Badge>
       </div>
 
@@ -95,7 +98,7 @@ export default function ClientDashboardPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Presupuesto Total
+                Total Budget
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -114,7 +117,7 @@ export default function ClientDashboardPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Presupuesto Invertido
+                Invested Budget
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -133,7 +136,7 @@ export default function ClientDashboardPage() {
           <Card className="bg-foreground text-background">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-medium uppercase tracking-wider text-background/70">
-                Budget Disponible
+                Available Budget
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -154,20 +157,17 @@ export default function ClientDashboardPage() {
       >
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Últimas 24h</CardTitle>
+            <CardTitle className="text-lg font-semibold">Total Performance Overview</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {last24hMetrics.map((metric, index) => (
+            {performanceMetrics.map((metric, index) => (
               <div key={metric.label} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <metric.icon className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium text-muted-foreground">{metric.label}</span>
                   </div>
-                  <div className="text-right">
-                    <span className="text-lg font-bold text-foreground">{metric.value}</span>
-                    <span className="ml-1 text-sm text-muted-foreground">{metric.suffix}</span>
-                  </div>
+                  <span className="text-sm font-bold text-foreground">{metric.value}</span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
                   <motion.div
@@ -195,7 +195,7 @@ export default function ClientDashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Timeline</CardTitle>
-              <p className="text-sm text-muted-foreground">Rendimiento semanal</p>
+              <p className="text-sm text-muted-foreground">Weekly Performance</p>
             </CardHeader>
             <CardContent>
               <div className="h-64">
@@ -242,7 +242,7 @@ export default function ClientDashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Funnel</CardTitle>
-              <p className="text-sm text-muted-foreground">Conversión por etapa</p>
+              <p className="text-sm text-muted-foreground">Conversion by Stage</p>
             </CardHeader>
             <CardContent>
               <div className="h-64">
@@ -290,7 +290,7 @@ export default function ClientDashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
       >
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Mis Campañas</h2>
+        <h2 className="mb-4 text-lg font-semibold text-foreground">My Campaigns</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {campaigns.map((campaign, index) => (
             <motion.div
@@ -312,7 +312,7 @@ export default function ClientDashboardPage() {
                             {campaign.name}
                           </CardTitle>
                           <p className="text-xs text-muted-foreground">
-                            Expira en {campaign.expiresIn} días
+                            Expires in {campaign.expiresIn} days
                           </p>
                         </div>
                       </div>
@@ -327,11 +327,11 @@ export default function ClientDashboardPage() {
                         ? 'bg-foreground text-background'
                         : 'border border-border text-muted-foreground'
                     }`}>
-                      Estado: {campaign.status}
+                      Status: {campaign.status}
                     </div>
 
                     <div>
-                      <p className="text-xs text-muted-foreground">Última actualización</p>
+                      <p className="text-xs text-muted-foreground">Last Update</p>
                       <p className="text-xs text-muted-foreground">{campaign.lastUpdate}</p>
                     </div>
 

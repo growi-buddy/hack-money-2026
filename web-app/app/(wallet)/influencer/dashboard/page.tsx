@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { Eye, Filter, Link2, ShoppingCart, CreditCard, User } from 'lucide-react';
+import { Eye, Filter, Link2, ShoppingCart, CreditCard, User, Wallet, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 
 // Mock data for the influencer dashboard
 const earningsData = {
-  realTimeEarnings: 12450.00,
+  totalEarnings: 12450.00,
 };
 
 // Activity data
@@ -30,9 +30,11 @@ const activityLinks = [
 
 // Performance metrics
 const performanceMetrics = [
-  { label: 'VIEWS', icon: Eye, value: '45K', progress: 85, color: 'bg-foreground' },
-  { label: 'ADD TO CART', icon: ShoppingCart, value: '48K', progress: 70, color: 'bg-growi-lime' },
-  { label: 'CHECKOUT', icon: CreditCard, value: '45K', progress: 80, color: 'bg-growi-blue' },
+  { label: 'Landing Page View', icon: Eye, value: '45K', progress: 90, color: 'bg-foreground' },
+  { label: 'View Item', icon: Eye, value: '38K', progress: 75, color: 'bg-foreground' },
+  { label: 'Add to Cart', icon: ShoppingCart, value: '24K', progress: 55, color: 'bg-growi-lime' },
+  { label: 'Checkout', icon: CreditCard, value: '12K', progress: 35, color: 'bg-growi-blue' },
+  { label: 'Purchase', icon: DollarSign, value: '8K', progress: 25, color: 'bg-growi-lime' },
 ];
 
 // Available campaigns
@@ -70,11 +72,25 @@ export default function InfluencerDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard Influencer</h1>
+      <div className="flex items-start justify-between">
+        <h1 className="text-2xl font-bold text-foreground">Influencer Dashboard</h1>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Button className="relative overflow-hidden bg-growi-lime text-foreground hover:bg-growi-lime/90">
+            <motion.div
+              className="absolute inset-0 bg-white/20"
+              animate={{ x: ['-100%', '100%'] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            />
+            <Wallet className="mr-2 h-4 w-4" />
+            Withdraw to Wallet
+          </Button>
+        </motion.div>
       </div>
 
-      {/* Real-time Earnings Card */}
+      {/* Total Earnings Card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -83,10 +99,10 @@ export default function InfluencerDashboardPage() {
         <Card className="w-fit bg-foreground text-background">
           <CardContent className="p-6">
             <p className="text-xs font-medium uppercase tracking-wider text-background/70">
-              Ganancias en tiempo real
+              Total Earnings
             </p>
             <p className="mt-2 text-4xl font-bold">
-              {earningsData.realTimeEarnings.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              {earningsData.totalEarnings.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </p>
           </CardContent>
         </Card>
@@ -98,7 +114,7 @@ export default function InfluencerDashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <h2 className="mb-4 text-lg font-medium text-foreground">actividad</h2>
+        <h2 className="mb-4 text-lg font-medium text-foreground">Activity</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {activityLinks.map((activity, index) => (
             <motion.div
@@ -167,11 +183,11 @@ export default function InfluencerDashboardPage() {
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold uppercase tracking-wider text-foreground">
-            Campañas Disponibles
+            Available Campaigns
           </h2>
           <Button variant="outline" size="sm" className="gap-2">
             <Filter className="h-4 w-4" />
-            Filtros
+            Filters
           </Button>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -203,7 +219,7 @@ export default function InfluencerDashboardPage() {
                       <p className="text-sm text-muted-foreground">
                         {campaign.earning} / {campaign.sales}
                       </p>
-                      <p className="text-sm text-muted-foreground">ventas</p>
+                      <p className="text-sm text-muted-foreground">sales</p>
                     </div>
                     <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
                       <motion.div
