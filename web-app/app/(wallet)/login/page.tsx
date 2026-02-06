@@ -58,7 +58,7 @@ export default function LoginPage() {
           <Link href="/" className="flex items-center">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Image
-                src="/growi-logo-full.png"
+                src="/growi-main-logo.png"
                 alt="GROWI"
                 width={140}
                 height={45}

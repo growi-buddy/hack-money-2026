@@ -8,9 +8,9 @@ const _geist = Geist({ subsets: [ 'latin' ] });
 const _geistMono = Geist_Mono({ subsets: [ 'latin' ] });
 
 export const metadata: Metadata = {
-  title: 'GROWI - Web3 Influencer Marketing Platform',
-  description: 'Connect clients with influencers through crypto-reward campaigns. Earn real-time by hitting goals.',
-  generator: 'v0.app',
+  title: 'GROWI - Marketing Reimagined',
+  description: 'Connect marketing campaign managers with influencers through crypto-reward campaigns.',
+  generator: 'growi',
   icons: {
     icon: [
       {

@@ -106,9 +106,10 @@ export default function LandingPage() {
           <div className="order-2 flex flex-col items-center text-center md:order-1 md:items-start md:text-left">
             <motion.h1
               variants={fadeUp}
-              className="max-w-xl text-balance text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl"
+              className="max-w-xl text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-7xl"
             >
-              Web3 Influencer Marketing{' '}
+              Marketing 
+              <br />
               <span className="text-growi-blue">Reimagined</span>
             </motion.h1>
             
@@ -116,8 +117,7 @@ export default function LandingPage() {
               variants={fadeUp}
               className="mt-3 max-w-lg text-pretty text-sm text-muted-foreground sm:text-base md:mt-4 md:text-lg"
             >
-              Connect clients with influencers through crypto-reward campaigns.
-              Create performance-based bounties and earn real-time as you hit goals.
+              Connect marketing campaign managers with influencers through crypto-reward campaigns.
             </motion.p>
 
             <motion.div variants={fadeUp} className="mt-6">
@@ -148,7 +148,7 @@ export default function LandingPage() {
               className="w-full"
             >
               <Image
-                src="/growi-logo-full.png"
+                src="/growi-main-logo.png"
                 alt="GROWI Mascot"
                 width={900}
                 height={360}
@@ -235,14 +235,22 @@ export default function LandingPage() {
       >
         <div className="mx-auto max-w-7xl px-4 text-center">
           <Image
-            src="/growi-logo-full.png"
+            src="/growi-main-logo.png"
             alt="GROWI"
             width={100}
             height={32}
             className="mx-auto mb-3 h-8 w-auto opacity-60 md:mb-4"
           />
+          <div className="mb-3 flex items-center justify-center gap-4">
+            <a href="https://x.com/growi_app" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+            </a>
+            <a href="https://www.instagram.com/growi_app/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg>
+            </a>
+          </div>
           <p className="text-xs text-muted-foreground sm:text-sm">
-            2026 GROWI. Web3 Influencer Marketing Platform.
+            2026 GROWI. Marketing Reimagined.
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             an{' '}

@@ -1,9 +1,12 @@
 'use client';
 
+import { useEnsName } from '@/hooks/useEnsName';
 import { createContext, ReactNode, useCallback, useContext, useState } from 'react';
 
 interface WalletContextType {
   address: string | null,
+  ensName: string | null,
+  displayName: string | null,
   loginType: 'human' | 'walletconnect' | 'injected' | null,
   error: string,
   isConnected: boolean
@@ -19,6 +22,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [ isConnecting, setIsConnecting ] = useState(false);
   const [ loginType, setLoginType ] = useState<'human' | 'walletconnect' | 'injected' | null>(null);
   const [ error, setError ] = useState<string>('');
+  const { ensName, displayName } = useEnsName(address);
   
   const connect = useCallback(async () => {
     setIsConnecting(true);
@@ -68,6 +72,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     <WalletContext.Provider
       value={{
         address,
+        ensName,
+        displayName,
         isConnected: !!address,
         isConnecting,
         connect,
