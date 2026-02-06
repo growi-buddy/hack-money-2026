@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useWallet } from '@/contexts/wallet-context';
 import { mapCampaignFormToAPI, validateCampaignForm } from '@/helpers/campaign-mapper';
 import { float, scaleIn } from '@/lib/animations';
+import { AUDIENCE_DEMOGRAPHIC_OPTIONS, INTEREST_OPTIONS } from '@/lib/constants/tags';
 import { EventType } from '@/lib/db/prisma/generated';
 import { RewardEventDTO } from '@/types';
 import { CampaignFormData } from '@/types/campaign-form';
@@ -14,6 +15,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
   AlertTriangle,
+  ArrowLeft,
   Bot,
   Calendar,
   CheckCircle2,
@@ -25,10 +27,10 @@ import {
   Sparkles,
   Target,
   User,
-  Users,
   Zap,
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -47,9 +49,7 @@ const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
   startDate: '',
   endDate: '',
   targetAudience: {
-    gender: [],
-    ageMin: undefined,
-    ageMax: undefined,
+    demographics: [],
   },
   geographic: {
     regions: [],
@@ -210,18 +210,15 @@ export default function CreateCampaignPage() {
   
   const calculateCompleteness = () => {
     let filled = 0;
-    const total = 14;
+    const total = 11;
     
     if (campaignData.name) filled++;
     if (campaignData.description) filled++;
     if (campaignData.duration) filled++;
     if (campaignData.startDate) filled++;
     if (campaignData.endDate) filled++;
-    if (campaignData.targetAudience?.gender?.length) filled++;
-    if (campaignData.targetAudience?.ageMin) filled++;
-    if (campaignData.targetAudience?.ageMax) filled++;
+    if (campaignData.targetAudience?.demographics?.length) filled++;
     if (campaignData.geographic?.regions?.length) filled++;
-    if (campaignData.geographic?.countries?.length) filled++;
     if (campaignData.interests?.length) filled++;
     if (campaignData.budget) filled++;
     if (campaignData.slots) filled++;
@@ -285,10 +282,19 @@ export default function CreateCampaignPage() {
   return (
     <div className="relative mx-auto max-w-7xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">AI Campaign Creator</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Tell our AI about your campaign goals and let it create the perfect structure for you
-        </p>
+        <div className="flex items-center gap-3">
+          <Link href="/manager/campaigns">
+            <Button variant="ghost" size="icon" className="h-9 w-9">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">AI Campaign Creator</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Tell our AI about your campaign goals and let it create the perfect structure for you
+            </p>
+          </div>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 items-stretch">
@@ -508,38 +514,6 @@ export default function CreateCampaignPage() {
                 </div>
               </InfoCard>
               
-              <InfoCard icon={<Users className="h-4 w-4" />} title="Target Audience" color="purple">
-                <div className="grid grid-cols-2 gap-2">
-                  <Field
-                    label="Min Age"
-                    value={campaignData.targetAudience?.ageMin?.toString()}
-                    type="number"
-                    onChange={(value) =>
-                      setCampaignData((prev) => ({
-                        ...prev,
-                        targetAudience: {
-                          ...prev.targetAudience,
-                          ageMin: value ? parseInt(value) : undefined,
-                        },
-                      }))
-                    }
-                  />
-                  <Field
-                    label="Max Age"
-                    value={campaignData.targetAudience?.ageMax?.toString()}
-                    type="number"
-                    onChange={(value) =>
-                      setCampaignData((prev) => ({
-                        ...prev,
-                        targetAudience: {
-                          ...prev.targetAudience,
-                          ageMax: value ? parseInt(value) : undefined,
-                        },
-                      }))
-                    }
-                  />
-                </div>
-              </InfoCard>
               
               <InfoCard icon={<Globe className="h-4 w-4" />} title="Geographic" color="indigo">
                 <Field
@@ -560,20 +534,62 @@ export default function CreateCampaignPage() {
                 />
               </InfoCard>
               
-              <InfoCard icon={<Target className="h-4 w-4" />} title="Interests" color="pink">
-                <Field
-                  label="Tags"
-                  value={campaignData.interests?.join(', ')}
-                  onChange={(value) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      interests: value
-                        .split(',')
-                        .map((i) => i.trim())
-                        .filter(Boolean),
-                    }))
-                  }
-                />
+              <InfoCard icon={<Target className="h-4 w-4" />} title="Interests & Audience" color="pink">
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Interests</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {INTEREST_OPTIONS.map((interest) => (
+                        <button
+                          key={interest}
+                          onClick={() =>
+                            setCampaignData((prev) => ({
+                              ...prev,
+                              interests: prev.interests?.includes(interest)
+                                ? prev.interests.filter((i) => i !== interest)
+                                : [ ...(prev.interests || []), interest ],
+                            }))
+                          }
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
+                            campaignData.interests?.includes(interest)
+                              ? 'bg-pink-500/20 text-pink-600 border border-pink-500/30'
+                              : 'bg-secondary text-muted-foreground hover:bg-secondary/80 border border-border'
+                          }`}
+                        >
+                          {interest}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Target Demographics</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {AUDIENCE_DEMOGRAPHIC_OPTIONS.map((demo) => (
+                        <button
+                          key={demo}
+                          onClick={() => {
+                            const current = campaignData.targetAudience?.demographics || [];
+                            setCampaignData((prev) => ({
+                              ...prev,
+                              targetAudience: {
+                                ...prev.targetAudience,
+                                demographics: current.includes(demo) ? current.filter((d) => d !== demo) : [ ...current, demo ],
+                              },
+                            }));
+                          }}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
+                            campaignData.targetAudience?.demographics?.includes(demo)
+                              ? 'bg-purple-500/20 text-purple-600 border border-purple-500/30'
+                              : 'bg-secondary text-muted-foreground hover:bg-secondary/80 border border-border'
+                          }`}
+                        >
+                          {demo}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </InfoCard>
               
               <InfoCard icon={<DollarSign className="h-4 w-4" />} title="Budget & Slots" color="emerald">

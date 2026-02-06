@@ -12,9 +12,7 @@ export const CampaignFormDataSchema = z.object({
   
   // Público objetivo
   targetAudience: z.object({
-    gender: z.array(z.enum(['male', 'female', 'non-binary', 'all'])).optional(),
-    ageMin: z.number().optional(),
-    ageMax: z.number().optional(),
+    demographics: z.array(z.string()).optional(), // ej: ['Gen Z', 'Millennials']
   }).optional(),
   
   // Geográfico
