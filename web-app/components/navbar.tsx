@@ -3,23 +3,16 @@
 import { Button } from '@/components/ui/button';
 import { WalletButton } from '@/components/wallet-button';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 
 interface NavbarProps {
-  showBack?: boolean;
   onMenuClick?: () => void;
   showMenu?: boolean;
 }
 
-export function Navbar({ showBack = false, onMenuClick, showMenu = false }: NavbarProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  
-  // Determine if we should show back button
-  const isSubPage = pathname !== '/' && pathname.split('/').length > 2;
+export function Navbar({ onMenuClick, showMenu = false }: NavbarProps) {
   
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
@@ -36,24 +29,7 @@ export function Navbar({ showBack = false, onMenuClick, showMenu = false }: Navb
               <Menu className="h-5 w-5 text-foreground" />
             </Button>
           )}
-          
-          {/* Back button */}
-          {(showBack || isSubPage) && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.back()}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </motion.div>
-          )}
-          
+
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <motion.div
