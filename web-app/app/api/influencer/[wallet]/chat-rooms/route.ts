@@ -37,22 +37,6 @@ export async function GET(
           userTwo: {
             select: { id: true, name: true, walletAddress: true, avatar: true },
           },
-          campaign: {
-            select: {
-              id: true,
-              title: true,
-              status: true,
-              budgetTotal: true,
-              interests: true,
-              startDate: true,
-              endDate: true,
-              rewardEvents: {
-                include: {
-                  rewardEvent: { select: { name: true, eventType: true } },
-                },
-              },
-            },
-          },
           messages: {
             orderBy: { createdAt: 'desc' },
             take: 1,
@@ -67,53 +51,98 @@ export async function GET(
       prisma.chatRoom.count({ where: whereClause }),
     ]);
 
-    const chatRooms = rooms.map((room) => {
-      // Determine the "other" user relative to the requesting user
-      const otherUser = room.userOneId === user.id ? room.userTwo : room.userOne;
-      const lastMessage = room.messages[0] ?? null;
+    // For each room, find related campaigns
+    const chatRoomsWithCampaigns = await Promise.all(
+      rooms.map(async (room) => {
+        // Determine the "other" user relative to the requesting user
+        const otherUser = room.userOneId === user.id ? room.userTwo : room.userOne;
+        const lastMessage = room.messages[0] ?? null;
 
-      return {
-        id: room.id,
-        ablyRoomId: room.ablyRoomId,
-        otherUser: {
-          id: otherUser.id,
-          name: otherUser.name,
-          walletAddress: otherUser.walletAddress,
-          avatar: otherUser.avatar,
-        },
-        campaign: room.campaign
-          ? {
-            id: room.campaign.id,
-            title: room.campaign.title,
-            status: room.campaign.status,
-            budgetTotal: Number(room.campaign.budgetTotal),
-            interests: room.campaign.interests,
-            startDate: room.campaign.startDate?.toISOString() ?? null,
-            endDate: room.campaign.endDate?.toISOString() ?? null,
-            rewardEvents: room.campaign.rewardEvents.map((cre) => ({
+        // Find campaigns where:
+        // - Current user is owner AND other user is participant, OR
+        // - Other user is owner AND current user is participant
+        const relatedCampaigns = await prisma.campaign.findMany({
+          where: {
+            OR: [
+              {
+                ownerId: user.id,
+                participations: {
+                  some: {
+                    influencerId: otherUser.id,
+                  },
+                },
+              },
+              {
+                ownerId: otherUser.id,
+                participations: {
+                  some: {
+                    influencerId: user.id,
+                  },
+                },
+              },
+            ],
+          },
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            budgetTotal: true,
+            interests: true,
+            startDate: true,
+            endDate: true,
+            ownerId: true,
+            rewardEvents: {
+              include: {
+                rewardEvent: { select: { name: true, eventType: true } },
+              },
+            },
+          },
+        });
+
+        return {
+          id: room.id,
+          userOneId: room.userOneId,
+          userTwoId: room.userTwoId,
+          otherUser: {
+            id: otherUser.id,
+            name: otherUser.name,
+            walletAddress: otherUser.walletAddress,
+            avatar: otherUser.avatar,
+          },
+          relatedCampaigns: relatedCampaigns.map((campaign) => ({
+            id: campaign.id,
+            title: campaign.title,
+            status: campaign.status,
+            budgetTotal: Number(campaign.budgetTotal),
+            interests: campaign.interests,
+            startDate: campaign.startDate?.toISOString() ?? null,
+            endDate: campaign.endDate?.toISOString() ?? null,
+            ownerId: campaign.ownerId,
+            isCurrentUserOwner: campaign.ownerId === user.id,
+            rewardEvents: campaign.rewardEvents.map((cre) => ({
               name: cre.rewardEvent.name,
               eventType: cre.rewardEvent.eventType,
               amount: Number(cre.amount),
             })),
-          }
-          : null,
-        lastMessage: lastMessage
-          ? {
-            id: lastMessage.id,
-            text: lastMessage.text,
-            senderId: lastMessage.senderId,
-            senderName: lastMessage.sender.name,
-            createdAt: lastMessage.createdAt.toISOString(),
-          }
-          : null,
-        lastActivityAt: room.lastActivityAt.toISOString(),
-        createdAt: room.createdAt.toISOString(),
-      };
-    });
+          })),
+          lastMessage: lastMessage
+            ? {
+              id: lastMessage.id,
+              text: lastMessage.text,
+              senderId: lastMessage.senderId,
+              senderName: lastMessage.sender.name,
+              createdAt: lastMessage.createdAt.toISOString(),
+            }
+            : null,
+          lastActivityAt: room.lastActivityAt.toISOString(),
+          createdAt: room.createdAt.toISOString(),
+        };
+      })
+    );
 
-    const response: ApiDataResponse<{ chatRooms: typeof chatRooms; total: number }> = {
+    const response: ApiDataResponse<{ chatRooms: typeof chatRoomsWithCampaigns; total: number }> = {
       success: true,
-      data: { chatRooms, total },
+      data: { chatRooms: chatRoomsWithCampaigns, total },
     };
 
     return { response };
