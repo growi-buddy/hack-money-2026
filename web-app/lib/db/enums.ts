@@ -38,3 +38,12 @@ export const SocialMediaPlatform = {
 } as const;
 
 export type SocialMediaPlatform = (typeof SocialMediaPlatform)[keyof typeof SocialMediaPlatform];
+
+export const InfluencerVerificationStatus = {
+  NONE: 'NONE',
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type InfluencerVerificationStatus = (typeof InfluencerVerificationStatus)[keyof typeof InfluencerVerificationStatus];

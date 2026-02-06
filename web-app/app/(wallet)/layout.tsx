@@ -1,14 +1,31 @@
 'use client';
 
 import { WaaPProvider } from '@/components/WaaPProvider';
-import { WalletProvider } from '@/contexts/wallet-context';
+import { useWallet, WalletProvider } from '@/contexts/wallet-context';
+import { usePathname, useRouter } from 'next/navigation';
+import { PropsWithChildren, useEffect } from 'react';
 
-import React, { PropsWithChildren } from 'react';
+const Redirection = () => {
+  const { isConnected } = useWallet();
+  const pathname = usePathname();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (!isConnected && pathname !== '/login') {
+      console.log({ pathname });
+      const callbackUrl = encodeURIComponent(pathname);
+      router.push(`/login?callbackUrl=${callbackUrl}`);
+    }
+  }, [ isConnected, pathname, router ]);
+  
+  return null;
+};
 
 export default function ClientLayout({ children }: PropsWithChildren) {
   return (
     <WaaPProvider>
       <WalletProvider>
+        <Redirection />
         {children}
       </WalletProvider>
     </WaaPProvider>

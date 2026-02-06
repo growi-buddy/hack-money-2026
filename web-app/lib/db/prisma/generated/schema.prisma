@@ -9,21 +9,26 @@ generator client {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  walletAddress String   @unique
-  name          String?
-  email         String?  @unique
-  phone         String?
-  location      String?
-  bio           String?
-  avatar        String?
-  interests     String[] @default([])
-  affinities    String[] @default([])
+  id                     String                       @id @default(cuid())
+  walletAddress          String                       @unique
+  name                   String?
+  email                  String?                      @unique
+  phone                  String?
+  location               String?
+  bio                    String?
+  avatar                 String?
+  interests              String[]                     @default([])
+  affinities             String[]                     @default([])
+  influencerVerification InfluencerVerificationStatus @default(NONE)
 
   socialMedias     SocialMedia[]
   campaignsCreated Campaign[]      @relation("UserCampaigns")
   rewardEvents     RewardEvent[]   @relation("UserRewardEvents")
   participations   Participation[]
+
+  chatRoomsAsOne ChatRoom[]    @relation("ChatRoomUserOne")
+  chatRoomsAsTwo ChatRoom[]    @relation("ChatRoomUserTwo")
+  chatMessages   ChatMessage[] @relation("ChatMessageSender")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -67,6 +72,7 @@ model Campaign {
   yellowChannelId String?
   status          CampaignStatus  @default(ACTIVE)
   participations  Participation[]
+  chatRooms       ChatRoom[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -201,6 +207,50 @@ model AnalyticsEvent {
   updatedAt DateTime @updatedAt
 }
 
+model ChatRoom {
+  id String @id @default(cuid())
+
+  userOneId String
+  userOne   User   @relation("ChatRoomUserOne", fields: [userOneId], references: [id])
+
+  userTwoId String
+  userTwo   User   @relation("ChatRoomUserTwo", fields: [userTwoId], references: [id])
+
+  campaignId String?
+  campaign   Campaign? @relation(fields: [campaignId], references: [id])
+
+  ablyRoomId String @unique
+
+  lastActivityAt DateTime @default(now())
+
+  messages ChatMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userOneId, userTwoId, campaignId])
+  @@index([lastActivityAt])
+}
+
+model ChatMessage {
+  id String @id @default(cuid())
+
+  chatRoomId String
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User   @relation("ChatMessageSender", fields: [senderId], references: [id])
+
+  text       String
+  ablySerial String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chatRoomId, createdAt])
+  @@index([senderId])
+}
+
 enum EventType {
   LANDING_PAGE_VIEW
   VIEW_ITEM
@@ -230,4 +280,11 @@ enum CampaignStatus {
   DEPLETED
   COMPLETED
   DELETED
+}
+
+enum InfluencerVerificationStatus {
+  NONE
+  PENDING
+  VERIFIED
+  REJECTED
 }

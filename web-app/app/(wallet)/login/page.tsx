@@ -4,33 +4,44 @@ import { FallingLeaves } from '@/components/falling-leaves';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { WalletButton } from '@/components/wallet-button';
 import { useWallet } from '@/contexts/wallet-context';
+import { useProfile } from '@/hooks';
 import { fadeUp, staggerContainer, staggerItem } from '@/lib/animations';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
 
-export default function LoginPage() {
+function LoginPageContent() {
+  
   const { isConnected } = useWallet();
   const router = useRouter();
-  const [showWarning, setShowWarning] = useState(false);
-
+  const [ showWarning, setShowWarning ] = useState(false);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
+  const { profile } = useProfile();
+  
+  const isNewProfile = profile.updatedAt === profile.createdAt;
+  
+  console.log({ isNewProfile, profile });
+  
   const handleCardClick = (e: React.MouseEvent, path: string) => {
     if (!isConnected) {
       e.preventDefault();
       setShowWarning(true);
       return;
     }
-    router.push(path);
+    let destination = callbackUrl ? decodeURIComponent(callbackUrl) : path;
+    if (isNewProfile) {
+      destination += '?welcome=true';
+    }
+    router.push(destination);
   };
-
+  
   return (
     <div className="min-h-screen bg-background">
-      {/* Falling Leaves Animation */}
       <FallingLeaves />
-
-      {/* Header */}
+      
       <header className="relative z-10 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
           <Link href="/" className="flex items-center">
@@ -47,8 +58,7 @@ export default function LoginPage() {
           </Link>
         </div>
       </header>
-
-      {/* Main Content */}
+      
       <main className="relative z-10 flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-12">
         <motion.div
           variants={staggerContainer}
@@ -77,7 +87,7 @@ export default function LoginPage() {
               )}
             </AnimatePresence>
           </motion.div>
-
+          
           {/* Choose Your Path Section */}
           <motion.div variants={fadeUp} className="mb-10 text-center">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
@@ -87,7 +97,7 @@ export default function LoginPage() {
               Join as a marketing campaign manager or influencer
             </p>
           </motion.div>
-
+          
           <motion.div
             variants={staggerContainer}
             initial="hidden"
@@ -110,7 +120,7 @@ export default function LoginPage() {
                       <motion.div
                         className="mx-auto mb-4"
                         whileHover={{ scale: 1.1 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                       >
                         <Image
                           src="/growi-manager.png"
@@ -138,7 +148,7 @@ export default function LoginPage() {
                 </motion.div>
               </div>
             </motion.div>
-
+            
             {/* Influencer Card */}
             <motion.div variants={staggerItem} className="h-full">
               <div
@@ -155,13 +165,13 @@ export default function LoginPage() {
                       <motion.div
                         className="mx-auto mb-4"
                         whileHover={{ scale: 1.1 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                       >
                         <Image
                           src="/growi-influencer.png"
                           alt="Influencer"
-                          width={120}
-                          height={120}
+                          width={160}
+                          height={160}
                           className="h-32 w-32 object-contain sm:h-40 sm:w-40"
                         />
                       </motion.div>
@@ -187,5 +197,13 @@ export default function LoginPage() {
         </motion.div>
       </main>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

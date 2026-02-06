@@ -10,7 +10,19 @@ import { staggerContainer, staggerItem } from '@/lib/animations';
 import { CampaignStatus, EventType } from '@/lib/db/enums';
 import { InfluencerCampaignSummary } from '@/types';
 import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
-import { Archive, CheckCircle, Clock, DollarSign, Loader2, MessageSquare, Play, RefreshCw, Sparkles, Star, Wallet } from 'lucide-react';
+import {
+  Archive,
+  CheckCircle,
+  Clock,
+  DollarSign,
+  Loader2,
+  MessageSquare,
+  Play,
+  RefreshCw,
+  Sparkles,
+  Star,
+  Wallet,
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
@@ -40,7 +52,7 @@ function groupRewardEventsByType(rewardEvents: InfluencerCampaignSummary['campai
     acc[event.eventType].totalAmount += event.amount;
     return acc;
   }, {} as Record<EventType, { trackedEventsCount: number; totalAmount: number }>);
-
+  
   return EVENT_TYPE_ORDER
     .filter(type => grouped[type])
     .map(type => ({
@@ -57,7 +69,7 @@ function CountUpMoney({ value }: { value: number }) {
   const rounded = useTransform(count, (latest) => {
     return `$${latest.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   });
-
+  
   useEffect(() => {
     const controls = animate(count, value, {
       type: 'spring',
@@ -67,12 +79,12 @@ function CountUpMoney({ value }: { value: number }) {
     });
     return controls.stop;
   }, [ count, value ]);
-
+  
   return <motion.span>{rounded}</motion.span>;
 }
 
 export default function InfluencerDashboard() {
-  const { address, isConnected, connect } = useWallet();
+  const { address } = useWallet();
   const [ myCampaigns, setMyCampaigns ] = useState<InfluencerCampaignSummary[]>([]);
   const [ completedCampaigns, setCompletedCampaigns ] = useState<InfluencerCampaignSummary[]>([]);
   const [ archivedCampaigns, setArchivedCampaigns ] = useState<InfluencerCampaignSummary[]>([]);
@@ -80,14 +92,14 @@ export default function InfluencerDashboard() {
   const [ refreshing, setRefreshing ] = useState(false);
   const [ error, setError ] = useState<string | null>(null);
   const [ lastUpdated, setLastUpdated ] = useState<Date | null>(null);
-
+  
   const [ showRatingModal, setShowRatingModal ] = useState(false);
   const [ selectedCampaign, setSelectedCampaign ] = useState<InfluencerCampaignSummary | null>(null);
   const [ rating, setRating ] = useState(0);
   const [ hoverRating, setHoverRating ] = useState(0);
   const [ review, setReview ] = useState('');
   const [ ratingSubmitted, setRatingSubmitted ] = useState(false);
-
+  
   const fetchCampaigns = useCallback(async (isManualRefresh = false) => {
     if (!address) {
       setMyCampaigns([]);
@@ -95,7 +107,7 @@ export default function InfluencerDashboard() {
       setArchivedCampaigns([]);
       return;
     }
-
+    
     try {
       if (isManualRefresh) {
         setRefreshing(true);
@@ -103,7 +115,7 @@ export default function InfluencerDashboard() {
         setLoading(true);
       }
       setError(null);
-
+      
       // Fetch all campaign statuses in parallel
       // My Campaigns = ACTIVE + DEPLETED
       // Completed Campaigns = COMPLETED
@@ -114,14 +126,14 @@ export default function InfluencerDashboard() {
         fetch(`/api/influencer/${address}/campaigns?status=${CampaignStatus.COMPLETED}`),
         fetch(`/api/influencer/${address}/campaigns?status=${CampaignStatus.DELETED}`),
       ]);
-
+      
       const [ activeData, depletedData, completedData, deletedData ] = await Promise.all([
         activeRes.json(),
         depletedRes.json(),
         completedRes.json(),
         deletedRes.json(),
       ]);
-
+      
       // My Campaigns: combine ACTIVE + DEPLETED
       const myList: InfluencerCampaignSummary[] = [];
       if (activeRes.ok) {
@@ -133,15 +145,15 @@ export default function InfluencerDashboard() {
         myList.push(...(depletedData.data?.campaigns ?? []));
       }
       setMyCampaigns(myList);
-
+      
       if (completedRes.ok) {
         setCompletedCampaigns(completedData.data?.campaigns ?? []);
       }
-
+      
       if (deletedRes.ok) {
         setArchivedCampaigns(deletedData.data?.campaigns ?? []);
       }
-
+      
       setLastUpdated(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -150,7 +162,7 @@ export default function InfluencerDashboard() {
       setRefreshing(false);
     }
   }, [ address ]);
-
+  
   useEffect(() => {
     if (!address) {
       setMyCampaigns([]);
@@ -159,20 +171,20 @@ export default function InfluencerDashboard() {
       setLoading(false);
       return;
     }
-
+    
     void fetchCampaigns();
-
+    
     const interval = setInterval(() => {
       void fetchCampaigns(true);
     }, REFRESH_INTERVAL);
-
+    
     return () => clearInterval(interval);
   }, [ address, fetchCampaigns ]);
-
+  
   // Total earnings = sum of currentBalance across all participations
   const totalEarnings = [ ...myCampaigns, ...completedCampaigns, ...archivedCampaigns ]
     .reduce((sum, p) => sum + p.currentBalance, 0);
-
+  
   const handleRateCampaign = (item: InfluencerCampaignSummary) => {
     setSelectedCampaign(item);
     setShowRatingModal(true);
@@ -181,7 +193,7 @@ export default function InfluencerDashboard() {
     setReview('');
     setRatingSubmitted(false);
   };
-
+  
   const handleSubmitRating = () => {
     setRatingSubmitted(true);
     setTimeout(() => {
@@ -189,53 +201,11 @@ export default function InfluencerDashboard() {
       setRatingSubmitted(false);
     }, 1500);
   };
-
+  
   const hasMyCampaigns = myCampaigns.length > 0;
   const hasCompletedCampaigns = completedCampaigns.length > 0;
   const hasArchivedCampaigns = archivedCampaigns.length > 0;
-
-  // Show connect wallet prompt if not connected
-  if (!isConnected) {
-    return (
-      <div className="space-y-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Card className="border-2 border-dashed border-growi-blue/30 bg-growi-blue/5">
-            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <motion.div
-                animate={{ scale: [ 1, 1.05, 1 ] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-growi-blue/10"
-              >
-                <Wallet className="h-10 w-10 text-growi-blue" />
-              </motion.div>
-              <h3 className="text-xl font-bold text-foreground">Connect Your Wallet</h3>
-              <p className="mt-3 max-w-md text-muted-foreground">
-                Connect your wallet to view your campaign participations and earnings.
-              </p>
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="mt-6"
-              >
-                <Button
-                  size="lg"
-                  className="bg-growi-blue text-white hover:bg-growi-blue/90"
-                  onClick={connect}
-                >
-                  <Wallet className="mr-2 h-5 w-5" />
-                  Connect Wallet
-                </Button>
-              </motion.div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-    );
-  }
-
+  
   return (
     <div className="space-y-6">
       {/* Earnings Header */}
@@ -287,7 +257,7 @@ export default function InfluencerDashboard() {
           </CardContent>
         </Card>
       </motion.div>
-
+      
       {/* Loading State */}
       {loading && (
         <Card>
@@ -296,7 +266,7 @@ export default function InfluencerDashboard() {
           </CardContent>
         </Card>
       )}
-
+      
       {/* Error State */}
       {error && (
         <Card className="border-destructive/50">
@@ -312,7 +282,7 @@ export default function InfluencerDashboard() {
           </CardContent>
         </Card>
       )}
-
+      
       {/* My Campaigns (ACTIVE + DEPLETED) */}
       {!loading && (
         <Card>
@@ -340,7 +310,7 @@ export default function InfluencerDashboard() {
                   const progress = campaign.budgetTotal > 0
                     ? Math.round((campaign.budgetSpent / campaign.budgetTotal) * 100)
                     : 0;
-
+                  
                   return (
                     <motion.div
                       key={item.participationId}
@@ -380,7 +350,7 @@ export default function InfluencerDashboard() {
                             <p className="mt-1 text-xs text-muted-foreground">
                               by {campaign.owner.name || campaign.owner.walletAddress.slice(0, 6) + '...' + campaign.owner.walletAddress.slice(-4)}
                             </p>
-
+                            
                             {/* Reward events summary */}
                             <div className="mt-3 grid grid-cols-3 gap-1 text-center">
                               {groupRewardEventsByType(campaign.rewardEvents).slice(0, 3).map((event) => (
@@ -394,7 +364,7 @@ export default function InfluencerDashboard() {
                                 </div>
                               ))}
                             </div>
-
+                            
                             <div className="mt-3 flex items-center justify-between">
                               <p className="text-sm font-semibold text-growi-blue">
                                 +${item.currentBalance.toFixed(2)}
@@ -403,7 +373,7 @@ export default function InfluencerDashboard() {
                                 {item.totalEvents} events
                               </p>
                             </div>
-
+                            
                             {/* Progress bar */}
                             <div className="mt-3">
                               <div className="mb-1 flex justify-between text-xs text-muted-foreground">
@@ -419,9 +389,13 @@ export default function InfluencerDashboard() {
                                 />
                               </div>
                             </div>
-
+                            
                             <p className="mt-2 text-xs text-muted-foreground">
-                              Started: {new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              Started: {new Date(campaign.createdAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
                             </p>
                           </CardContent>
                         </Card>
@@ -445,7 +419,11 @@ export default function InfluencerDashboard() {
                 </motion.div>
                 <p className="text-sm text-muted-foreground">No active campaigns yet</p>
                 <Link href="/influencer/campaigns" className="mt-3">
-                  <Button variant="outline" size="sm" className="bg-transparent border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-transparent border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10"
+                  >
                     Browse Campaigns
                   </Button>
                 </Link>
@@ -454,7 +432,7 @@ export default function InfluencerDashboard() {
           </CardContent>
         </Card>
       )}
-
+      
       {/* Completed Campaigns */}
       {hasCompletedCampaigns && (
         <Card>
@@ -479,7 +457,7 @@ export default function InfluencerDashboard() {
                 const grouped = groupRewardEventsByType(campaign.rewardEvents);
                 const views = grouped.find(e => e.eventType === EventType.LANDING_PAGE_VIEW);
                 const purchases = grouped.find(e => e.eventType === EventType.PURCHASE_SUCCESS);
-
+                
                 return (
                   <motion.div
                     key={item.participationId}
@@ -506,7 +484,7 @@ export default function InfluencerDashboard() {
                         <p className="mt-1 text-xs text-muted-foreground">
                           by {campaign.owner.name || campaign.owner.walletAddress.slice(0, 6) + '...' + campaign.owner.walletAddress.slice(-4)}
                         </p>
-
+                        
                         {/* Metrics Grid */}
                         <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                           <div className="rounded-lg bg-secondary/50 p-2">
@@ -524,7 +502,7 @@ export default function InfluencerDashboard() {
                             <p className="text-[10px] text-muted-foreground">Earned</p>
                           </div>
                         </div>
-
+                        
                         {/* Rate Campaign Button */}
                         <Button
                           variant="outline"
@@ -538,10 +516,14 @@ export default function InfluencerDashboard() {
                           <Star className="mr-2 h-4 w-4" />
                           Rate Campaign
                         </Button>
-
+                        
                         <div className="mt-2 flex items-center justify-between">
                           <p className="text-xs text-muted-foreground">
-                            Ended: {new Date(campaign.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            Ended: {new Date(campaign.updatedAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
                           </p>
                         </div>
                       </CardContent>
@@ -553,7 +535,7 @@ export default function InfluencerDashboard() {
           </CardContent>
         </Card>
       )}
-
+      
       {/* Archived Campaigns */}
       {hasArchivedCampaigns && (
         <Card className="border-muted">
@@ -575,7 +557,7 @@ export default function InfluencerDashboard() {
             >
               {archivedCampaigns.map((item) => {
                 const campaign = item.campaign;
-
+                
                 return (
                   <motion.div
                     key={item.participationId}
@@ -601,7 +583,11 @@ export default function InfluencerDashboard() {
                             <span className="font-bold">${item.currentBalance.toFixed(2)}</span>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            {new Date(campaign.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            {new Date(campaign.updatedAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
                           </p>
                         </div>
                       </CardContent>
@@ -613,7 +599,7 @@ export default function InfluencerDashboard() {
           </CardContent>
         </Card>
       )}
-
+      
       {/* Empty state when nothing exists */}
       {!loading && !error && !hasMyCampaigns && !hasCompletedCampaigns && !hasArchivedCampaigns && (
         <motion.div
@@ -645,17 +631,18 @@ export default function InfluencerDashboard() {
           </Card>
         </motion.div>
       )}
-
+      
       {/* Rating Modal */}
       <Dialog open={showRatingModal} onOpenChange={setShowRatingModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Rate Campaign</DialogTitle>
             <DialogDescription>
-              Share your experience with {selectedCampaign?.campaign.title} by {selectedCampaign?.campaign.owner.name || 'the campaign manager'}
+              Share your experience
+              with {selectedCampaign?.campaign.title} by {selectedCampaign?.campaign.owner.name || 'the campaign manager'}
             </DialogDescription>
           </DialogHeader>
-
+          
           {ratingSubmitted ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -709,7 +696,7 @@ export default function InfluencerDashboard() {
                   </motion.p>
                 )}
               </div>
-
+              
               {/* Review Text */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Your Review (Optional)</label>
@@ -720,7 +707,7 @@ export default function InfluencerDashboard() {
                   rows={4}
                 />
               </div>
-
+              
               {/* Submit Button */}
               <div className="flex gap-2">
                 <Button

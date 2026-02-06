@@ -3,23 +3,20 @@
 import { Button } from '@/components/ui/button';
 import { WalletButton } from '@/components/wallet-button';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 interface NavbarProps {
-  showBack?: boolean;
   onMenuClick?: () => void;
   showMenu?: boolean;
 }
 
-export function Navbar({ showBack = false, onMenuClick, showMenu = false }: NavbarProps) {
-  const router = useRouter();
+export function Navbar({ onMenuClick, showMenu = false }: NavbarProps) {
   const pathname = usePathname();
   
-  // Determine if we should show back button
-  const isSubPage = pathname !== '/' && pathname.split('/').length > 2;
+  const isLanding = pathname === '/';
   
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
@@ -37,24 +34,6 @@ export function Navbar({ showBack = false, onMenuClick, showMenu = false }: Navb
             </Button>
           )}
           
-          {/* Back button */}
-          {(showBack || isSubPage) && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.back()}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </motion.div>
-          )}
-          
-          {/* Logo */}
           <Link href="/" className="flex items-center">
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -73,13 +52,15 @@ export function Navbar({ showBack = false, onMenuClick, showMenu = false }: Navb
         </div>
         
         <div className="flex items-center gap-3">
-          <Link href="/login">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button className="bg-growi-blue text-white hover:bg-growi-blue/90">
-                Start Now
-              </Button>
-            </motion.div>
-          </Link>
+          {isLanding && (
+            <Link href="/login">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button className="bg-growi-blue text-white hover:bg-growi-blue/90">
+                  Start Now
+                </Button>
+              </motion.div>
+            </Link>
+          )}
           <WalletButton />
         </div>
       </div>

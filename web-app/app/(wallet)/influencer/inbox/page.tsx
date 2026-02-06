@@ -1,353 +1,483 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
-import { Send, Check, CheckCheck, ArrowLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-import { staggerContainer, staggerItem } from "@/lib/animations"
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import { Send, CheckCheck, ArrowLeft, Loader2, MessageSquare } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { staggerContainer, staggerItem } from '@/lib/animations';
+import { useWallet } from '@/contexts/wallet-context';
+import { AblyChatProvider } from '@/components/providers/ably-chat-provider';
+import { ChatRoomProvider, useMessages } from '@ably/chat/react';
+import { ChatMessageEventType } from '@ably/chat';
+import type { Message as AblyMessage, ChatMessageEvent } from '@ably/chat';
 
-interface Message {
-  id: string
-  text: string
-  sender: "client" | "influencer"
-  timestamp: string
-  status?: "sent" | "delivered" | "read"
+// ---- Types ----
+
+interface ChatRoomUser {
+  id: string;
+  name: string | null;
+  walletAddress: string;
+  avatar: string | null;
 }
 
-interface Conversation {
-  id: string
-  clientName: string
-  clientAvatar: string
-  campaignId: string
-  campaignTitle: string
-  lastMessage: string
-  lastMessageTime: string
-  unreadCount: number
-  status: "applied" | "invited" | "accepted" | "active"
-  messages: Message[]
+interface ChatRoomCampaign {
+  id: string;
+  title: string;
+  status: string;
+  budgetTotal: number;
+  interests: string[];
+  startDate: string | null;
+  endDate: string | null;
+  rewardEvents: {
+    name: string;
+    eventType: string;
+    amount: number;
+  }[];
 }
 
-const conversations: Conversation[] = [
-  {
-    id: "1",
-    clientName: "Nike Brand Team",
-    clientAvatar: "/growi-mascot.png",
-    campaignId: "1",
-    campaignTitle: "Nike Summer Collection",
-    lastMessage: "The campaign runs Feb 10-24. You'll earn $0.007 per verified view.",
-    lastMessageTime: "2 min ago",
-    unreadCount: 1,
-    status: "accepted",
-    messages: [
-      { id: "1", text: "Hi! I saw your campaign invitation for Nike Summer Collection. I'd love to participate!", sender: "influencer", timestamp: "10:30 AM", status: "read" },
-      { id: "2", text: "Hey! Thanks for your interest. Your profile looks great for this campaign.", sender: "client", timestamp: "10:35 AM" },
-      { id: "3", text: "Thank you! I have a strong following in the sneaker community. What's the expected timeline?", sender: "influencer", timestamp: "10:38 AM", status: "read" },
-      { id: "4", text: "The campaign runs Feb 10-24. You'll earn $0.007 per verified view and $0.10 per checkout.", sender: "client", timestamp: "10:42 AM" },
-    ]
-  },
-  {
-    id: "2",
-    clientName: "Adidas Marketing",
-    clientAvatar: "/growi-mascot.png",
-    campaignId: "2",
-    campaignTitle: "Adidas Winter Drop",
-    lastMessage: "Welcome to the campaign! Your tracking link is ready.",
-    lastMessageTime: "1 hour ago",
-    unreadCount: 0,
-    status: "active",
-    messages: [
-      { id: "1", text: "I applied for the Adidas Winter campaign. My audience loves athletic wear!", sender: "influencer", timestamp: "Yesterday", status: "read" },
-      { id: "2", text: "Hi! We reviewed your application and would love to have you on board.", sender: "client", timestamp: "Yesterday" },
-      { id: "3", text: "That's wonderful news! When do I get my tracking link?", sender: "influencer", timestamp: "Yesterday", status: "read" },
-      { id: "4", text: "Welcome to the campaign! Your tracking link is ready.", sender: "client", timestamp: "1 hour ago" },
-    ]
-  },
-  {
-    id: "3",
-    clientName: "Puma Sports",
-    clientAvatar: "/growi-mascot.png",
-    campaignId: "3",
-    campaignTitle: "Puma Rush Campaign",
-    lastMessage: "We'd love to invite you to our new campaign!",
-    lastMessageTime: "3 hours ago",
-    unreadCount: 1,
-    status: "invited",
-    messages: [
-      { id: "1", text: "Hi! We noticed your great engagement rates and fitness content. We'd love to invite you to our new campaign!", sender: "client", timestamp: "3 hours ago" },
-    ]
-  }
-]
-
-const campaignDetails = {
-  "1": {
-    title: "Nike Summer Collection",
-    budget: "$5,000",
-    duration: "Feb 10 - Feb 24",
-    rates: {
-      view: "$0.007",
-      addToCart: "$0.05",
-      checkout: "$0.10"
-    },
-    interests: ["Fashion", "Sports", "Lifestyle"]
-  },
-  "2": {
-    title: "Adidas Winter Drop",
-    budget: "$3,000",
-    duration: "Feb 15 - Mar 1",
-    rates: {
-      view: "$0.005",
-      addToCart: "$0.04",
-      checkout: "$0.08"
-    },
-    interests: ["Fitness", "Sports", "Streetwear"]
-  },
-  "3": {
-    title: "Puma Rush Campaign",
-    budget: "$4,000",
-    duration: "Feb 20 - Mar 5",
-    rates: {
-      view: "$0.010",
-      addToCart: "$0.06",
-      checkout: "$0.12"
-    },
-    interests: ["Running", "Sports", "Health"]
-  }
+interface ChatRoomLastMessage {
+  id: string;
+  text: string;
+  senderId: string;
+  senderName: string | null;
+  createdAt: string;
 }
 
-export default function InfluencerInboxPage() {
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(conversations[0])
-  const [newMessage, setNewMessage] = useState("")
-  const [showMobileChat, setShowMobileChat] = useState(false)
+interface ChatRoomData {
+  id: string;
+  ablyRoomId: string;
+  otherUser: ChatRoomUser;
+  campaign: ChatRoomCampaign | null;
+  lastMessage: ChatRoomLastMessage | null;
+  lastActivityAt: string;
+  createdAt: string;
+}
 
-  const handleSelectConversation = (conv: Conversation) => {
-    setSelectedConversation(conv)
-    setShowMobileChat(true)
+// ---- Helpers ----
+
+function formatUserName(user: ChatRoomUser): string {
+  return user.name || `${user.walletAddress.slice(0, 6)}...${user.walletAddress.slice(-4)}`;
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+// ---- Chat Messages Component (inside ChatRoomProvider) ----
+
+function ChatMessages({ currentUserId }: { currentUserId: string }) {
+  const [ messages, setMessages ] = useState<AblyMessage[]>([]);
+  const [ loadingHistory, setLoadingHistory ] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { sendMessage, historyBeforeSubscribe } = useMessages({
+    listener: (event: ChatMessageEvent) => {
+      if (event.type === ChatMessageEventType.Created) {
+        setMessages((prev) => {
+          const exists = prev.some((m) => m.serial === event.message.serial);
+          if (exists) return prev;
+          return [ ...prev, event.message ];
+        });
+      }
+    },
+  });
+
+  // Load history before subscription
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        if (historyBeforeSubscribe) {
+          const result = await historyBeforeSubscribe({ limit: 50 });
+          if (result.items.length > 0) {
+            setMessages(result.items.reverse());
+          }
+        }
+      } catch (err) {
+        console.error('[Chat] Failed to load history:', err);
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+    loadHistory();
+  }, [ historyBeforeSubscribe ]);
+
+  // Auto scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [ messages ]);
+
+  const [ inputValue, setInputValue ] = useState('');
+  const [ sending, setSending ] = useState(false);
+
+  const handleSend = async () => {
+    const text = inputValue.trim();
+    if (!text || sending) return;
+
+    setSending(true);
+    setInputValue('');
+    try {
+      await sendMessage({ text });
+    } catch (err) {
+      console.error('[Chat] Failed to send:', err);
+      setInputValue(text);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (loadingHistory) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-growi-blue" />
+      </div>
+    );
   }
-
-  const handleBack = () => {
-    setShowMobileChat(false)
-  }
-
-  const campaign = selectedConversation 
-    ? campaignDetails[selectedConversation.campaignId as keyof typeof campaignDetails] 
-    : null
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] gap-4 overflow-hidden">
-      {/* Conversations List */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        className={cn(
-          "w-full shrink-0 overflow-y-auto rounded-lg border border-border bg-card md:w-80",
-          showMobileChat && "hidden md:block"
+    <>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 && (
+          <div className="flex flex-1 items-center justify-center py-12">
+            <p className="text-sm text-muted-foreground">No messages yet. Start the conversation!</p>
+          </div>
         )}
-      >
-        <div className="border-b border-border p-4">
-          <h2 className="font-semibold text-foreground">Messages</h2>
-          <p className="text-sm text-muted-foreground">{conversations.length} conversations</p>
-        </div>
+        <AnimatePresence>
+          {messages.map((message, index) => {
+            const isMe = message.clientId === currentUserId;
+            return (
+              <motion.div
+                key={message.serial}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index < 20 ? index * 0.02 : 0 }}
+                className={cn('flex', isMe ? 'justify-end' : 'justify-start')}
+              >
+                <div
+                  className={cn(
+                    'max-w-[80%] rounded-2xl px-4 py-2',
+                    isMe
+                      ? 'bg-growi-blue text-white rounded-br-sm'
+                      : 'bg-secondary text-foreground rounded-bl-sm',
+                  )}
+                >
+                  <p className="text-sm">{message.text}</p>
+                  <div
+                    className={cn(
+                      'mt-1 flex items-center justify-end gap-1 text-xs',
+                      isMe ? 'text-white/70' : 'text-muted-foreground',
+                    )}
+                  >
+                    <span>
+                      {new Date(message.timestamp).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                    {isMe && <CheckCheck className="h-3 w-3" />}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+        <div ref={messagesEndRef} />
+      </div>
 
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="divide-y divide-border"
+      {/* Input */}
+      <div className="border-t border-border p-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }}
+          className="flex gap-2"
         >
-          {conversations.map((conv) => (
+          <Input
+            placeholder="Type a message..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="flex-1"
+            disabled={sending}
+          />
+          <Button
+            type="submit"
+            className="bg-growi-blue text-white hover:bg-growi-blue/90"
+            disabled={sending || !inputValue.trim()}
+          >
+            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </Button>
+        </form>
+      </div>
+    </>
+  );
+}
+
+// ---- Main Inbox Page ----
+
+export default function InfluencerInboxPage() {
+  const { address, isConnected } = useWallet();
+  const [ chatRooms, setChatRooms ] = useState<ChatRoomData[]>([]);
+  const [ selectedRoom, setSelectedRoom ] = useState<ChatRoomData | null>(null);
+  const [ showMobileChat, setShowMobileChat ] = useState(false);
+  const [ loading, setLoading ] = useState(true);
+
+  const fetchRooms = useCallback(async () => {
+    if (!address) {
+      setChatRooms([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/influencer/${address}/chat-rooms`);
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setChatRooms(data.data.chatRooms);
+      }
+    } catch (err) {
+      console.error('[Inbox] Failed to fetch rooms:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [ address ]);
+
+  useEffect(() => {
+    fetchRooms();
+  }, [ fetchRooms ]);
+
+  // Auto-select first room when rooms load
+  useEffect(() => {
+    if (chatRooms.length > 0 && !selectedRoom) {
+      setSelectedRoom(chatRooms[0]);
+    }
+  }, [ chatRooms, selectedRoom ]);
+
+  const handleSelectRoom = (room: ChatRoomData) => {
+    setSelectedRoom(room);
+    setShowMobileChat(true);
+  };
+
+  const handleBack = () => {
+    setShowMobileChat(false);
+  };
+
+  if (!isConnected) {
+    return (
+      <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+        <div className="text-center">
+          <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground/50" />
+          <p className="mt-4 text-muted-foreground">Connect your wallet to view messages</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
+      </div>
+    );
+  }
+
+  return (
+    <AblyChatProvider clientId={address!}>
+      <div className="flex h-[calc(100vh-8rem)] gap-4 overflow-hidden">
+        {/* Conversations List */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className={cn(
+            'w-full shrink-0 overflow-y-auto rounded-lg border border-border bg-card md:w-80',
+            showMobileChat && 'hidden md:block',
+          )}
+        >
+          <div className="border-b border-border p-4">
+            <h2 className="font-semibold text-foreground">Messages</h2>
+            <p className="text-sm text-muted-foreground">{chatRooms.length} conversations</p>
+          </div>
+
+          {chatRooms.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+              <MessageSquare className="h-10 w-10 text-muted-foreground/30" />
+              <p className="mt-3 text-sm text-muted-foreground">No conversations yet</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Messages from campaign managers will appear here
+              </p>
+            </div>
+          ) : (
             <motion.div
-              key={conv.id}
-              variants={staggerItem}
-              onClick={() => handleSelectConversation(conv)}
-              className={cn(
-                "flex cursor-pointer items-start gap-3 p-4 transition-colors hover:bg-secondary/50",
-                selectedConversation?.id === conv.id && "bg-secondary/50"
-              )}
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="divide-y divide-border"
             >
-              <div className="relative shrink-0">
+              {chatRooms.map((room) => (
+                <motion.div
+                  key={room.id}
+                  variants={staggerItem}
+                  onClick={() => handleSelectRoom(room)}
+                  className={cn(
+                    'flex cursor-pointer items-start gap-3 p-4 transition-colors hover:bg-secondary/50',
+                    selectedRoom?.id === room.id && 'bg-secondary/50',
+                  )}
+                >
+                  <div className="relative shrink-0">
+                    <Image
+                      src={room.otherUser.avatar || '/growi-mascot.png'}
+                      alt={formatUserName(room.otherUser)}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium text-foreground">{formatUserName(room.otherUser)}</p>
+                      <span className="text-xs text-muted-foreground">
+                        {room.lastMessage ? timeAgo(room.lastMessage.createdAt) : timeAgo(room.createdAt)}
+                      </span>
+                    </div>
+                    {room.campaign && (
+                      <p className="text-xs text-growi-blue">{room.campaign.title}</p>
+                    )}
+                    <p className="mt-1 truncate text-sm text-muted-foreground">
+                      {room.lastMessage?.text || 'No messages yet'}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Chat Area */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className={cn(
+            'flex flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card',
+            !showMobileChat && 'hidden md:flex',
+          )}
+        >
+          {selectedRoom ? (
+            <>
+              {/* Chat Header */}
+              <div className="flex items-center gap-3 border-b border-border p-4">
+                <Button variant="ghost" size="icon" className="md:hidden" onClick={handleBack}>
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
                 <Image
-                  src={conv.clientAvatar || "/placeholder.svg"}
-                  alt={conv.clientName}
+                  src={selectedRoom.otherUser.avatar || '/growi-mascot.png'}
+                  alt={formatUserName(selectedRoom.otherUser)}
                   width={40}
                   height={40}
                   className="rounded-full"
                 />
-                {conv.unreadCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-growi-blue text-xs font-medium text-white">
-                    {conv.unreadCount}
-                  </span>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
-                  <p className="font-medium text-foreground">{conv.clientName}</p>
-                  <span className="text-xs text-muted-foreground">{conv.lastMessageTime}</span>
-                </div>
-                <p className="text-xs text-growi-blue">{conv.campaignTitle}</p>
-                <p className="mt-1 truncate text-sm text-muted-foreground">{conv.lastMessage}</p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.div>
-
-      {/* Chat Area */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className={cn(
-          "flex flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card",
-          !showMobileChat && "hidden md:flex"
-        )}
-      >
-        {selectedConversation ? (
-          <>
-            {/* Chat Header */}
-            <div className="flex items-center gap-3 border-b border-border p-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={handleBack}
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <Image
-                src={selectedConversation.clientAvatar || "/placeholder.svg"}
-                alt={selectedConversation.clientName}
-                width={40}
-                height={40}
-                className="rounded-full"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-foreground">{selectedConversation.clientName}</p>
-                <Badge
-                  className={cn(
-                    "text-xs",
-                    selectedConversation.status === "accepted" && "bg-growi-success/20 text-growi-success",
-                    selectedConversation.status === "active" && "bg-growi-blue/20 text-growi-blue",
-                    selectedConversation.status === "invited" && "bg-growi-yellow/20 text-growi-yellow"
-                  )}
-                >
-                  {selectedConversation.status}
-                </Badge>
-              </div>
-            </div>
-
-            {/* Campaign Details Card */}
-            {campaign && (
-              <div className="border-b border-border p-4">
-                <Card className="bg-growi-blue/5 border-growi-blue/20">
-                  <CardContent className="p-4">
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div>
-                        <p className="font-semibold text-foreground">{campaign.title}</p>
-                        <p className="text-sm text-muted-foreground">{campaign.duration}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-foreground">Budget: {campaign.budget}</p>
-                      </div>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">View: </span>
-                        <span className="font-medium text-growi-money">{campaign.rates.view}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Add to Cart: </span>
-                        <span className="font-medium text-growi-money">{campaign.rates.addToCart}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Checkout: </span>
-                        <span className="font-medium text-growi-money">{campaign.rates.checkout}</span>
-                      </div>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-1">
-                      {campaign.interests.map((interest) => (
-                        <Badge key={interest} variant="secondary" className="text-xs">
-                          {interest}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Messages - Influencer messages on RIGHT for desktop */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              <AnimatePresence>
-                {selectedConversation.messages.map((message, index) => (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className={cn(
-                      "flex",
-                      message.sender === "influencer" ? "justify-end" : "justify-start"
-                    )}
-                  >
-                    <div
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-foreground">{formatUserName(selectedRoom.otherUser)}</p>
+                  {selectedRoom.campaign && (
+                    <Badge
                       className={cn(
-                        "max-w-[80%] rounded-2xl px-4 py-2",
-                        message.sender === "influencer"
-                          ? "bg-growi-blue text-white rounded-br-sm"
-                          : "bg-secondary text-foreground rounded-bl-sm"
+                        'text-xs',
+                        selectedRoom.campaign.status === 'ACTIVE' && 'bg-growi-success/20 text-growi-success',
+                        selectedRoom.campaign.status === 'COMPLETED' && 'bg-growi-blue/20 text-growi-blue',
+                        selectedRoom.campaign.status === 'PAUSED' && 'bg-growi-yellow/20 text-growi-yellow',
                       )}
                     >
-                      <p className="text-sm">{message.text}</p>
-                      <div className={cn(
-                        "mt-1 flex items-center justify-end gap-1 text-xs",
-                        message.sender === "influencer" ? "text-white/70" : "text-muted-foreground"
-                      )}>
-                        <span>{message.timestamp}</span>
-                        {message.sender === "influencer" && message.status && (
-                          message.status === "read" ? (
-                            <CheckCheck className="h-3 w-3" />
-                          ) : (
-                            <Check className="h-3 w-3" />
-                          )
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
+                      {selectedRoom.campaign.status}
+                    </Badge>
+                  )}
+                </div>
+              </div>
 
-            {/* Message Input */}
-            <div className="border-t border-border p-4">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  setNewMessage("")
-                }}
-                className="flex gap-2"
-              >
-                <Input
-                  placeholder="Type a message..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex-1"
-                />
-                <Button type="submit" className="bg-growi-blue text-white hover:bg-growi-blue/90">
-                  <Send className="h-4 w-4" />
-                </Button>
-              </form>
+              {/* Campaign Details Card */}
+              {selectedRoom.campaign && (
+                <div className="border-b border-border p-4">
+                  <Card className="bg-growi-blue/5 border-growi-blue/20">
+                    <CardContent className="p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                          <p className="font-semibold text-foreground">{selectedRoom.campaign.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {selectedRoom.campaign.startDate
+                              ? new Date(selectedRoom.campaign.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                              : 'TBD'}
+                            {' - '}
+                            {selectedRoom.campaign.endDate
+                              ? new Date(selectedRoom.campaign.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                              : 'TBD'}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-foreground">
+                            Budget: ${selectedRoom.campaign.budgetTotal.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      {selectedRoom.campaign.rewardEvents.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                          {selectedRoom.campaign.rewardEvents.map((event, i) => {
+                            const labels: Record<string, string> = {
+                              LANDING_PAGE_VIEW: 'View',
+                              VIEW_ITEM: 'View Item',
+                              ADD_TO_CART: 'Add to Cart',
+                              CHECKOUT: 'Checkout',
+                              PURCHASE_SUCCESS: 'Purchase',
+                            };
+                            return (
+                              <div key={i}>
+                                <span className="text-muted-foreground">{labels[event.eventType] || event.eventType}: </span>
+                                <span className="font-medium text-growi-money">${event.amount.toFixed(3)}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {selectedRoom.campaign.interests.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1">
+                          {selectedRoom.campaign.interests.map((interest) => (
+                            <Badge key={interest} variant="secondary" className="text-xs">
+                              {interest}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {/* Chat Room with Ably */}
+              <ChatRoomProvider key={selectedRoom.ablyRoomId} name={selectedRoom.ablyRoomId}>
+                <ChatMessages currentUserId={address!} />
+              </ChatRoomProvider>
+            </>
+          ) : (
+            <div className="flex flex-1 items-center justify-center">
+              <div className="text-center">
+                <MessageSquare className="mx-auto h-10 w-10 text-muted-foreground/30" />
+                <p className="mt-3 text-muted-foreground">Select a conversation to start messaging</p>
+              </div>
             </div>
-          </>
-        ) : (
-          <div className="flex flex-1 items-center justify-center">
-            <p className="text-muted-foreground">Select a conversation to start messaging</p>
-          </div>
-        )}
-      </motion.div>
-    </div>
-  )
+          )}
+        </motion.div>
+      </div>
+    </AblyChatProvider>
+  );
 }

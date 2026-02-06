@@ -42,9 +42,16 @@ export async function GET(req: Request) {
       where: { walletAddress },
       include: {
         socialMedias: true,
+        campaignsCreated: {
+          select: {
+            budgetTotal: true,
+            status: true,
+          },
+        },
         _count: {
           select: {
             participations: true,
+            campaignsCreated: true,
           },
         },
       },
@@ -56,24 +63,45 @@ export async function GET(req: Request) {
         data: { walletAddress },
         include: {
           socialMedias: true,
+          campaignsCreated: {
+            select: {
+              budgetTotal: true,
+              status: true,
+            },
+          },
           _count: {
             select: {
               participations: true,
+              campaignsCreated: true,
             },
           },
         },
       });
 
-      const response: ApiDataResponse<typeof newUser> = {
+      // Calculate budget spent
+      const budgetSpent = 0; // New user has no budget spent
+
+      const response: ApiDataResponse<typeof newUser & { budgetSpent: number }> = {
         success: true,
-        data: newUser,
+        data: {
+          ...newUser,
+          budgetSpent,
+        },
       };
       return { response, status: 201 };
     }
 
-    const response: ApiDataResponse<typeof user> = {
+    // Calculate total budget spent across all campaigns
+    const budgetSpent = user.campaignsCreated.reduce((total, campaign) => {
+      return total + Number(campaign.budgetTotal);
+    }, 0);
+
+    const response: ApiDataResponse<typeof user & { budgetSpent: number }> = {
       success: true,
-      data: user,
+      data: {
+        ...user,
+        budgetSpent,
+      },
     };
     return { response };
   });
@@ -142,22 +170,46 @@ export async function PUT(req: Request) {
       }
     }
 
-    // Fetch updated user with social medias
+    // Fetch updated user with social medias and campaign stats
     const finalUser = await prisma.user.findUnique({
       where: { id: user.id },
       include: {
         socialMedias: true,
+        campaignsCreated: {
+          select: {
+            budgetTotal: true,
+            status: true,
+          },
+        },
         _count: {
           select: {
             participations: true,
+            campaignsCreated: true,
           },
         },
       },
     });
 
-    const response: ApiDataResponse<typeof finalUser> = {
+    if (!finalUser) {
+      const response: ApiErrorResponse = {
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'User not found after update' },
+      };
+      return { response, status: 404 };
+    }
+
+    // Calculate budget spent
+    const budgetSpent = finalUser.campaignsCreated.reduce((total, campaign) => {
+      return total + Number(campaign.budgetTotal);
+    }, 0);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response: ApiDataResponse<any> = {
       success: true,
-      data: finalUser,
+      data: {
+        ...finalUser,
+        budgetSpent,
+      },
     };
     return { response };
   });

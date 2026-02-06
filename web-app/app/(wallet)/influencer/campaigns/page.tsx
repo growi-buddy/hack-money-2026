@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useWallet } from '@/contexts/wallet-context';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { motion } from 'framer-motion';
 import { Building2, Flame, Loader2, Search, TrendingUp, X } from 'lucide-react';
@@ -45,6 +46,7 @@ interface Manager {
 export default function CampaignsPage() {
   const searchParams = useSearchParams();
   const managerFromUrl = searchParams.get('manager');
+  const { address } = useWallet();
 
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [managers, setManagers] = useState<Manager[]>([]);
@@ -61,6 +63,8 @@ export default function CampaignsPage() {
       if (searchQuery) params.set('search', searchQuery);
       if (selectedInterest) params.set('interest', selectedInterest);
       if (selectedManager) params.set('managerId', selectedManager);
+      // Exclude campaigns created by the current user
+      if (address) params.set('walletAddress', address);
 
       const response = await fetch(`/api/campaigns/available?${params.toString()}`);
       const data = await response.json();
@@ -79,7 +83,7 @@ export default function CampaignsPage() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, selectedInterest, selectedManager]);
+  }, [searchQuery, selectedInterest, selectedManager, address]);
 
   useEffect(() => {
     fetchCampaigns();
