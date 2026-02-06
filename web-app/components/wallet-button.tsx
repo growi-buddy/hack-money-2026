@@ -15,10 +15,10 @@ import { useCallback, useState } from 'react';
 
 export function WalletButton() {
   
-  const { address, isConnected, connect, disconnect } = useWallet();
+  const { address, displayName, isConnected, connect, disconnect } = useWallet();
   const [ isHovered, setIsHovered ] = useState(false);
   const [ copied, setCopied ] = useState(false);
-  console.log({ address, isConnected, connect, disconnect });
+  console.log({ address, displayName, isConnected, connect, disconnect });
   const copyAddress = useCallback(async () => {
     if (!address) return;
     try {
@@ -63,7 +63,7 @@ export function WalletButton() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="border-growi-blue/50 text-foreground bg-transparent">
           <Wallet className="mr-2 h-4 w-4 text-growi-blue" />
-          {address}
+          {displayName}
           <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>

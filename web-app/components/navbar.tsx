@@ -40,7 +40,7 @@ export function Navbar({ onMenuClick, showMenu = false }: NavbarProps) {
               whileTap={{ scale: 0.98 }}
             >
               <Image
-                src="/growi-logo-full.png"
+                src="/growi-main-logo.png"
                 alt="GROWI"
                 width={140}
                 height={45}
