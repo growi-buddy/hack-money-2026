@@ -61,11 +61,14 @@ model Campaign {
   budgetTotal   Decimal
 
   // Campaign settings
-  isHot     Boolean   @default(false)
-  slots     Int       @default(10)
-  interests String[]  @default([])
-  startDate DateTime?
-  endDate   DateTime?
+  isHot        Boolean   @default(false)
+  slots        Int       @default(10)
+  interests    String[]  @default([])
+  demographics String[]  @default([])
+  regions      String[]  @default([])
+  countries    String[]  @default([])
+  startDate    DateTime?
+  endDate      DateTime?
 
   rewardEvents CampaignRewardEvent[]
 

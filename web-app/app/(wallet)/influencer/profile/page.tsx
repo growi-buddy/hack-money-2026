@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { useProfile } from '@/hooks';
 import { staggerContainer, staggerItem } from '@/lib/animations';
+import { INTEREST_OPTIONS, AUDIENCE_DEMOGRAPHIC_OPTIONS } from '@/lib/constants/tags';
 import { InfluencerVerificationStatus, SocialMediaPlatform } from '@/lib/db/enums';
 import { SocialMedia } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -52,15 +53,9 @@ const platformLabels: Record<SocialMediaPlatform, string> = {
   OTHER: 'Other',
 };
 
-const interestOptions = [
-  'Fashion', 'Sports', 'Fitness', 'Gaming', 'Tech', 'Beauty', 'Lifestyle',
-  'Food', 'Travel', 'Music', 'Art', 'Photography', 'Health', 'Finance',
-];
-
-const affinityOptions = [
-  'Gen Z', 'Millennials', 'Young Professionals', 'Parents', 'Students',
-  'Entrepreneurs', 'Gamers', 'Athletes', 'Artists', 'Tech Enthusiasts',
-];
+// Using shared tag options from constants
+const interestOptions = INTEREST_OPTIONS;
+const affinityOptions = AUDIENCE_DEMOGRAPHIC_OPTIONS;
 
 export default function ProfilePage() {
   

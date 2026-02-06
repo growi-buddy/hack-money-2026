@@ -9,16 +9,16 @@ generator client {
 }
 
 model User {
-  id            String  @id @default(cuid())
-  walletAddress String  @unique
-  name          String?
-  email         String? @unique
-  phone         String?
-  location      String?
-  bio           String?
-  avatar        String?
-  interests     String[] @default([])
-  affinities    String[] @default([])
+  id                     String                       @id @default(cuid())
+  walletAddress          String                       @unique
+  name                   String?
+  email                  String?                      @unique
+  phone                  String?
+  location               String?
+  bio                    String?
+  avatar                 String?
+  interests              String[]                     @default([])
+  affinities             String[]                     @default([])
   influencerVerification InfluencerVerificationStatus @default(NONE)
 
   socialMedias     SocialMedia[]
@@ -61,11 +61,14 @@ model Campaign {
   budgetTotal   Decimal
 
   // Campaign settings
-  isHot      Boolean  @default(false)
-  slots      Int      @default(10)
-  interests  String[] @default([])
-  startDate  DateTime?
-  endDate    DateTime?
+  isHot        Boolean   @default(false)
+  slots        Int       @default(10)
+  interests    String[]  @default([])
+  demographics String[]  @default([])
+  regions      String[]  @default([])
+  countries    String[]  @default([])
+  startDate    DateTime?
+  endDate      DateTime?
 
   rewardEvents CampaignRewardEvent[]
 

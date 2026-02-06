@@ -12,6 +12,9 @@ export type InfluencerCampaignView = {
   slots: number;
   filledSlots: number;
   interests: string[];
+  demographics: string[];
+  regions: string[];
+  countries: string[];
   startDate: string | null;
   endDate: string | null;
   owner: {
@@ -71,6 +74,9 @@ export const getCampaignForInfluencer = async (campaignId: string): Promise<Infl
     slots: campaign.slots,
     filledSlots: campaign._count.participations,
     interests: campaign.interests,
+    demographics: campaign.demographics,
+    regions: campaign.regions,
+    countries: campaign.countries,
     startDate: campaign.startDate?.toISOString() ?? null,
     endDate: campaign.endDate?.toISOString() ?? null,
     owner: campaign.owner,
@@ -107,9 +113,17 @@ export const getCampaignById = (campaignId: string) => {
 export type CampaignDashboardData = {
   id: string;
   title: string;
+  description: string | null;
   status: CampaignStatus;
   budgetTotal: number;
   budgetSpent: number;
+  slots: number;
+  interests: string[];
+  demographics: string[];
+  regions: string[];
+  countries: string[];
+  startDate: string | null;
+  endDate: string | null;
   rewardEvents: {
     id: string;
     name: string;
@@ -216,9 +230,17 @@ export const getCampaignDashboard = async (campaignId: string): Promise<Campaign
   return {
     id: campaign.id,
     title: campaign.title,
+    description: campaign.description,
     status: campaign.status,
     budgetTotal: Number(campaign.budgetTotal),
     budgetSpent,
+    slots: campaign.slots,
+    interests: campaign.interests,
+    demographics: campaign.demographics,
+    regions: campaign.regions,
+    countries: campaign.countries,
+    startDate: campaign.startDate?.toISOString() ?? null,
+    endDate: campaign.endDate?.toISOString() ?? null,
     rewardEvents,
     participations,
     createdAt: campaign.createdAt.toISOString(),

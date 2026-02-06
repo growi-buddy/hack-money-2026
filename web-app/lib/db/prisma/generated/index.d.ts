@@ -4835,6 +4835,9 @@ export namespace Prisma {
     isHot: number
     slots: number
     interests: number
+    demographics: number
+    regions: number
+    countries: number
     startDate: number
     endDate: number
     yellowChannelId: number
@@ -4899,6 +4902,9 @@ export namespace Prisma {
     isHot?: true
     slots?: true
     interests?: true
+    demographics?: true
+    regions?: true
+    countries?: true
     startDate?: true
     endDate?: true
     yellowChannelId?: true
@@ -5004,6 +5010,9 @@ export namespace Prisma {
     isHot: boolean
     slots: number
     interests: string[]
+    demographics: string[]
+    regions: string[]
+    countries: string[]
     startDate: Date | null
     endDate: Date | null
     yellowChannelId: string | null
@@ -5041,6 +5050,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: boolean
     interests?: boolean
+    demographics?: boolean
+    regions?: boolean
+    countries?: boolean
     startDate?: boolean
     endDate?: boolean
     yellowChannelId?: boolean
@@ -5064,6 +5076,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: boolean
     interests?: boolean
+    demographics?: boolean
+    regions?: boolean
+    countries?: boolean
     startDate?: boolean
     endDate?: boolean
     yellowChannelId?: boolean
@@ -5083,6 +5098,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: boolean
     interests?: boolean
+    demographics?: boolean
+    regions?: boolean
+    countries?: boolean
     startDate?: boolean
     endDate?: boolean
     yellowChannelId?: boolean
@@ -5102,6 +5120,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: boolean
     interests?: boolean
+    demographics?: boolean
+    regions?: boolean
+    countries?: boolean
     startDate?: boolean
     endDate?: boolean
     yellowChannelId?: boolean
@@ -5110,7 +5131,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type CampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "title" | "description" | "escrowAddress" | "budgetTotal" | "isHot" | "slots" | "interests" | "startDate" | "endDate" | "yellowChannelId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["campaign"]>
+  export type CampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "title" | "description" | "escrowAddress" | "budgetTotal" | "isHot" | "slots" | "interests" | "demographics" | "regions" | "countries" | "startDate" | "endDate" | "yellowChannelId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["campaign"]>
   export type CampaignInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     rewardEvents?: boolean | Campaign$rewardEventsArgs<ExtArgs>
@@ -5143,6 +5164,9 @@ export namespace Prisma {
       isHot: boolean
       slots: number
       interests: string[]
+      demographics: string[]
+      regions: string[]
+      countries: string[]
       startDate: Date | null
       endDate: Date | null
       yellowChannelId: string | null
@@ -5585,6 +5609,9 @@ export namespace Prisma {
     readonly isHot: FieldRef<"Campaign", 'Boolean'>
     readonly slots: FieldRef<"Campaign", 'Int'>
     readonly interests: FieldRef<"Campaign", 'String[]'>
+    readonly demographics: FieldRef<"Campaign", 'String[]'>
+    readonly regions: FieldRef<"Campaign", 'String[]'>
+    readonly countries: FieldRef<"Campaign", 'String[]'>
     readonly startDate: FieldRef<"Campaign", 'DateTime'>
     readonly endDate: FieldRef<"Campaign", 'DateTime'>
     readonly yellowChannelId: FieldRef<"Campaign", 'String'>
@@ -17314,6 +17341,9 @@ export namespace Prisma {
     isHot: 'isHot',
     slots: 'slots',
     interests: 'interests',
+    demographics: 'demographics',
+    regions: 'regions',
+    countries: 'countries',
     startDate: 'startDate',
     endDate: 'endDate',
     yellowChannelId: 'yellowChannelId',
@@ -17861,6 +17891,9 @@ export namespace Prisma {
     isHot?: BoolFilter<"Campaign"> | boolean
     slots?: IntFilter<"Campaign"> | number
     interests?: StringNullableListFilter<"Campaign">
+    demographics?: StringNullableListFilter<"Campaign">
+    regions?: StringNullableListFilter<"Campaign">
+    countries?: StringNullableListFilter<"Campaign">
     startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableFilter<"Campaign"> | string | null
@@ -17883,6 +17916,9 @@ export namespace Prisma {
     isHot?: SortOrder
     slots?: SortOrder
     interests?: SortOrder
+    demographics?: SortOrder
+    regions?: SortOrder
+    countries?: SortOrder
     startDate?: SortOrderInput | SortOrder
     endDate?: SortOrderInput | SortOrder
     yellowChannelId?: SortOrderInput | SortOrder
@@ -17908,6 +17944,9 @@ export namespace Prisma {
     isHot?: BoolFilter<"Campaign"> | boolean
     slots?: IntFilter<"Campaign"> | number
     interests?: StringNullableListFilter<"Campaign">
+    demographics?: StringNullableListFilter<"Campaign">
+    regions?: StringNullableListFilter<"Campaign">
+    countries?: StringNullableListFilter<"Campaign">
     startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableFilter<"Campaign"> | string | null
@@ -17930,6 +17969,9 @@ export namespace Prisma {
     isHot?: SortOrder
     slots?: SortOrder
     interests?: SortOrder
+    demographics?: SortOrder
+    regions?: SortOrder
+    countries?: SortOrder
     startDate?: SortOrderInput | SortOrder
     endDate?: SortOrderInput | SortOrder
     yellowChannelId?: SortOrderInput | SortOrder
@@ -17956,6 +17998,9 @@ export namespace Prisma {
     isHot?: BoolWithAggregatesFilter<"Campaign"> | boolean
     slots?: IntWithAggregatesFilter<"Campaign"> | number
     interests?: StringNullableListFilter<"Campaign">
+    demographics?: StringNullableListFilter<"Campaign">
+    regions?: StringNullableListFilter<"Campaign">
+    countries?: StringNullableListFilter<"Campaign">
     startDate?: DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableWithAggregatesFilter<"Campaign"> | string | null
@@ -18880,6 +18925,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -18902,6 +18950,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -18922,6 +18973,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18944,6 +18998,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18965,6 +19022,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -18982,6 +19042,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19000,6 +19063,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20065,6 +20131,9 @@ export namespace Prisma {
     isHot?: SortOrder
     slots?: SortOrder
     interests?: SortOrder
+    demographics?: SortOrder
+    regions?: SortOrder
+    countries?: SortOrder
     startDate?: SortOrder
     endDate?: SortOrder
     yellowChannelId?: SortOrder
@@ -21029,6 +21098,18 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type CampaignCreatedemographicsInput = {
+    set: string[]
+  }
+
+  export type CampaignCreateregionsInput = {
+    set: string[]
+  }
+
+  export type CampaignCreatecountriesInput = {
+    set: string[]
+  }
+
   export type UserCreateNestedOneWithoutCampaignsCreatedInput = {
     create?: XOR<UserCreateWithoutCampaignsCreatedInput, UserUncheckedCreateWithoutCampaignsCreatedInput>
     connectOrCreate?: UserCreateOrConnectWithoutCampaignsCreatedInput
@@ -21098,6 +21179,21 @@ export namespace Prisma {
   }
 
   export type CampaignUpdateinterestsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type CampaignUpdatedemographicsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type CampaignUpdateregionsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type CampaignUpdatecountriesInput = {
     set?: string[]
     push?: string | string[]
   }
@@ -22064,6 +22160,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -22084,6 +22183,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -22316,6 +22418,9 @@ export namespace Prisma {
     isHot?: BoolFilter<"Campaign"> | boolean
     slots?: IntFilter<"Campaign"> | number
     interests?: StringNullableListFilter<"Campaign">
+    demographics?: StringNullableListFilter<"Campaign">
+    regions?: StringNullableListFilter<"Campaign">
+    countries?: StringNullableListFilter<"Campaign">
     startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableFilter<"Campaign"> | string | null
@@ -23032,6 +23137,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -23053,6 +23161,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -23141,6 +23252,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23162,6 +23276,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23498,6 +23615,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -23519,6 +23639,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -23667,6 +23790,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23688,6 +23814,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23976,6 +24105,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -23997,6 +24129,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -24170,6 +24305,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -24191,6 +24329,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -24400,6 +24541,9 @@ export namespace Prisma {
     isHot?: boolean
     slots?: number
     interests?: CampaignCreateinterestsInput | string[]
+    demographics?: CampaignCreatedemographicsInput | string[]
+    regions?: CampaignCreateregionsInput | string[]
+    countries?: CampaignCreatecountriesInput | string[]
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
@@ -24492,6 +24636,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -24512,6 +24659,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -24532,6 +24682,9 @@ export namespace Prisma {
     isHot?: BoolFieldUpdateOperationsInput | boolean
     slots?: IntFieldUpdateOperationsInput | number
     interests?: CampaignUpdateinterestsInput | string[]
+    demographics?: CampaignUpdatedemographicsInput | string[]
+    regions?: CampaignUpdateregionsInput | string[]
+    countries?: CampaignUpdatecountriesInput | string[]
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null

@@ -246,7 +246,7 @@ export default function ClientDashboard() {
       {/* Header */}
       <div>
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground">Campaigns</h1>
+          <h1 className="text-2xl font-bold text-foreground">My Campaigns</h1>
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -263,7 +263,7 @@ export default function ClientDashboard() {
                 Updated {lastUpdated.toLocaleTimeString()}
               </span>
             )}
-            <Link href="/manager/create">
+            <Link href="/manager/campaigns/create">
               <Button
                 variant="outline"
                 size="sm"
@@ -279,7 +279,7 @@ export default function ClientDashboard() {
           View and manage all your campaigns in one place
         </p>
       </div>
-
+      
       {/* Install CTA Card - Show full card only if no reward events configured */}
       {hasRewardEvents === false && (
         <motion.div
@@ -305,7 +305,7 @@ export default function ClientDashboard() {
                   </p>
                 </div>
               </div>
-              <Link href="/manager/setup">
+              <Link href="/manager/sites-tracking">
                 <Button className="bg-growi-blue text-white hover:bg-growi-blue/90">
                   Setup Tracking
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -315,7 +315,7 @@ export default function ClientDashboard() {
           </Card>
         </motion.div>
       )}
-
+      
       <div>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
@@ -355,7 +355,7 @@ export default function ClientDashboard() {
           >
             {activeCampaigns.map((campaign) => (
               <motion.div key={campaign.id} variants={staggerItem}>
-                <Link href={`/manager/campaign/${campaign.id}`}>
+                <Link href={`/manager/campaigns/${campaign.id}`}>
                   <Card className="cursor-pointer transition-colors hover:border-growi-blue/50">
                     <CardHeader>
                       <div className="flex items-center justify-between">
@@ -507,7 +507,7 @@ export default function ClientDashboard() {
                       </div>
                     </div>
                     <div className="mt-4 flex gap-2">
-                      <Link href={`/manager/campaign/${campaign.id}`} className="flex-1">
+                      <Link href={`/manager/campaigns/${campaign.id}`} className="flex-1">
                         <Button variant="outline" size="sm" className="w-full bg-transparent">
                           View Summary
                         </Button>
