@@ -40,7 +40,7 @@ export default function LoginPage() {
     }
     let destination = callbackUrl ? decodeURIComponent(callbackUrl) : path;
     if (isNewProfile) {
-      destination += '?welcome=true';
+      destination += '/profile?welcome=true';
     }
     router.push(destination);
   };
