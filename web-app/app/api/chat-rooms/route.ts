@@ -1,6 +1,7 @@
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
 import { getOrCreateUserByWallet } from '@/lib/services/user.service';
+import { ServerPublisher } from '@/lib/realtime/server-publisher';
 import { ApiDataResponse } from '@/types';
 import { z } from 'zod';
 
@@ -89,6 +90,7 @@ export async function POST(req: Request) {
         };
       });
 
+      // Create messages in DB
       await prisma.chatMessage.createMany({
         data: messagesToCreate,
       });
@@ -98,6 +100,29 @@ export async function POST(req: Request) {
         where: { id: room.id },
         data: { lastActivityAt: new Date() },
       });
+
+      // Publish messages to Ably Chat
+      const ablyChatRoomId = `chat:${orderedOneId}:${orderedTwoId}`;
+
+      // Send each message to Ably
+      for (let i = 0; i < initialMessages.length; i++) {
+        const msg = initialMessages[i];
+        const senderId = messagesToCreate[i].senderId;
+        const sender = senderId === userOne.id ? userOne : userTwo;
+
+        try {
+          await ServerPublisher.publish(ablyChatRoomId, 'message', {
+            text: msg.text,
+            senderId,
+            senderName: sender.name,
+            senderWallet: sender.walletAddress,
+            timestamp: Date.now(),
+          });
+        } catch (error) {
+          console.error('[ChatRoom] Failed to publish message to Ably:', error);
+          // Continue even if Ably publish fails
+        }
+      }
 
       // Refetch room with messages
       room = await prisma.chatRoom.findUnique({
@@ -116,9 +141,15 @@ export async function POST(req: Request) {
       }) as typeof room;
     }
 
-    const response: ApiDataResponse<typeof room> = {
+    // Generate Ably Chat Room ID for frontend
+    const ablyChatRoomId = `chat:${orderedOneId}:${orderedTwoId}`;
+
+    const response: ApiDataResponse<typeof room & { ablyChatRoomId: string }> = {
       success: true,
-      data: room,
+      data: {
+        ...room,
+        ablyChatRoomId,
+      },
     };
 
     return { response, status: room.messages.length > 0 ? 200 : 201 };
