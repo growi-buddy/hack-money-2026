@@ -11,8 +11,7 @@ const Redirection = () => {
   const router = useRouter();
   
   useEffect(() => {
-    if (!isConnected && pathname !== '/login') {
-      console.log({ pathname });
+    if (!isConnected && pathname !== '/login' && pathname !== '/' && pathname !== '') {
       const callbackUrl = encodeURIComponent(pathname);
       router.push(`/login?callbackUrl=${callbackUrl}`);
     }
