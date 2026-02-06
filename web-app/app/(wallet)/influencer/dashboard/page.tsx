@@ -7,28 +7,10 @@ import { motion } from 'framer-motion';
 import { Eye, Filter, Link2, ShoppingCart, CreditCard, User, Wallet, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 
-// Mock data for the influencer dashboard
 const earningsData = {
   totalEarnings: 12450.00,
 };
 
-// Activity data
-const activityLinks = [
-  {
-    id: '1',
-    name: 'tiktok link',
-    url: 'growi.es/idea/st',
-    clicks: '1.2k clicks',
-  },
-  {
-    id: '2',
-    name: 'story ig',
-    url: 'VE2 bounty',
-    clicks: '',
-  },
-];
-
-// Performance metrics
 const performanceMetrics = [
   { label: 'Landing Page View', icon: Eye, value: '45K', progress: 90, color: 'bg-foreground' },
   { label: 'View Item', icon: Eye, value: '38K', progress: 75, color: 'bg-foreground' },
@@ -37,7 +19,6 @@ const performanceMetrics = [
   { label: 'Purchase', icon: DollarSign, value: '8K', progress: 25, color: 'bg-growi-lime' },
 ];
 
-// Available campaigns
 const availableCampaigns = [
   {
     id: '1',
@@ -174,8 +155,7 @@ export default function InfluencerDashboardPage() {
           ))}
         </div>
       </motion.div>
-
-      {/* Available Campaigns Section */}
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -131,6 +131,7 @@ exports.Prisma.UserScalarFieldEnum = {
   avatar: 'avatar',
   interests: 'interests',
   affinities: 'affinities',
+  influencerVerification: 'influencerVerification',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -242,6 +243,27 @@ exports.Prisma.AnalyticsEventScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ChatRoomScalarFieldEnum = {
+  id: 'id',
+  userOneId: 'userOneId',
+  userTwoId: 'userTwoId',
+  campaignId: 'campaignId',
+  ablyRoomId: 'ablyRoomId',
+  lastActivityAt: 'lastActivityAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ChatMessageScalarFieldEnum = {
+  id: 'id',
+  chatRoomId: 'chatRoomId',
+  senderId: 'senderId',
+  text: 'text',
+  ablySerial: 'ablySerial',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -267,6 +289,13 @@ exports.Prisma.JsonNullValueFilter = {
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
+exports.InfluencerVerificationStatus = exports.$Enums.InfluencerVerificationStatus = {
+  NONE: 'NONE',
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED'
+};
+
 exports.SocialMediaPlatform = exports.$Enums.SocialMediaPlatform = {
   INSTAGRAM: 'INSTAGRAM',
   TIKTOK: 'TIKTOK',
@@ -309,7 +338,9 @@ exports.Prisma.ModelName = {
   Selector: 'Selector',
   Participation: 'Participation',
   TrackingLink: 'TrackingLink',
-  AnalyticsEvent: 'AnalyticsEvent'
+  AnalyticsEvent: 'AnalyticsEvent',
+  ChatRoom: 'ChatRoom',
+  ChatMessage: 'ChatMessage'
 };
 
 /**

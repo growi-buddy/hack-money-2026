@@ -14,6 +14,7 @@ export async function GET(req: Request) {
     const interest = searchParams.get('interest');
     const search = searchParams.get('search');
     const managerId = searchParams.get('managerId');
+    const walletAddress = searchParams.get('walletAddress');
 
     // Build where clause
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,6 +26,18 @@ export async function GET(req: Request) {
         { endDate: { gte: new Date() } },
       ],
     };
+
+    // Exclude campaigns created by the current user
+    if (walletAddress) {
+      const currentUser = await prisma.user.findUnique({
+        where: { walletAddress },
+        select: { id: true },
+      });
+
+      if (currentUser) {
+        where.ownerId = { not: currentUser.id };
+      }
+    }
 
     // Filter by interest
     if (interest) {
@@ -44,7 +57,7 @@ export async function GET(req: Request) {
       ];
     }
 
-    // Filter by manager/owner
+    // Filter by manager/owner (this overrides the exclude logic)
     if (managerId) {
       where.ownerId = managerId;
     }

@@ -1,4 +1,4 @@
-import { CreateCampaignInput, CampaignRewardEventInput } from '@/types';
+import { CampaignRewardEventInput, CreateCampaignInput } from '@/types';
 import { CampaignFormData } from '@/types/campaign-form';
 
 /**
@@ -10,7 +10,7 @@ export function mapCampaignFormToAPI(
   walletAddress: string,
 ): CreateCampaignInput {
   const rewardEvents: CampaignRewardEventInput[] = [];
-
+  
   // Map selected reward events from the form
   if (formData.selectedRewardEvents) {
     for (const selectedEvent of formData.selectedRewardEvents) {
@@ -21,7 +21,7 @@ export function mapCampaignFormToAPI(
       });
     }
   }
-
+  
   return {
     walletAddress,
     title: formData.name || 'Draft',
@@ -60,7 +60,7 @@ export function validateCampaignForm(formData: CampaignFormData): {
   const hasRewardEvents = formData.selectedRewardEvents &&
     formData.selectedRewardEvents.length > 0 &&
     formData.selectedRewardEvents.some(e => e.amount > 0);
-
+  
   if (!hasRewardEvents) {
     errors.push('Debes seleccionar al menos un evento de recompensa con un monto mayor a 0');
   }
@@ -86,19 +86,19 @@ export function validateCampaignForm(formData: CampaignFormData): {
  */
 export function calculateCampaignStats(formData: CampaignFormData) {
   const selectedEvents = formData.selectedRewardEvents || [];
-
+  
   const totalRewardsCost = selectedEvents.reduce((sum, event) => {
     return sum + (event.amount || 0);
   }, 0);
-
+  
   const averageRewardPrice = selectedEvents.length > 0
     ? totalRewardsCost / selectedEvents.length
     : 0;
-
+  
   const estimatedActions = formData.budget && averageRewardPrice > 0
     ? Math.floor(formData.budget / averageRewardPrice)
     : 0;
-
+  
   return {
     enabledRewardsCount: selectedEvents.length,
     totalRewardsCost,

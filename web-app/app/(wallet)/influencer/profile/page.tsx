@@ -1,175 +1,129 @@
-"use client"
+'use client';
 
-import { useState, useEffect, useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { useProfile } from '@/hooks';
+import { staggerContainer, staggerItem } from '@/lib/animations';
+import { InfluencerVerificationStatus, SocialMediaPlatform } from '@/lib/db/enums';
+import { SocialMedia } from '@/types';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  User,
-  MapPin,
-  Instagram,
-  Twitter,
-  Youtube,
-  Link as LinkIcon,
-  Save,
-  Plus,
-  Trash2,
   ExternalLink,
+  Instagram,
+  Link as LinkIcon,
+  Loader2,
+  MapPin,
+  Plus,
+  Save,
+  ShieldCheck,
   Star,
+  Trash2,
+  Twitter,
+  User,
   X,
-  Loader2
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { staggerContainer, staggerItem } from "@/lib/animations"
-import { useWallet } from "@/contexts/wallet-context"
-import { SocialMediaPlatform } from "@/lib/db/enums"
-
-interface SocialMedia {
-  id: string
-  platform: SocialMediaPlatform
-  username: string
-  followers: string
-  url: string
-}
-
-interface UserProfile {
-  id: string
-  walletAddress: string
-  name: string | null
-  email: string | null
-  phone: string | null
-  location: string | null
-  bio: string | null
-  avatar: string | null
-  interests: string[]
-  affinities: string[]
-  socialMedias: SocialMedia[]
-  _count?: {
-    participations: number
-  }
-}
+  Youtube,
+} from 'lucide-react';
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 const platformIcons: Record<string, React.FC<{ className?: string }>> = {
   INSTAGRAM: Instagram,
   TIKTOK: () => (
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
     </svg>
   ),
   YOUTUBE: Youtube,
   TWITTER: Twitter,
-  OTHER: LinkIcon
-}
+  OTHER: LinkIcon,
+};
 
 const platformLabels: Record<SocialMediaPlatform, string> = {
-  INSTAGRAM: "Instagram",
-  TIKTOK: "TikTok",
-  YOUTUBE: "YouTube",
-  TWITTER: "Twitter/X",
-  OTHER: "Other"
-}
+  INSTAGRAM: 'Instagram',
+  TIKTOK: 'TikTok',
+  YOUTUBE: 'YouTube',
+  TWITTER: 'Twitter/X',
+  OTHER: 'Other',
+};
 
 const interestOptions = [
-  "Fashion", "Sports", "Fitness", "Gaming", "Tech", "Beauty", "Lifestyle",
-  "Food", "Travel", "Music", "Art", "Photography", "Health", "Finance"
-]
+  'Fashion', 'Sports', 'Fitness', 'Gaming', 'Tech', 'Beauty', 'Lifestyle',
+  'Food', 'Travel', 'Music', 'Art', 'Photography', 'Health', 'Finance',
+];
 
 const affinityOptions = [
-  "Gen Z", "Millennials", "Young Professionals", "Parents", "Students",
-  "Entrepreneurs", "Gamers", "Athletes", "Artists", "Tech Enthusiasts"
-]
+  'Gen Z', 'Millennials', 'Young Professionals', 'Parents', 'Students',
+  'Entrepreneurs', 'Gamers', 'Athletes', 'Artists', 'Tech Enthusiasts',
+];
 
-export default function ProfilePage() {
-  const { address, isConnected } = useWallet()
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    location: "",
-    bio: "",
-    avatar: "/growi-mascot.png",
-  })
-  const [socialMedias, setSocialMedias] = useState<SocialMedia[]>([])
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([])
-  const [selectedAffinities, setSelectedAffinities] = useState<string[]>([])
-
-  // Fetch profile data
-  const fetchProfile = useCallback(async () => {
-    if (!address) return
-
-    try {
-      setIsLoading(true)
-      setError(null)
-      const response = await fetch(`/api/users/profile?walletAddress=${address}`)
-      const data = await response.json()
-
-      if (!data.success) {
-        throw new Error(data.error?.message || "Failed to fetch profile")
-      }
-
-      const user = data.data as UserProfile
-      setProfile(user)
-      setFormData({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        location: user.location || "",
-        bio: user.bio || "",
-        avatar: user.avatar || "/growi-mascot.png",
-      })
-      setSocialMedias(user.socialMedias.map(sm => ({
-        id: sm.id,
-        platform: sm.platform as SocialMediaPlatform,
-        username: sm.username,
-        followers: sm.followers || "",
-        url: sm.url || ""
-      })))
-      setSelectedInterests(user.interests || [])
-      setSelectedAffinities(user.affinities || [])
-
-      // Show welcome modal if profile is empty
-      if (!user.name && !localStorage.getItem("growi-influencer-welcome-seen")) {
-        setShowWelcomeModal(true)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-    } finally {
-      setIsLoading(false)
-    }
-  }, [address])
-
+function ProfilePageContent() {
+  
+  const [ isSaving, setIsSaving ] = useState(false);
+  const [ isRequestingVerification, setIsRequestingVerification ] = useState(false);
+  const [ showWelcomeModal, setShowWelcomeModal ] = useState(false);
+  const [ socialMedias, setSocialMedias ] = useState<SocialMedia[]>([]);
+  const [ selectedInterests, setSelectedInterests ] = useState<string[]>([]);
+  const [ selectedAffinities, setSelectedAffinities ] = useState<string[]>([]);
+  const [ error, setError ] = useState<string | null>(null);
+  const [ verificationSuccess, setVerificationSuccess ] = useState(false);
+  const searchParams = useSearchParams();
+  const welcome = searchParams.get('welcome');
+  console.log({ welcome, showWelcomeModal });
+  const [ formData, setFormData ] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    bio: '',
+    avatar: '/growi-mascot.png',
+  });
+  
+  const { error: errorProfile, profile, isLoading, reload } = useProfile();
+  
   useEffect(() => {
-    if (isConnected && address) {
-      fetchProfile()
-    }
-  }, [isConnected, address, fetchProfile])
-
+    setFormData({
+      name: profile.name || '',
+      email: profile.email || '',
+      phone: profile.phone || '',
+      location: profile.location || '',
+      bio: profile.bio || '',
+      avatar: profile.avatar || '/growi-mascot.png',
+    });
+    setSocialMedias(profile.socialMedias.map(sm => ({
+      id: sm.id,
+      platform: sm.platform as SocialMediaPlatform,
+      username: sm.username,
+      followers: sm.followers || '',
+      url: sm.url || '',
+    })));
+    setSelectedInterests(profile.interests || []);
+    setSelectedAffinities(profile.affinities || []);
+  }, [ profile ]);
+  
   const closeWelcomeModal = () => {
-    setShowWelcomeModal(false)
-    localStorage.setItem("growi-influencer-welcome-seen", "true")
-  }
-
+    setShowWelcomeModal(false);
+  };
+  useEffect(() => {
+    if (welcome) {
+      setShowWelcomeModal(true);
+    }
+  }, [ welcome ]);
+  
   const handleSave = async () => {
-    if (!address) return
-
-    setIsSaving(true)
-    setError(null)
-
+    
+    setIsSaving(true);
+    setError(null);
+    
     try {
-      const response = await fetch(`/api/users/profile?walletAddress=${address}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      await fetch(`/api/users/profile?walletAddress=${profile.walletAddress}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name || null,
           email: formData.email || null,
@@ -183,93 +137,101 @@ export default function ProfilePage() {
             platform: sm.platform,
             username: sm.username,
             followers: sm.followers,
-            url: sm.url
-          }))
-        })
-      })
-
-      const data = await response.json()
-
-      if (!data.success) {
-        throw new Error(data.error?.message || "Failed to save profile")
-      }
-
-      setProfile(data.data)
+            url: sm.url,
+          })),
+        }),
+      });
+      
+      reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
-
+  };
+  
+  const handleRequestVerification = async () => {
+    setIsRequestingVerification(true);
+    setError(null);
+    setVerificationSuccess(false);
+    
+    try {
+      const response = await fetch('/api/users/verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: profile.walletAddress,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        setError(data.error?.message || 'Failed to request verification');
+        return;
+      }
+      
+      setVerificationSuccess(true);
+      reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsRequestingVerification(false);
+    }
+  };
+  
   const addSocialMedia = () => {
     const newSocial: SocialMedia = {
       id: `new-${Date.now()}`,
       platform: SocialMediaPlatform.INSTAGRAM,
-      username: "",
-      followers: "",
-      url: ""
-    }
-    setSocialMedias([...socialMedias, newSocial])
-  }
-
+      username: '',
+      followers: '',
+      url: '',
+    };
+    setSocialMedias([ ...socialMedias, newSocial ]);
+  };
+  
   const removeSocialMedia = (id: string) => {
-    setSocialMedias(socialMedias.filter(s => s.id !== id))
-  }
-
+    setSocialMedias(socialMedias.filter(s => s.id !== id));
+  };
+  
   const updateSocialMedia = (id: string, field: keyof SocialMedia, value: string) => {
     setSocialMedias(socialMedias.map(s =>
-      s.id === id ? { ...s, [field]: value } : s
-    ))
-  }
-
+      s.id === id ? { ...s, [field]: value } : s,
+    ));
+  };
+  
   const toggleInterest = (interest: string) => {
     setSelectedInterests(prev =>
       prev.includes(interest)
         ? prev.filter(i => i !== interest)
-        : [...prev, interest]
-    )
-  }
-
+        : [ ...prev, interest ],
+    );
+  };
+  
   const toggleAffinity = (affinity: string) => {
     setSelectedAffinities(prev =>
       prev.includes(affinity)
         ? prev.filter(a => a !== affinity)
-        : [...prev, affinity]
-    )
-  }
-
+        : [ ...prev, affinity ],
+    );
+  };
+  
   const totalFollowers = socialMedias.reduce((acc, s) => {
-    const num = Number.parseFloat(s.followers.replace(/[^0-9.]/g, "")) || 0
-    const multiplier = s.followers.toLowerCase().includes("k") ? 1000 :
-                       s.followers.toLowerCase().includes("m") ? 1000000 : 1
-    return acc + (num * multiplier)
-  }, 0)
-
-  if (!isConnected) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Card className="max-w-md text-center">
-          <CardContent className="p-8">
-            <User className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-            <h2 className="text-xl font-bold text-foreground">Connect Your Wallet</h2>
-            <p className="mt-2 text-muted-foreground">
-              Connect your wallet to view and edit your profile
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
+    const num = Number.parseFloat(s.followers.replace(/[^0-9.]/g, '')) || 0;
+    const multiplier = s.followers.toLowerCase().includes('k') ? 1000 :
+      s.followers.toLowerCase().includes('m') ? 1000000 : 1;
+    return acc + (num * multiplier);
+  }, 0);
+  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
       </div>
-    )
+    );
   }
-
+  
   return (
     <div className="space-y-6">
       {/* Welcome Modal */}
@@ -286,7 +248,7 @@ export default function ProfilePage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="relative mx-4 w-full max-w-md rounded-2xl bg-background p-8 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
@@ -311,7 +273,7 @@ export default function ProfilePage() {
           </motion.div>
         )}
       </AnimatePresence>
-
+      
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -322,36 +284,84 @@ export default function ProfilePage() {
           <h1 className="text-2xl font-bold text-foreground">Edit Profile</h1>
           <p className="text-muted-foreground">Manage your public profile visible to brands</p>
         </div>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <Button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-growi-blue text-white hover:bg-growi-blue/90"
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Save Profile
-              </>
+        <div className="flex flex-col sm:flex-row gap-2">
+          {profile.influencerVerification !== InfluencerVerificationStatus.VERIFIED &&
+            profile.influencerVerification !== InfluencerVerificationStatus.PENDING && (
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={handleRequestVerification}
+                  disabled={isRequestingVerification || socialMedias.length === 0}
+                  variant="outline"
+                  className="border-growi-blue text-growi-blue hover:bg-growi-blue/10"
+                >
+                  {isRequestingVerification ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Requesting...
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="mr-2 h-4 w-4" />
+                      Request Verification
+                    </>
+                  )}
+                </Button>
+              </motion.div>
             )}
-          </Button>
-        </motion.div>
+          {profile.influencerVerification === InfluencerVerificationStatus.PENDING && (
+            <Badge className="bg-yellow-500/20 text-yellow-600 border-yellow-500/30 h-10 px-4 flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Verification Pending
+            </Badge>
+          )}
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="bg-growi-blue text-white hover:bg-growi-blue/90"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Profile
+                </>
+              )}
+            </Button>
+          </motion.div>
+        </div>
       </motion.div>
-
+      
       {error && (
         <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
           {error}
         </div>
       )}
-
+      
+      {errorProfile && (
+        <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
+          {errorProfile}
+        </div>
+      )}
+      
+      {verificationSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-lg bg-growi-success/10 p-4 text-growi-success"
+        >
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5" />
+            <span>Verification request submitted successfully! We&#39;ll review your profile and social media
+              accounts.
+            </span>
+          </div>
+        </motion.div>
+      )}
       <motion.div
         variants={staggerContainer}
         initial="hidden"
@@ -367,30 +377,44 @@ export default function ProfilePage() {
                 className="mx-auto mb-4 relative"
               >
                 <Image
-                  src={formData.avatar || "/growi-mascot.png"}
-                  alt={formData.name || "Profile"}
+                  src={formData.avatar || '/growi-mascot.png'}
+                  alt={formData.name || 'Profile'}
                   width={120}
                   height={120}
                   className="rounded-full border-4 border-growi-blue/20"
                 />
-                <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-growi-success text-white">
-                  Verified
-                </Badge>
+                {profile.influencerVerification === InfluencerVerificationStatus.VERIFIED && (
+                  <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-growi-success text-white">
+                    <ShieldCheck className="mr-1 h-3 w-3" />
+                    Verified
+                  </Badge>
+                )}
+                {profile.influencerVerification === InfluencerVerificationStatus.PENDING && (
+                  <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-yellow-500 text-white">
+                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                    Pending
+                  </Badge>
+                )}
+                {profile.influencerVerification === InfluencerVerificationStatus.NONE && (
+                  <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gray-500 text-white">
+                    Not Verified
+                  </Badge>
+                )}
               </motion.div>
-              <CardTitle className="text-foreground">{formData.name || "Your Name"}</CardTitle>
+              <CardTitle className="text-foreground">{formData.name || 'Your Name'}</CardTitle>
               <CardDescription className="flex items-center justify-center gap-1">
                 <MapPin className="h-3 w-3" />
-                {formData.location || "Location"}
+                {formData.location || 'Location'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Star Rating - placeholder */}
               <div className="text-center">
                 <div className="flex justify-center gap-1">
-                  {[...Array(5)].map((_, i) => (
+                  {[ ...Array(5) ].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-5 w-5 ${i < 4 ? "fill-growi-yellow text-growi-yellow" : "text-muted-foreground/30"}`}
+                      className={`h-5 w-5 ${i < 4 ? 'fill-growi-yellow text-growi-yellow' : 'text-muted-foreground/30'}`}
                     />
                   ))}
                 </div>
@@ -398,9 +422,9 @@ export default function ProfilePage() {
                   New Influencer
                 </p>
               </div>
-
+              
               <Separator />
-
+              
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
                   <p className="text-2xl font-bold text-growi-blue">
@@ -417,14 +441,14 @@ export default function ProfilePage() {
                   <p className="text-xs text-muted-foreground">Campaigns</p>
                 </div>
               </div>
-
+              
               <Separator />
-
+              
               <div className="space-y-2">
                 <p className="text-sm font-medium text-foreground">Connected Platforms</p>
                 <div className="flex flex-wrap gap-2">
                   {socialMedias.filter(s => s.username).map((social) => {
-                    const IconComponent = platformIcons[social.platform] || LinkIcon
+                    const IconComponent = platformIcons[social.platform] || LinkIcon;
                     return (
                       <a
                         key={social.id}
@@ -434,18 +458,18 @@ export default function ProfilePage() {
                         className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs hover:bg-secondary/80 transition-colors"
                       >
                         <IconComponent className="h-3 w-3" />
-                        {social.followers || "0"}
+                        {social.followers || '0'}
                       </a>
-                    )
+                    );
                   })}
                   {socialMedias.filter(s => s.username).length === 0 && (
                     <p className="text-xs text-muted-foreground">No platforms connected</p>
                   )}
                 </div>
               </div>
-
+              
               <Separator />
-
+              
               <div className="space-y-2">
                 <p className="text-sm font-medium text-foreground">Interests</p>
                 <div className="flex flex-wrap gap-1">
@@ -458,7 +482,7 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-
+              
               <div className="space-y-2">
                 <p className="text-sm font-medium text-foreground">Audience</p>
                 <div className="flex flex-wrap gap-1">
@@ -474,7 +498,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
         </motion.div>
-
+        
         {/* Edit Form */}
         <motion.div variants={staggerItem} className="space-y-6 lg:col-span-2">
           {/* Personal Information */}
@@ -539,7 +563,7 @@ export default function ProfilePage() {
               </div>
             </CardContent>
           </Card>
-
+          
           {/* Social Media Accounts */}
           <Card>
             <CardHeader>
@@ -559,7 +583,7 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {socialMedias.map((social, index) => {
-                const IconComponent = platformIcons[social.platform] || LinkIcon
+                const IconComponent = platformIcons[social.platform] || LinkIcon;
                 return (
                   <motion.div
                     key={social.id}
@@ -572,10 +596,10 @@ export default function ProfilePage() {
                       <Label>Platform</Label>
                       <select
                         value={social.platform}
-                        onChange={(e) => updateSocialMedia(social.id, "platform", e.target.value)}
+                        onChange={(e) => updateSocialMedia(social.id, 'platform', e.target.value)}
                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       >
-                        {Object.entries(platformLabels).map(([value, label]) => (
+                        {Object.entries(platformLabels).map(([ value, label ]) => (
                           <option key={value} value={value}>{label}</option>
                         ))}
                       </select>
@@ -584,7 +608,7 @@ export default function ProfilePage() {
                       <Label>Username</Label>
                       <Input
                         value={social.username}
-                        onChange={(e) => updateSocialMedia(social.id, "username", e.target.value)}
+                        onChange={(e) => updateSocialMedia(social.id, 'username', e.target.value)}
                         placeholder="@username"
                       />
                     </div>
@@ -592,7 +616,7 @@ export default function ProfilePage() {
                       <Label>Followers</Label>
                       <Input
                         value={social.followers}
-                        onChange={(e) => updateSocialMedia(social.id, "followers", e.target.value)}
+                        onChange={(e) => updateSocialMedia(social.id, 'followers', e.target.value)}
                         placeholder="125K"
                       />
                     </div>
@@ -600,7 +624,7 @@ export default function ProfilePage() {
                       <Label>Profile URL</Label>
                       <Input
                         value={social.url}
-                        onChange={(e) => updateSocialMedia(social.id, "url", e.target.value)}
+                        onChange={(e) => updateSocialMedia(social.id, 'url', e.target.value)}
                         placeholder="https://..."
                       />
                     </div>
@@ -627,7 +651,7 @@ export default function ProfilePage() {
                       </Button>
                     </div>
                   </motion.div>
-                )
+                );
               })}
               {socialMedias.length === 0 && (
                 <p className="text-center text-muted-foreground py-4">
@@ -636,7 +660,7 @@ export default function ProfilePage() {
               )}
             </CardContent>
           </Card>
-
+          
           {/* Interests & Affinities */}
           <Card>
             <CardHeader>
@@ -657,8 +681,8 @@ export default function ProfilePage() {
                       onClick={() => toggleInterest(interest)}
                       className={`rounded-full px-3 py-1 text-sm transition-colors ${
                         selectedInterests.includes(interest)
-                          ? "bg-growi-blue text-white"
-                          : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                          ? 'bg-growi-blue text-white'
+                          : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                       }`}
                     >
                       {interest}
@@ -666,9 +690,9 @@ export default function ProfilePage() {
                   ))}
                 </div>
               </div>
-
+              
               <Separator />
-
+              
               <div className="space-y-3">
                 <Label>Audience Demographics</Label>
                 <div className="flex flex-wrap gap-2">
@@ -680,8 +704,8 @@ export default function ProfilePage() {
                       onClick={() => toggleAffinity(affinity)}
                       className={`rounded-full px-3 py-1 text-sm transition-colors ${
                         selectedAffinities.includes(affinity)
-                          ? "bg-growi-money text-white"
-                          : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                          ? 'bg-growi-money text-white'
+                          : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                       }`}
                     >
                       {affinity}
@@ -694,5 +718,19 @@ export default function ProfilePage() {
         </motion.div>
       </motion.div>
     </div>
-  )
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
+        </div>
+      }
+    >
+      <ProfilePageContent />
+    </Suspense>
+  );
 }
