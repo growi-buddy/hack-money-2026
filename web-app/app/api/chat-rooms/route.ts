@@ -141,15 +141,9 @@ export async function POST(req: Request) {
       }) as typeof room;
     }
 
-    // Generate Ably Chat Room ID for frontend
-    const ablyChatRoomId = `chat:${orderedOneId}:${orderedTwoId}`;
-
-    const response: ApiDataResponse<typeof room & { ablyChatRoomId: string }> = {
+    const response: ApiDataResponse<typeof room> = {
       success: true,
-      data: {
-        ...room,
-        ablyChatRoomId,
-      },
+      data: room,
     };
 
     return { response, status: room.messages.length > 0 ? 200 : 201 };
