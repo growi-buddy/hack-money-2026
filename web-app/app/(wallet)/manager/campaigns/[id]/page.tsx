@@ -14,8 +14,10 @@ import { CampaignStatus, EventType } from '@/lib/db/prisma/generated';
 import { useRealtimeStore } from '@/store/realtime-store';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  ArrowLeft,
   ArrowRight,
   Calendar,
+  CheckCircle2,
   CreditCard,
   DollarSign,
   Edit,
@@ -24,6 +26,7 @@ import {
   MessageSquare,
   Package,
   Radio,
+  Rocket,
   ShoppingCart,
   Sparkles,
   Star,
@@ -137,6 +140,8 @@ export default function CampaignDashboardPage() {
   const [ hoverRating, setHoverRating ] = useState(0);
   const [ review, setReview ] = useState('');
   const [ ratingSubmitted, setRatingSubmitted ] = useState(false);
+  const [ showPublishModal, setShowPublishModal ] = useState(false);
+  const [ isPublishing, setIsPublishing ] = useState(false);
   
   // Live events from WebSocket
   const [ liveEvents, setLiveEvents ] = useState<LiveTrackedEvent[]>([]);
@@ -226,6 +231,32 @@ export default function CampaignDashboardPage() {
       setRatingSubmitted(false);
     }, 1500);
   };
+
+  const handlePublishCampaign = async () => {
+    try {
+      setIsPublishing(true);
+      const response = await fetch(`/api/campaigns/${campaignId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: CampaignStatus.ACTIVE }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Failed to publish campaign');
+      }
+
+      // Update local state
+      setCampaign(prev => prev ? { ...prev, status: CampaignStatus.ACTIVE } : null);
+      setShowPublishModal(false);
+    } catch (err) {
+      console.error('Failed to publish campaign:', err);
+      alert(err instanceof Error ? err.message : 'Failed to publish campaign');
+    } finally {
+      setIsPublishing(false);
+    }
+  };
   
   // Loading state
   if (loading) {
@@ -260,36 +291,61 @@ export default function CampaignDashboardPage() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+        className="space-y-4"
       >
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Campaign Dashboard</h1>
-          <p className="text-muted-foreground">{campaign.title}</p>
+        {/* Back Button */}
+        <Link href="/manager/campaigns">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Campaigns
+          </Button>
+        </Link>
+
+        {/* Title and Actions */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">{campaign.title}</h1>
+            <p className="text-sm text-muted-foreground">Campaign Dashboard</p>
+          </div>
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            className="flex items-center gap-2 flex-wrap"
+          >
+            <Badge className={`${statusStyle.bg} ${statusStyle.text} hover:${statusStyle.bg}`}>
+              {campaign.status}
+            </Badge>
+            <Badge variant="outline" className="border-growi-blue/50 text-growi-blue">
+              Budget: ${campaign.budgetTotal.toLocaleString()}
+            </Badge>
+            {campaign.status === CampaignStatus.DRAFT && (
+              <>
+                <Link href={`/manager/campaigns/${campaignId}/edit`}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                  </Button>
+                </Link>
+                <Button
+                  size="sm"
+                  className="bg-growi-success text-white hover:bg-growi-success/90"
+                  onClick={() => setShowPublishModal(true)}
+                >
+                  <Rocket className="mr-2 h-4 w-4" />
+                  Publish Campaign
+                </Button>
+              </>
+            )}
+          </motion.div>
         </div>
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          className="flex items-center gap-2"
-        >
-          <Badge className={`${statusStyle.bg} ${statusStyle.text} hover:${statusStyle.bg}`}>
-            {campaign.status}
-          </Badge>
-          <Badge variant="outline" className="border-growi-blue/50 text-growi-blue">
-            Budget: ${campaign.budgetTotal.toLocaleString()}
-          </Badge>
-          {campaign.status === CampaignStatus.DRAFT && (
-            <Link href={`/manager/campaigns/${campaignId}/edit`}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
-            </Link>
-          )}
-        </motion.div>
       </motion.div>
       
       {/* Campaign Details */}
@@ -807,7 +863,96 @@ export default function CampaignDashboardPage() {
           </div>
         </CardContent>
       </Card>
-      
+
+      {/* Publish Campaign Modal */}
+      <Dialog open={showPublishModal} onOpenChange={setShowPublishModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Rocket className="h-5 w-5 text-growi-success" />
+              Publish Campaign
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to publish this campaign?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Warning Card */}
+            <div className="rounded-lg border border-orange-500/50 bg-orange-500/10 p-4">
+              <div className="flex gap-3">
+                <div className="flex-shrink-0">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/20">
+                    <span className="text-orange-500 text-xl">⚠️</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-foreground">Important Notice</h4>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-orange-500 flex-shrink-0" />
+                      <span>Once activated, <strong className="text-foreground">the campaign cannot be edited</strong></span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-orange-500 flex-shrink-0" />
+                      <span>The campaign will be <strong className="text-foreground">visible to all influencers</strong></span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-orange-500 flex-shrink-0" />
+                      <span>Influencers can start joining and participating</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Campaign Info */}
+            <div className="rounded-lg border border-border bg-secondary/30 p-4">
+              <h4 className="font-medium text-foreground mb-2">{campaign.title}</h4>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Budget</p>
+                  <p className="font-semibold text-growi-money">${campaign.budgetTotal.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Slots</p>
+                  <p className="font-semibold text-foreground">{campaign.slots}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1 bg-transparent"
+                onClick={() => setShowPublishModal(false)}
+                disabled={isPublishing}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 bg-growi-success text-white hover:bg-growi-success/90"
+                onClick={handlePublishCampaign}
+                disabled={isPublishing}
+              >
+                {isPublishing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Publishing...
+                  </>
+                ) : (
+                  <>
+                    <Rocket className="mr-2 h-4 w-4" />
+                    Publish Campaign
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Rating Modal */}
       <Dialog open={showRatingModal} onOpenChange={setShowRatingModal}>
         <DialogContent className="sm:max-w-md">
