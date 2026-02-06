@@ -2,16 +2,19 @@ import { NextResponse } from 'next/server';
 import * as Ably from 'ably';
 import { ApiDataResponse, ApiErrorResponse } from '@/types';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     if (!process.env.ABLY_API_KEY) {
       throw new Error('ABLY_API_KEY is not configured');
     }
 
+    const { searchParams } = new URL(req.url);
+    const clientId = searchParams.get('clientId') || 'growi-client';
+
     const ably = new Ably.Rest({ key: process.env.ABLY_API_KEY });
 
     const tokenRequest = await ably.auth.createTokenRequest({
-      clientId: 'growi-client',
+      clientId,
       capability: {
         '*': ['publish', 'subscribe', 'presence'],
       },

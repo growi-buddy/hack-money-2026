@@ -13,6 +13,7 @@
     "db:push": "npx prisma db push"
   },
   "dependencies": {
+    "@ably/chat": "^1.1.1",
     "@ai-sdk/openai": "^3.0.25",
     "@ai-sdk/react": "^3.0.71",
     "@emotion/is-prop-valid": "^1.4.0",
