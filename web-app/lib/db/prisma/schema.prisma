@@ -222,8 +222,6 @@ model ChatRoom {
   campaignId String?
   campaign   Campaign? @relation(fields: [campaignId], references: [id])
 
-  ablyRoomId String @unique
-
   lastActivityAt DateTime @default(now())
 
   messages ChatMessage[]
@@ -231,7 +229,7 @@ model ChatRoom {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userOneId, userTwoId, campaignId])
+  @@unique([userOneId, userTwoId])
   @@index([lastActivityAt])
 }
 
