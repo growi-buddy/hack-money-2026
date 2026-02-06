@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const platformIcons: Record<string, React.FC<{ className?: string }>> = {
   INSTAGRAM: Instagram,
@@ -62,7 +62,7 @@ const affinityOptions = [
   'Entrepreneurs', 'Gamers', 'Athletes', 'Artists', 'Tech Enthusiasts',
 ];
 
-function ProfilePageContent() {
+export default function ProfilePage() {
   
   const [ isSaving, setIsSaving ] = useState(false);
   const [ isRequestingVerification, setIsRequestingVerification ] = useState(false);
@@ -718,19 +718,5 @@ function ProfilePageContent() {
         </motion.div>
       </motion.div>
     </div>
-  );
-}
-
-export default function ProfilePage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
-        </div>
-      }
-    >
-      <ProfilePageContent />
-    </Suspense>
   );
 }

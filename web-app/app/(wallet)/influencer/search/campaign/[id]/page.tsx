@@ -76,15 +76,15 @@ export default function CampaignDetailsPage() {
   const params = useParams();
   const campaignId = params.id as string;
   const { address } = useWallet();
-
-  const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [isApplying, setIsApplying] = useState(false);
-  const [isParticipating, setIsParticipating] = useState(false);
-  const [checkingParticipation, setCheckingParticipation] = useState(true);
-
+  
+  const [ campaign, setCampaign ] = useState<CampaignDetail | null>(null);
+  const [ loading, setLoading ] = useState(true);
+  const [ error, setError ] = useState<string | null>(null);
+  const [ showSuccess, setShowSuccess ] = useState(false);
+  const [ isApplying, setIsApplying ] = useState(false);
+  const [ isParticipating, setIsParticipating ] = useState(false);
+  const [ checkingParticipation, setCheckingParticipation ] = useState(true);
+  
   // Fetch campaign details
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -92,7 +92,7 @@ export default function CampaignDetailsPage() {
         setLoading(true);
         const response = await fetch(`/api/campaigns/${campaignId}?view=influencer`);
         const data = await response.json();
-
+        
         if (data.success) {
           setCampaign(data.data);
         } else {
@@ -105,12 +105,12 @@ export default function CampaignDetailsPage() {
         setLoading(false);
       }
     };
-
+    
     if (campaignId) {
       fetchCampaign();
     }
-  }, [campaignId]);
-
+  }, [ campaignId ]);
+  
   // Check if user is already participating
   useEffect(() => {
     const checkParticipation = async () => {
@@ -118,11 +118,11 @@ export default function CampaignDetailsPage() {
         setCheckingParticipation(false);
         return;
       }
-
+      
       try {
         const response = await fetch(`/api/campaigns/${campaignId}/participate?walletAddress=${address}`);
         const data = await response.json();
-
+        
         if (data.success) {
           setIsParticipating(data.data.isParticipating);
         }
@@ -132,28 +132,28 @@ export default function CampaignDetailsPage() {
         setCheckingParticipation(false);
       }
     };
-
+    
     checkParticipation();
-  }, [address, campaignId]);
-
+  }, [ address, campaignId ]);
+  
   const handleApply = async () => {
     if (!address) {
       setError('Please connect your wallet first');
       return;
     }
-
+    
     setIsApplying(true);
     setError(null);
-
+    
     try {
       const response = await fetch(`/api/campaigns/${campaignId}/participate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress: address }),
       });
-
+      
       const data = await response.json();
-
+      
       if (data.success) {
         setShowSuccess(true);
         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -168,7 +168,7 @@ export default function CampaignDetailsPage() {
       setIsApplying(false);
     }
   };
-
+  
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'TBD';
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -177,7 +177,7 @@ export default function CampaignDetailsPage() {
       year: 'numeric',
     });
   };
-
+  
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -185,7 +185,7 @@ export default function CampaignDetailsPage() {
       </div>
     );
   }
-
+  
   if (error && !campaign) {
     return (
       <div className="mx-auto max-w-3xl text-center py-20">
@@ -196,11 +196,11 @@ export default function CampaignDetailsPage() {
       </div>
     );
   }
-
+  
   if (!campaign) return null;
-
+  
   const slotsProgress = campaign.slots > 0 ? Math.round((campaign.filledSlots / campaign.slots) * 100) : 0;
-
+  
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Header */}
@@ -223,8 +223,7 @@ export default function CampaignDetailsPage() {
           </Badge>
         )}
       </motion.div>
-
-      {/* Campaign Details Card */}
+      
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <Card>
           <CardHeader className="border-b border-border">
@@ -283,7 +282,7 @@ export default function CampaignDetailsPage() {
                   </p>
                 </div>
               </motion.div>
-
+              
               {/* Slots Progress */}
               <motion.div variants={staggerItem}>
                 <div className="mb-2 flex justify-between text-sm">
@@ -299,7 +298,7 @@ export default function CampaignDetailsPage() {
                   />
                 </div>
               </motion.div>
-
+              
               {/* Interests */}
               {campaign.interests.length > 0 && (
                 <motion.div variants={staggerItem}>
@@ -313,7 +312,7 @@ export default function CampaignDetailsPage() {
                   </div>
                 </motion.div>
               )}
-
+              
               {/* Available Bounties */}
               <motion.div variants={staggerItem}>
                 <h3 className="mb-3 font-semibold text-foreground">Available Bounties</h3>
@@ -338,7 +337,7 @@ export default function CampaignDetailsPage() {
                   })}
                 </div>
               </motion.div>
-
+              
               {/* Error Message */}
               {error && (
                 <motion.div
@@ -349,7 +348,7 @@ export default function CampaignDetailsPage() {
                   {error}
                 </motion.div>
               )}
-
+              
               {/* Apply Button */}
               <motion.div variants={staggerItem}>
                 {checkingParticipation ? (
@@ -391,7 +390,7 @@ export default function CampaignDetailsPage() {
                             whileHover={{ x: '100%' }}
                             transition={{ duration: 0.5 }}
                           />
-                          Apply for Bounty
+                          Apply
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </>
                       )}
@@ -403,7 +402,7 @@ export default function CampaignDetailsPage() {
           </CardContent>
         </Card>
       </motion.div>
-
+      
       {/* Success Modal */}
       <AnimatePresence>
         {showSuccess && (
@@ -423,7 +422,7 @@ export default function CampaignDetailsPage() {
                 <CardContent className="p-8">
                   <motion.div
                     initial={{ scale: 0 }}
-                    animate={{ scale: [0, 1.3, 1] }}
+                    animate={{ scale: [ 0, 1.3, 1 ] }}
                     transition={{ delay: 0.2, duration: 0.5 }}
                     className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-growi-success/20"
                   >

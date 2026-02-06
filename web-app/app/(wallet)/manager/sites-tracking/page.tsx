@@ -325,7 +325,7 @@ export default function RewardEventsPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Events Tracking</h1>
+          <h1 className="text-2xl font-bold text-foreground">Sites Tracking</h1>
           <p className="mt-1 text-muted-foreground">
             Manage your reward event templates for campaigns
           </p>

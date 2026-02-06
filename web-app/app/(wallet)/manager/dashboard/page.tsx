@@ -1,11 +1,9 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { DollarSign, Eye, MoreVertical, ShoppingCart, CreditCard, Users } from 'lucide-react';
-import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
-import { Button } from '@/components/ui/button';
+import { CreditCard, DollarSign, Eye, MoreVertical, ShoppingCart, Users } from 'lucide-react';
 import Link from 'next/link';
 
 // Mock data for the dashboard
@@ -79,15 +77,10 @@ export default function ClientDashboardPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">{campaignData.name}</p>
+          <h1 className="text-2xl font-bold text-foreground">Dashboard Overview</h1>
         </div>
-        <Badge className="bg-foreground text-background hover:bg-foreground/90">
-          <span className="mr-1.5 h-2 w-2 rounded-full bg-growi-lime animate-pulse" />
-          Live
-        </Badge>
       </div>
-
+      
       {/* Budget Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <motion.div
@@ -108,7 +101,7 @@ export default function ClientDashboardPage() {
             </CardContent>
           </Card>
         </motion.div>
-
+        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -127,7 +120,7 @@ export default function ClientDashboardPage() {
             </CardContent>
           </Card>
         </motion.div>
-
+        
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -148,7 +141,7 @@ export default function ClientDashboardPage() {
           </Card>
         </motion.div>
       </div>
-
+      
       {/* Last 24h Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -183,108 +176,7 @@ export default function ClientDashboardPage() {
           </CardContent>
         </Card>
       </motion.div>
-
-      {/* Timeline and Funnel Row */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Timeline Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Timeline</CardTitle>
-              <p className="text-sm text-muted-foreground">Weekly Performance</p>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={timelineData}>
-                    <XAxis
-                      dataKey="day"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#9CA3AF', fontSize: 12 }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#9CA3AF', fontSize: 12 }}
-                      tickFormatter={(value) => `${(value / 1000).toFixed(1)}k`}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                      labelStyle={{ color: 'hsl(var(--foreground))' }}
-                    />
-                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                      {timelineData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill="#6B7280" />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Funnel Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Funnel</CardTitle>
-              <p className="text-sm text-muted-foreground">Conversion by Stage</p>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={funnelData} layout="vertical">
-                    <XAxis
-                      type="number"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#9CA3AF', fontSize: 12 }}
-                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="stage"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#9CA3AF', fontSize: 12 }}
-                      width={80}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                      labelStyle={{ color: 'hsl(var(--foreground))' }}
-                    />
-                    <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                      {funnelData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* My Campaigns Section */}
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -299,7 +191,7 @@ export default function ClientDashboardPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 + index * 0.1 }}
             >
-              <Link href={`/client/campaign/${campaign.id}`}>
+              <Link href={`/manager/campaign/${campaign.id}`}>
                 <Card className="cursor-pointer transition-colors hover:border-growi-blue/50">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
@@ -322,19 +214,21 @@ export default function ClientDashboardPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <div className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
-                      index === 0
-                        ? 'bg-foreground text-background'
-                        : 'border border-border text-muted-foreground'
-                    }`}>
+                    <div
+                      className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
+                        index === 0
+                          ? 'bg-foreground text-background'
+                          : 'border border-border text-muted-foreground'
+                      }`}
+                    >
                       Status: {campaign.status}
                     </div>
-
+                    
                     <div>
                       <p className="text-xs text-muted-foreground">Last Update</p>
                       <p className="text-xs text-muted-foreground">{campaign.lastUpdate}</p>
                     </div>
-
+                    
                     <div className="flex items-center gap-1">
                       <Users className="h-4 w-4 text-muted-foreground" />
                       <Users className="h-4 w-4 text-muted-foreground" />

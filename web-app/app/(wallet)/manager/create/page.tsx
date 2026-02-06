@@ -211,7 +211,7 @@ export default function CreateCampaignPage() {
   const calculateCompleteness = () => {
     let filled = 0;
     const total = 14;
-
+    
     if (campaignData.name) filled++;
     if (campaignData.description) filled++;
     if (campaignData.duration) filled++;
@@ -225,13 +225,13 @@ export default function CreateCampaignPage() {
     if (campaignData.interests?.length) filled++;
     if (campaignData.budget) filled++;
     if (campaignData.slots) filled++;
-
+    
     // Check selected reward events instead of legacy rewards
     const rewardEventsSelected = (campaignData.selectedRewardEvents || []).filter(
       (e) => e.amount > 0,
     ).length;
     if (rewardEventsSelected > 0) filled++;
-
+    
     return Math.round((filled / total) * 100);
   };
   
@@ -271,7 +271,7 @@ export default function CreateCampaignPage() {
       
       setShowSuccess(true);
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      router.push(`/client/campaign/${result.data.id}`);
+      router.push(`/manager/campaign/${result.data.id}`);
     } catch (error) {
       console.error('Error creating campaign:', error);
       setCreationError(error instanceof Error ? error.message : 'Unknown error creating campaign');
@@ -612,7 +612,7 @@ export default function CreateCampaignPage() {
                       No tienes eventos de recompensa configurados
                     </p>
                     <a
-                      href="/client/events-tracking"
+                      href="/manager/sites-tracking"
                       className="text-sm text-growi-blue hover:underline"
                     >
                       Configurar eventos →
@@ -788,7 +788,7 @@ export default function CreateCampaignPage() {
                     Esto te permitirá definir qué acciones de los usuarios quieres recompensar.
                   </p>
                   <Button
-                    onClick={() => router.push('/client/events-tracking')}
+                    onClick={() => router.push('/manager/sites-tracking')}
                     className="mt-6 w-full bg-growi-blue text-white hover:bg-growi-blue/90"
                   >
                     <Settings className="mr-2 h-4 w-4" />

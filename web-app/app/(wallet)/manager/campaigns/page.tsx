@@ -23,7 +23,6 @@ import {
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
-// Labels for each EventType
 const EVENT_TYPE_LABELS: Record<EventType, string> = {
   [EventType.LANDING_PAGE_VIEW]: 'Views',
   [EventType.VIEW_ITEM]: 'Items',
@@ -32,7 +31,6 @@ const EVENT_TYPE_LABELS: Record<EventType, string> = {
   [EventType.PURCHASE_SUCCESS]: 'Sales',
 };
 
-// Order for displaying event types
 const EVENT_TYPE_ORDER: EventType[] = [
   EventType.LANDING_PAGE_VIEW,
   EventType.VIEW_ITEM,
@@ -41,7 +39,6 @@ const EVENT_TYPE_ORDER: EventType[] = [
   EventType.PURCHASE_SUCCESS,
 ];
 
-// Helper to group reward events by eventType and sum trackedEventsCount
 function groupRewardEventsByType(rewardEvents: CampaignSummary['rewardEvents']) {
   const grouped = rewardEvents.reduce((acc, event) => {
     if (!acc[event.eventType]) {
@@ -52,7 +49,6 @@ function groupRewardEventsByType(rewardEvents: CampaignSummary['rewardEvents']) 
     return acc;
   }, {} as Record<EventType, { trackedEventsCount: number; totalAmount: number }>);
   
-  // Return in order
   return EVENT_TYPE_ORDER
     .filter(type => grouped[type])
     .map(type => ({
@@ -62,18 +58,15 @@ function groupRewardEventsByType(rewardEvents: CampaignSummary['rewardEvents']) 
     }));
 }
 
-// Get total purchases from campaign
 function getTotalPurchases(campaign: CampaignSummary): number {
   const grouped = groupRewardEventsByType(campaign.rewardEvents);
   const purchases = grouped.find(e => e.eventType === EventType.PURCHASE_SUCCESS);
   return purchases?.trackedEventsCount ?? 0;
 }
 
-// Calculate ROI (simple calculation: (spent / budget) * 100 as percentage of budget used)
 function calculateROI(campaign: CampaignSummary): number {
   if (campaign.budgetSpent === 0) return 0;
   const purchases = getTotalPurchases(campaign);
-  // Assume average order value of $50 for demo purposes
   const estimatedRevenue = purchases * 50;
   return Math.round((estimatedRevenue / campaign.budgetSpent) * 100);
 }
@@ -139,33 +132,33 @@ export default function ClientDashboard() {
         fetch(`/api/users/wallet/${address}/campaigns?status=${CampaignStatus.COMPLETED}`),
         fetch(`/api/users/wallet/${address}/campaigns?status=${CampaignStatus.DELETED}`),
       ]);
-
+      
       const [ activeData, depletedData, completedData, deletedData ] = await Promise.all([
         activeRes.json(),
         depletedRes.json(),
         completedRes.json(),
         deletedRes.json(),
       ]);
-
+      
       // Combine ACTIVE and DEPLETED campaigns
       const activeCampaignsList: CampaignSummary[] = [];
-
+      
       if (activeRes.ok) {
         activeCampaignsList.push(...(activeData.data?.campaigns ?? []));
       } else if (activeRes.status !== 404) {
         throw new Error(activeData.error?.message || 'Failed to fetch active campaigns');
       }
-
+      
       if (depletedRes.ok) {
         activeCampaignsList.push(...(depletedData.data?.campaigns ?? []));
       }
-
+      
       setActiveCampaigns(activeCampaignsList);
-
+      
       if (completedRes.ok) {
         setCompletedCampaigns(completedData.data?.campaigns ?? []);
       }
-
+      
       if (deletedRes.ok) {
         setDeletedCampaigns(deletedData.data?.campaigns ?? []);
       }
@@ -274,7 +267,7 @@ export default function ClientDashboard() {
                   </p>
                 </div>
               </div>
-              <Link href="/client/setup">
+              <Link href="/manager/setup">
                 <Button className="bg-growi-blue text-white hover:bg-growi-blue/90">
                   Setup Tracking
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -285,11 +278,10 @@ export default function ClientDashboard() {
         </motion.div>
       )}
       
-      {/* Active Campaigns Section */}
       <div>
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-foreground">Your Campaigns</h2>
+            <h2 className="text-lg font-semibold text-foreground">My Campaigns</h2>
             <Button
               variant="ghost"
               size="icon"
@@ -306,7 +298,7 @@ export default function ClientDashboard() {
               </span>
             )}
           </div>
-          <Link href="/client/create">
+          <Link href="/manager/create">
             <Button
               variant="outline"
               size="sm"
@@ -346,7 +338,7 @@ export default function ClientDashboard() {
           >
             {activeCampaigns.map((campaign) => (
               <motion.div key={campaign.id} variants={staggerItem}>
-                <Link href={`/client/campaign/${campaign.id}`}>
+                <Link href={`/manager/campaign/${campaign.id}`}>
                   <Card className="cursor-pointer transition-colors hover:border-growi-blue/50">
                     <CardHeader>
                       <div className="flex items-center justify-between">
@@ -428,7 +420,7 @@ export default function ClientDashboard() {
                   Once you create your first campaign, it will appear in this section.
                   Use our AI assistant to set up performance-based bounties and start connecting with influencers.
                 </p>
-                <Link href="/client/create" className="mt-6">
+                <Link href="/manager/create" className="mt-6">
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -498,7 +490,7 @@ export default function ClientDashboard() {
                       </div>
                     </div>
                     <div className="mt-4 flex gap-2">
-                      <Link href={`/client/campaign/${campaign.id}`} className="flex-1">
+                      <Link href={`/manager/campaign/${campaign.id}`} className="flex-1">
                         <Button variant="outline" size="sm" className="w-full bg-transparent">
                           View Summary
                         </Button>

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useWallet } from '@/contexts/wallet-context';
 import { motion } from 'framer-motion';
-import { Eye, Filter, Link2, ShoppingCart, CreditCard, Wallet, DollarSign, Loader2 } from 'lucide-react';
+import { CreditCard, DollarSign, Eye, Filter, Link2, Loader2, ShoppingCart, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -58,27 +58,27 @@ const colorMap = {
 
 export default function InfluencerDashboardPage() {
   const { address, isConnected } = useWallet();
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  const [ data, setData ] = useState<DashboardData | null>(null);
+  const [ loading, setLoading ] = useState(true);
+  const [ error, setError ] = useState<string | null>(null);
+  
   useEffect(() => {
     if (!isConnected || !address) {
       setLoading(false);
       return;
     }
-
+    
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
         const response = await fetch(`/api/influencer/${address}/dashboard`);
-
+        
         if (!response.ok) {
           throw new Error('Failed to fetch dashboard data');
         }
-
+        
         const result = await response.json();
-
+        
         if (result.success) {
           setData(result.data);
         } else {
@@ -91,10 +91,10 @@ export default function InfluencerDashboardPage() {
         setLoading(false);
       }
     };
-
+    
     fetchDashboardData();
-  }, [address, isConnected]);
-
+  }, [ address, isConnected ]);
+  
   if (!isConnected) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -102,7 +102,7 @@ export default function InfluencerDashboardPage() {
       </div>
     );
   }
-
+  
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -110,7 +110,7 @@ export default function InfluencerDashboardPage() {
       </div>
     );
   }
-
+  
   if (error || !data) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -130,7 +130,7 @@ export default function InfluencerDashboardPage() {
           <Button className="relative overflow-hidden bg-growi-lime text-foreground hover:bg-growi-lime/90">
             <motion.div
               className="absolute inset-0 bg-white/20"
-              animate={{ x: ['-100%', '100%'] }}
+              animate={{ x: [ '-100%', '100%' ] }}
               transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
             />
             <Wallet className="mr-2 h-4 w-4" />
@@ -138,7 +138,7 @@ export default function InfluencerDashboardPage() {
           </Button>
         </motion.div>
       </div>
-
+      
       {/* Total Earnings Card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -156,7 +156,7 @@ export default function InfluencerDashboardPage() {
           </CardContent>
         </Card>
       </motion.div>
-
+      
       {/* Activity Section */}
       {data.activityLinks.length > 0 && (
         <motion.div
@@ -190,7 +190,7 @@ export default function InfluencerDashboardPage() {
           </div>
         </motion.div>
       )}
-
+      
       {/* Performance Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -204,7 +204,7 @@ export default function InfluencerDashboardPage() {
           {data.performanceMetrics.map((metric, index) => {
             const Icon = iconMap[metric.label as keyof typeof iconMap] || Eye;
             const colorClass = colorMap[metric.label as keyof typeof colorMap] || 'bg-foreground';
-
+            
             return (
               <div key={metric.label} className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -236,7 +236,7 @@ export default function InfluencerDashboardPage() {
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold uppercase tracking-wider text-foreground">
-            Available Campaigns
+            My Active Campaigns
           </h2>
           <Button variant="outline" size="sm" className="gap-2">
             <Filter className="h-4 w-4" />

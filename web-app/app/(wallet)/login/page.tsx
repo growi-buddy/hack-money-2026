@@ -10,9 +10,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-function LoginPageContent() {
+export default function LoginPage() {
   
   const { isConnected } = useWallet();
   const router = useRouter();
@@ -23,7 +23,14 @@ function LoginPageContent() {
   
   const isNewProfile = profile.updatedAt === profile.createdAt;
   
-  console.log({ isNewProfile, profile });
+  useEffect(() => {
+    if (isConnected && callbackUrl) {
+      const destination = decodeURIComponent(callbackUrl);
+      if (destination) {
+        router.push(destination);
+      }
+    }
+  }, [ callbackUrl, isConnected, router ]);
   
   const handleCardClick = (e: React.MouseEvent, path: string) => {
     if (!isConnected) {
@@ -37,6 +44,10 @@ function LoginPageContent() {
     }
     router.push(destination);
   };
+  
+  const showManagerCard = !callbackUrl || (callbackUrl && ('//' + decodeURIComponent(callbackUrl)).includes('///manager'));
+  const showInfluencerCard = !callbackUrl || (callbackUrl && ('//' + decodeURIComponent(callbackUrl)).includes('///influencer'));
+  const showSingleCard = showManagerCard !== showInfluencerCard;
   
   return (
     <div className="min-h-screen bg-background">
@@ -66,7 +77,6 @@ function LoginPageContent() {
           animate="visible"
           className="w-full max-w-4xl"
         >
-          {/* Connect Wallet Section */}
           <motion.div variants={fadeUp} className="mb-12 text-center">
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
               Connect your wallet to start
@@ -88,122 +98,117 @@ function LoginPageContent() {
             </AnimatePresence>
           </motion.div>
           
-          {/* Choose Your Path Section */}
-          <motion.div variants={fadeUp} className="mb-10 text-center">
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-              Choose Your Path
-            </h2>
-            <p className="mt-2 text-muted-foreground">
-              Join as a marketing campaign manager or influencer
-            </p>
-          </motion.div>
+          {!callbackUrl && (
+            <motion.div variants={fadeUp} className="mb-10 text-center">
+              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
+                Choose Your Path
+              </h2>
+              <p className="mt-2 text-muted-foreground">
+                Join as a marketing campaign manager or influencer
+              </p>
+            </motion.div>
+          )}
           
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="grid gap-4 sm:gap-6 md:grid-cols-2"
+            className={`grid gap-4 sm:gap-6 ${showSingleCard ? 'place-items-center' : 'md:grid-cols-2'}`}
           >
-            {/* Client Card */}
-            <motion.div variants={staggerItem} className="h-full">
-              <div
-                onClick={(e) => handleCardClick(e, '/client/profile')}
-                className="block h-full"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -4 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="h-full"
+            {showManagerCard && (
+              <motion.div variants={staggerItem} className={`h-full ${showSingleCard ? 'w-full max-w-md' : ''}`}>
+                <div
+                  onClick={(e) => handleCardClick(e, '/manager/profile')}
+                  className="block h-full"
                 >
-                  <Card className="group h-full cursor-pointer border-2 border-transparent bg-card transition-colors hover:border-growi-blue hover:shadow-lg">
-                    <CardHeader className="text-center">
-                      <motion.div
-                        className="mx-auto mb-4"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      >
-                        <Image
-                          src="/growi-manager.png"
-                          alt="Manager"
-                          width={160}
-                          height={160}
-                          className="h-32 w-32 object-contain sm:h-40 sm:w-40"
-                        />
-                      </motion.div>
-                      <CardTitle className="text-xl text-foreground sm:text-2xl">
-                        I&apos;m a Marketing Campaign Manager
-                      </CardTitle>
-                      <CardDescription className="text-muted-foreground">
-                        Create crypto-reward campaigns and connect with influencers
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-center">
-                      <ul className="space-y-2 text-sm text-muted-foreground">
-                        <li>Set up performance-based bounties</li>
-                        <li>Track real-time campaign metrics</li>
-                        <li>Pay only for verified results</li>
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </div>
-            </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="h-full"
+                  >
+                    <Card className="group h-full cursor-pointer border-2 border-transparent bg-card transition-colors hover:border-growi-blue hover:shadow-lg">
+                      <CardHeader className="text-center">
+                        <motion.div
+                          className="mx-auto mb-4"
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                        >
+                          <Image
+                            src="/growi-manager.png"
+                            alt="Manager"
+                            width={160}
+                            height={160}
+                            className="h-32 w-32 object-contain sm:h-40 sm:w-40"
+                          />
+                        </motion.div>
+                        <CardTitle className="text-xl text-foreground sm:text-2xl">
+                          I&apos;m a Marketing Campaign Manager
+                        </CardTitle>
+                        <CardDescription className="text-muted-foreground">
+                          Create crypto-reward campaigns and connect with influencers
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="text-center">
+                        <ul className="space-y-2 text-sm text-muted-foreground">
+                          <li>Set up performance-based bounties</li>
+                          <li>Track real-time campaign metrics</li>
+                          <li>Pay only for verified results</li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
             
-            {/* Influencer Card */}
-            <motion.div variants={staggerItem} className="h-full">
-              <div
-                onClick={(e) => handleCardClick(e, '/influencer/profile')}
-                className="block h-full"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -4 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="h-full"
+            {showInfluencerCard && (
+              <motion.div variants={staggerItem} className={`h-full ${showSingleCard ? 'w-full max-w-md' : ''}`}>
+                <div
+                  onClick={(e) => handleCardClick(e, '/influencer/profile')}
+                  className="block h-full"
                 >
-                  <Card className="group h-full cursor-pointer border-2 border-transparent bg-card transition-colors hover:border-growi-lime hover:shadow-lg">
-                    <CardHeader className="text-center">
-                      <motion.div
-                        className="mx-auto mb-4"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      >
-                        <Image
-                          src="/growi-influencer.png"
-                          alt="Influencer"
-                          width={160}
-                          height={160}
-                          className="h-32 w-32 object-contain sm:h-40 sm:w-40"
-                        />
-                      </motion.div>
-                      <CardTitle className="text-xl text-foreground sm:text-2xl">
-                        I&apos;m an Influencer
-                      </CardTitle>
-                      <CardDescription className="text-muted-foreground">
-                        Earn crypto rewards by promoting products you love
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-center">
-                      <ul className="space-y-2 text-sm text-muted-foreground">
-                        <li>Browse available campaigns</li>
-                        <li>Earn per view, click, or sale</li>
-                        <li>Get paid instantly to your wallet</li>
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </div>
-            </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="h-full"
+                  >
+                    <Card className="group h-full cursor-pointer border-2 border-transparent bg-card transition-colors hover:border-growi-lime hover:shadow-lg">
+                      <CardHeader className="text-center">
+                        <motion.div
+                          className="mx-auto mb-4"
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                        >
+                          <Image
+                            src="/growi-influencer.png"
+                            alt="Influencer"
+                            width={160}
+                            height={160}
+                            className="h-32 w-32 object-contain sm:h-40 sm:w-40"
+                          />
+                        </motion.div>
+                        <CardTitle className="text-xl text-foreground sm:text-2xl">
+                          I&apos;m an Influencer
+                        </CardTitle>
+                        <CardDescription className="text-muted-foreground">
+                          Earn crypto rewards by promoting products you love
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="text-center">
+                        <ul className="space-y-2 text-sm text-muted-foreground">
+                          <li>Browse available campaigns</li>
+                          <li>Earn per view, click, or sale</li>
+                          <li>Get paid instantly to your wallet</li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         </motion.div>
       </main>
     </div>
-  );
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-background" />}>
-      <LoginPageContent />
-    </Suspense>
   );
 }

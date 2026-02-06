@@ -1,4 +1,3 @@
-// app/api/scripts/client/route.ts
 import { API_BASE_URL } from '@/config/envs';
 import { corsHeaders, handleOptions } from '@/lib/cors';
 import fs from 'fs';

@@ -5,51 +5,50 @@ import { Button } from '@/components/ui/button';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Inbox, LayoutDashboard, Package, PlusCircle, Send, UserCircle, Users, X, Zap } from 'lucide-react';
+import { Inbox, LayoutDashboard, LocateFixed, Megaphone, Search, Send, UserCircle, Users, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 interface AppSidebarProps {
-  type: 'client' | 'influencer';
+  type: 'manager' | 'influencer';
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-// Mock live influencers data
 const liveInfluencers = [
   { id: '1', name: 'Alex Chen', avatar: '/growi-mascot.png', followers: '125K', status: 'online' },
   { id: '2', name: 'Sarah Kim', avatar: '/growi-mascot.png', followers: '89K', status: 'online' },
   { id: '3', name: 'Mike Ross', avatar: '/growi-mascot.png', followers: '256K', status: 'away' },
 ];
 
-// Mock live campaign managers data
 const liveCampaignManagers = [
   { id: '1', name: 'Nike Marketing', avatar: '/growi-mascot.png', campaigns: 5, status: 'online' },
   { id: '2', name: 'Adidas Global', avatar: '/growi-mascot.png', campaigns: 3, status: 'online' },
   { id: '3', name: 'Puma Agency', avatar: '/growi-mascot.png', campaigns: 2, status: 'away' },
 ];
 
-const clientLinks = [
-  { href: '/client/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/client/events-tracking', icon: Zap, label: 'Site Tracking' },
-  { href: '/client/create', icon: PlusCircle, label: 'Campaigns' },
-  { href: '/client/influencers', icon: Users, label: 'Influencers' },
-  { href: '/client/inbox', icon: Inbox, label: 'Inbox' },
-  { href: '/client/profile', icon: UserCircle, label: 'Profile' },
+const managerLinks = [
+  { href: '/manager/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/manager/sites-tracking', icon: LocateFixed, label: 'Sites Tracking' },
+  { href: '/manager/campaigns', icon: Megaphone, label: 'Campaigns' },
+  { href: '/manager/search', icon: Search, label: 'Search' },
+  { href: '/manager/inbox', icon: Inbox, label: 'Inbox' },
+  { href: '/manager/profile', icon: UserCircle, label: 'Profile' },
 ];
 
 const influencerLinks = [
   { href: '/influencer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/influencer/campaigns', icon: Package, label: 'Campaigns' },
-  { href: '/influencer/managers', icon: Users, label: 'Campaign Managers' },
+  { href: '/influencer/campaigns', icon: Megaphone, label: 'Campaigns' },
+  { href: '/influencer/search', icon: Search, label: 'Search' },
+  { href: '/influencer/campaign-managers', icon: Users, label: 'Campaign Managers' },
   { href: '/influencer/inbox', icon: Inbox, label: 'Inbox' },
   { href: '/influencer/profile', icon: UserCircle, label: 'Profile' },
 ];
 
 export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
   const pathname = usePathname();
-  const links = type === 'client' ? clientLinks : influencerLinks;
+  const links = type === 'manager' ? managerLinks : influencerLinks;
   
   return (
     <>
@@ -75,14 +74,14 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
-              "fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-border shadow-xl md:hidden",
-              type === 'client' ? 'bg-growi-blue/5' : 'bg-growi-lime/5'
+              'fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-border shadow-xl md:hidden',
+              type === 'manager' ? 'bg-growi-blue/5' : 'bg-growi-lime/5',
             )}
           >
             {/* Close button for mobile */}
             <div className="flex items-center justify-between border-b border-border p-4">
               <span className="font-semibold text-foreground">
-                {type === 'client' ? 'Client Menu' : 'Influencer Menu'}
+                {type === 'manager' ? 'Client Menu' : 'Influencer Menu'}
               </span>
               <Button
                 variant="ghost"
@@ -110,7 +109,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                       className={cn(
                         'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                         isActive
-                          ? type === 'client'
+                          ? type === 'manager'
                             ? 'bg-growi-blue/10 text-growi-blue'
                             : 'bg-growi-lime/10 text-growi-lime'
                           : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
@@ -123,16 +122,16 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                 );
               })}
             </motion.nav>
-
+            
             {/* Mobile Footer */}
             <div className="border-t border-border p-4 text-center">
               <p className="text-xs text-muted-foreground">
-                {type === 'client' ? 'Campaign Manager Portal' : 'Influencer Portal'}
+                {type === 'manager' ? 'Campaign Manager Portal' : 'Influencer Portal'}
               </p>
               <div className="mt-6 flex justify-center">
                 <Image
-                  src={type === 'client' ? '/growi-manager.png' : '/growi-influencer.png'}
-                  alt={type === 'client' ? 'Manager' : 'Influencer'}
+                  src={type === 'manager' ? '/growi-manager.png' : '/growi-influencer.png'}
+                  alt={type === 'manager' ? 'Manager' : 'Influencer'}
                   width={120}
                   height={120}
                   className="h-28 w-28 object-contain"
@@ -145,10 +144,12 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
       </AnimatePresence>
       
       {/* Desktop Sidebar */}
-      <aside className={cn(
-          "fixed left-0 top-16 bottom-0 z-40 hidden w-56 overflow-y-auto border-r border-border md:block lg:w-64",
-          type === 'client' ? 'bg-growi-blue/5' : 'bg-growi-lime/5'
-        )}>
+      <aside
+        className={cn(
+          'fixed left-0 top-16 bottom-0 z-40 hidden w-56 overflow-y-auto border-r border-border md:block lg:w-64',
+          type === 'manager' ? 'bg-growi-blue/5' : 'bg-growi-lime/5',
+        )}
+      >
         <nav className="space-y-1 p-4">
           {links.map((link) => {
             const isActive = pathname === link.href || (link.href !== '/client/dashboard' && link.href !== '/influencer/dashboard' && pathname.startsWith(link.href));
@@ -159,7 +160,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? type === 'client'
+                    ? type === 'manager'
                       ? 'bg-growi-blue/10 text-growi-blue'
                       : 'bg-growi-lime/10 text-growi-lime'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
@@ -173,7 +174,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
         </nav>
         
         {/* Live Influencers Section (Client only) */}
-        {type === 'client' && (
+        {type === 'manager' && (
           <div className="border-t border-border p-4">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -216,7 +217,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                 </motion.div>
               ))}
             </div>
-            <Link href="/client/influencers">
+            <Link href="/manager/influencers">
               <Button
                 variant="ghost"
                 size="sm"
@@ -287,12 +288,12 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
         {/* Footer */}
         <div className="border-t border-border p-4 text-center">
           <p className="text-xs text-muted-foreground">
-            {type === 'client' ? 'Campaign Manager Portal' : 'Influencer Portal'}
+            {type === 'manager' ? 'Campaign Manager Portal' : 'Influencer Portal'}
           </p>
           <div className="mt-6 flex justify-center">
             <Image
-              src={type === 'client' ? '/growi-manager.png' : '/growi-influencer.png'}
-              alt={type === 'client' ? 'Manager' : 'Influencer'}
+              src={type === 'manager' ? '/growi-manager.png' : '/growi-influencer.png'}
+              alt={type === 'manager' ? 'Manager' : 'Influencer'}
               width={120}
               height={120}
               className="h-28 w-28 object-contain"

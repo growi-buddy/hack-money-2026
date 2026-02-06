@@ -768,8 +768,7 @@ export default function CampaignDashboardPage() {
         </DialogContent>
       </Dialog>
       
-      {/* Complete Campaign Demo Button */}
-      <Link href="/client/campaign/1/complete">
+      <Link href="/manager/campaign/1/complete">
         <motion.div
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}

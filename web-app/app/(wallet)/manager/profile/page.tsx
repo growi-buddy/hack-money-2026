@@ -12,10 +12,10 @@ import { staggerContainer, staggerItem } from '@/lib/animations';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, MapPin, Save, Star, User, X } from 'lucide-react';
 import Image from 'next/image';
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-function ClientProfileContent() {
+export default function ClientProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -296,19 +296,5 @@ function ClientProfileContent() {
         </motion.div>
       </motion.div>
     </div>
-  );
-}
-
-export default function ClientProfilePage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
-        </div>
-      }
-    >
-      <ClientProfileContent />
-    </Suspense>
   );
 }
