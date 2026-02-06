@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     // Build where clause
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {
-      status: CampaignStatus.ACTIVE,
+      status: { in: [CampaignStatus.ACTIVE, CampaignStatus.DEPLETED] },
       // Only show campaigns that haven't ended yet or have no end date
       OR: [
         { endDate: null },
@@ -112,8 +112,12 @@ export async function GET(req: Request) {
         id: campaign.id,
         title: campaign.title,
         description: campaign.description,
+        status: campaign.status,
         isHot: campaign.isHot,
         interests: campaign.interests,
+        demographics: campaign.demographics,
+        regions: campaign.regions,
+        countries: campaign.countries,
         budget: Number(campaign.budgetTotal),
         slots: campaign.slots,
         filledSlots,
@@ -126,9 +130,9 @@ export async function GET(req: Request) {
       };
     });
 
-    // Get unique interests from all active campaigns for filtering
+    // Get unique interests from all active/depleted campaigns for filtering
     const allCampaigns = await prisma.campaign.findMany({
-      where: { status: CampaignStatus.ACTIVE },
+      where: { status: { in: [CampaignStatus.ACTIVE, CampaignStatus.DEPLETED] } },
       select: { interests: true },
     });
     const allInterests = [...new Set(allCampaigns.flatMap(c => c.interests))];
@@ -137,7 +141,7 @@ export async function GET(req: Request) {
     const managers = await prisma.user.findMany({
       where: {
         campaignsCreated: {
-          some: { status: CampaignStatus.ACTIVE },
+          some: { status: { in: [CampaignStatus.ACTIVE, CampaignStatus.DEPLETED] } },
         },
       },
       select: {

@@ -19,8 +19,12 @@ interface Campaign {
   id: string;
   title: string;
   description?: string;
+  status: string;
   isHot: boolean;
   interests: string[];
+  demographics: string[];
+  regions: string[];
+  countries: string[];
   budget: number;
   slots: number;
   filledSlots: number;
@@ -268,7 +272,18 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
     if (end) return `Until ${end}`;
     return 'Ongoing';
   };
-  
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'bg-growi-success/20 text-growi-success border-growi-success/50';
+      case 'DEPLETED':
+        return 'bg-amber-500/20 text-amber-500 border-amber-500/50';
+      default:
+        return 'bg-gray-500/20 text-gray-500 border-gray-500/50';
+    }
+  };
+
   return (
     <motion.div
       variants={staggerItem}
@@ -276,7 +291,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
       whileTap={{ scale: 0.98 }}
     >
       <Link href={`/influencer/search/campaign/${campaign.id}`}>
-        <Card className="group cursor-pointer overflow-hidden transition-colors hover:border-growi-blue/50">
+        <Card className="group cursor-pointer overflow-hidden transition-colors hover:border-growi-blue/50 h-full flex flex-col">
           <div className="relative aspect-video overflow-hidden bg-secondary">
             <Image
               src={campaign.owner.avatar || '/growi-mascot.png'}
@@ -284,6 +299,11 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
               fill
               className="object-cover transition-transform group-hover:scale-105"
             />
+            <div className="absolute left-2 top-2 flex gap-2">
+              <Badge variant="outline" className={getStatusColor(campaign.status)}>
+                {campaign.status}
+              </Badge>
+            </div>
             {campaign.isHot && (
               <motion.div
                 animate={{
@@ -304,37 +324,95 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
               </motion.div>
             )}
           </div>
-          <CardContent className="p-4">
+          <CardContent className="p-4 flex-1 flex flex-col">
             <h3 className="font-semibold text-foreground">{campaign.title}</h3>
             <p className="mt-1 text-xs text-muted-foreground">
               by {campaign.owner.name || campaign.owner.walletAddress.slice(0, 8) + '...'}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">{formatDate(campaign.startDate, campaign.endDate)}</p>
-            <div className="mt-2 flex flex-wrap gap-1">
-              {campaign.interests.slice(0, 3).map((interest) => (
-                <Badge key={interest} variant="secondary" className="text-xs">
-                  {interest}
-                </Badge>
-              ))}
-            </div>
-            <div className="mt-3 flex items-center justify-between">
-              <p className="font-medium text-growi-money">${campaign.rate.toFixed(3)}/event</p>
-              <p className="text-xs text-muted-foreground">${campaign.budget.toLocaleString()}</p>
-            </div>
-            <div className="mt-3">
-              <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                <span>
-                  Slots filled ({campaign.filledSlots}/{campaign.slots})
-                </span>
-                <span>{campaign.progress}%</span>
+
+            {/* Interests */}
+            {campaign.interests.length > 0 && (
+              <div className="mt-2">
+                <p className="text-xs font-medium text-muted-foreground mb-1">Interests</p>
+                <div className="flex flex-wrap gap-1">
+                  {campaign.interests.slice(0, 3).map((interest) => (
+                    <Badge key={interest} variant="secondary" className="text-xs">
+                      {interest}
+                    </Badge>
+                  ))}
+                  {campaign.interests.length > 3 && (
+                    <Badge variant="secondary" className="text-xs">
+                      +{campaign.interests.length - 3}
+                    </Badge>
+                  )}
+                </div>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-secondary">
-                <motion.div
-                  className="h-full bg-growi-blue"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${campaign.progress}%` }}
-                  transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.3 }}
-                />
+            )}
+
+            {/* Demographics */}
+            {campaign.demographics.length > 0 && (
+              <div className="mt-2">
+                <p className="text-xs font-medium text-muted-foreground mb-1">Target Audience</p>
+                <div className="flex flex-wrap gap-1">
+                  {campaign.demographics.slice(0, 2).map((demo) => (
+                    <Badge key={demo} className="text-xs bg-purple-500/20 text-purple-500 border-purple-500/50">
+                      {demo}
+                    </Badge>
+                  ))}
+                  {campaign.demographics.length > 2 && (
+                    <Badge className="text-xs bg-purple-500/20 text-purple-500 border-purple-500/50">
+                      +{campaign.demographics.length - 2}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Geographic */}
+            {(campaign.regions.length > 0 || campaign.countries.length > 0) && (
+              <div className="mt-2">
+                <p className="text-xs font-medium text-muted-foreground mb-1">Geographic</p>
+                <div className="flex flex-wrap gap-1">
+                  {campaign.regions.slice(0, 2).map((region) => (
+                    <Badge key={region} className="text-xs bg-blue-500/20 text-blue-500 border-blue-500/50">
+                      {region}
+                    </Badge>
+                  ))}
+                  {campaign.countries.slice(0, 2).map((country) => (
+                    <Badge key={country} className="text-xs bg-blue-500/20 text-blue-500 border-blue-500/50">
+                      {country}
+                    </Badge>
+                  ))}
+                  {(campaign.regions.length + campaign.countries.length > 4) && (
+                    <Badge className="text-xs bg-blue-500/20 text-blue-500 border-blue-500/50">
+                      +{campaign.regions.length + campaign.countries.length - 4}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-auto pt-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="font-medium text-growi-money">${campaign.rate.toFixed(3)}/event</p>
+                <p className="text-xs text-muted-foreground">${campaign.budget.toLocaleString()}</p>
+              </div>
+              <div>
+                <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+                  <span>
+                    Slots filled ({campaign.filledSlots}/{campaign.slots})
+                  </span>
+                  <span>{campaign.progress}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-secondary">
+                  <motion.div
+                    className="h-full bg-growi-blue"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${campaign.progress}%` }}
+                    transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.3 }}
+                  />
+                </div>
               </div>
             </div>
           </CardContent>
