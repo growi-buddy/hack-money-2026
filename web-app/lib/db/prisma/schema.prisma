@@ -73,7 +73,7 @@ model Campaign {
   rewardEvents CampaignRewardEvent[]
 
   yellowChannelId String?
-  status          CampaignStatus  @default(ACTIVE)
+  status          CampaignStatus  @default(DRAFT)
   participations  Participation[]
 
   createdAt DateTime @default(now())

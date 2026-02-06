@@ -250,8 +250,6 @@ exports.Prisma.ChatRoomScalarFieldEnum = {
   id: 'id',
   userOneId: 'userOneId',
   userTwoId: 'userTwoId',
-  campaignId: 'campaignId',
-  ablyRoomId: 'ablyRoomId',
   lastActivityAt: 'lastActivityAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

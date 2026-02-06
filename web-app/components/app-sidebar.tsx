@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { cn } from '@/lib/utils';
+import { UserRoleType } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Inbox, LayoutDashboard, LocateFixed, Megaphone, Search, Send, UserCircle, Users, X } from 'lucide-react';
 import Image from 'next/image';
@@ -11,7 +12,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 interface AppSidebarProps {
-  type: 'manager' | 'influencer';
+  userRole: UserRoleType;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -46,9 +47,9 @@ const influencerLinks = [
   { href: '/influencer/profile', icon: UserCircle, label: 'Profile' },
 ];
 
-export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
+export function AppSidebar({ userRole, isOpen, onClose }: AppSidebarProps) {
   const pathname = usePathname();
-  const links = type === 'manager' ? managerLinks : influencerLinks;
+  const links = userRole === 'manager' ? managerLinks : influencerLinks;
   
   return (
     <>
@@ -75,13 +76,13 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
               'fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-border shadow-xl md:hidden',
-              type === 'manager' ? 'bg-growi-blue/5' : 'bg-growi-lime/5',
+              userRole === 'manager' ? 'bg-growi-blue/5' : 'bg-growi-lime/5',
             )}
           >
             {/* Close button for mobile */}
             <div className="flex items-center justify-between border-b border-border p-4">
               <span className="font-semibold text-foreground">
-                {type === 'manager' ? 'Client Menu' : 'Influencer Menu'}
+                {userRole === 'manager' ? 'Client Menu' : 'Influencer Menu'}
               </span>
               <Button
                 variant="ghost"
@@ -109,7 +110,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                       className={cn(
                         'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                         isActive
-                          ? type === 'manager'
+                          ? userRole === 'manager'
                             ? 'bg-growi-blue/10 text-growi-blue'
                             : 'bg-growi-lime/10 text-growi-lime'
                           : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
@@ -126,12 +127,12 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
             {/* Mobile Footer */}
             <div className="border-t border-border p-4 text-center">
               <p className="text-xs text-muted-foreground">
-                {type === 'manager' ? 'Campaign Manager Portal' : 'Influencer Portal'}
+                {userRole === 'manager' ? 'Campaign Manager Portal' : 'Influencer Portal'}
               </p>
               <div className="mt-6 flex justify-center">
                 <Image
-                  src={type === 'manager' ? '/growi-manager.png' : '/growi-influencer.png'}
-                  alt={type === 'manager' ? 'Manager' : 'Influencer'}
+                  src={userRole === 'manager' ? '/growi-manager.png' : '/growi-influencer.png'}
+                  alt={userRole === 'manager' ? 'Manager' : 'Influencer'}
                   width={120}
                   height={120}
                   className="h-28 w-28 object-contain"
@@ -147,7 +148,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
       <aside
         className={cn(
           'fixed left-0 top-16 bottom-0 z-40 hidden w-56 overflow-y-auto border-r border-border md:block lg:w-64',
-          type === 'manager' ? 'bg-growi-blue/5' : 'bg-growi-lime/5',
+          userRole === 'manager' ? 'bg-growi-blue/5' : 'bg-growi-lime/5',
         )}
       >
         <nav className="space-y-1 p-4">
@@ -160,7 +161,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? type === 'manager'
+                    ? userRole === 'manager'
                       ? 'bg-growi-blue/10 text-growi-blue'
                       : 'bg-growi-lime/10 text-growi-lime'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
@@ -174,7 +175,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
         </nav>
         
         {/* Live Influencers Section (Client only) */}
-        {type === 'manager' && (
+        {userRole === 'manager' && (
           <div className="border-t border-border p-4">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -230,7 +231,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
         )}
         
         {/* Live Campaign Managers Section (Influencer only) */}
-        {type === 'influencer' && (
+        {userRole === 'influencer' && (
           <div className="border-t border-border p-4">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -288,12 +289,12 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
         {/* Footer */}
         <div className="border-t border-border p-4 text-center">
           <p className="text-xs text-muted-foreground">
-            {type === 'manager' ? 'Campaign Manager Portal' : 'Influencer Portal'}
+            {userRole === 'manager' ? 'Campaign Manager Portal' : 'Influencer Portal'}
           </p>
           <div className="mt-6 flex justify-center">
             <Image
-              src={type === 'manager' ? '/growi-manager.png' : '/growi-influencer.png'}
-              alt={type === 'manager' ? 'Manager' : 'Influencer'}
+              src={userRole === 'manager' ? '/growi-manager.png' : '/growi-influencer.png'}
+              alt={userRole === 'manager' ? 'Manager' : 'Influencer'}
               width={120}
               height={120}
               className="h-28 w-28 object-contain"

@@ -15,7 +15,7 @@ export default function ClientLayoutContent({ children }: PropsWithChildren) {
       />
       
       <AppSidebar
-        type="manager"
+        userRole="manager"
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />

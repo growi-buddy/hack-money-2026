@@ -6,7 +6,6 @@ export const CampaignFormDataSchema = z.object({
   description: z.string().optional(),
   
   // Duración
-  duration: z.number().optional(), // en días
   startDate: z.string().optional(), // ISO date
   endDate: z.string().optional(), // ISO date
   
@@ -26,7 +25,7 @@ export const CampaignFormDataSchema = z.object({
   
   // Budget
   budget: z.number().optional(),
-
+  
   // Slots - number of influencers that can join
   slots: z.number().int().positive().optional(),
   
@@ -53,7 +52,7 @@ export const CampaignFormDataSchema = z.object({
       pricePerView: z.number().optional(),
     }).optional(),
   }).optional(),
-
+  
   // Selected reward events to link with the campaign
   selectedRewardEvents: z.array(z.object({
     rewardEventId: z.string(),

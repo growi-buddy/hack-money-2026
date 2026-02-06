@@ -291,7 +291,7 @@ export default function CampaignDashboardPage() {
           )}
         </motion.div>
       </motion.div>
-
+      
       {/* Campaign Details */}
       <Card>
         <CardHeader>
@@ -306,7 +306,7 @@ export default function CampaignDashboardPage() {
                 <p className="text-foreground text-sm leading-relaxed">{campaign.description}</p>
               </div>
             )}
-
+            
             {/* Duration */}
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -316,7 +316,15 @@ export default function CampaignDashboardPage() {
               <div className="text-sm text-foreground">
                 {campaign.startDate && campaign.endDate ? (
                   <>
-                    <p>{new Date(campaign.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} → {new Date(campaign.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    <p>{new Date(campaign.startDate).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })} → {new Date(campaign.endDate).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {Math.ceil((new Date(campaign.endDate).getTime() - new Date(campaign.startDate).getTime()) / (1000 * 60 * 60 * 24))} days
                     </p>
@@ -326,7 +334,7 @@ export default function CampaignDashboardPage() {
                 )}
               </div>
             </div>
-
+            
             {/* Budget & Slots */}
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -338,7 +346,7 @@ export default function CampaignDashboardPage() {
                 <p>Slots: <span className="font-semibold">{campaign.slots}</span></p>
               </div>
             </div>
-
+            
             {/* Interests */}
             {campaign.interests.length > 0 && (
               <div className="md:col-span-2">
@@ -358,13 +366,13 @@ export default function CampaignDashboardPage() {
                 </div>
               </div>
             )}
-
+            
             {/* Target Demographics */}
             {campaign.demographics.length > 0 && (
               <div className="md:col-span-2">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="h-4 w-4 text-growi-blue" />
-                  <h4 className="text-sm font-medium text-muted-foreground">Target Demographics</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground">Target Audience</h4>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {campaign.demographics.map((demographic) => (
@@ -378,7 +386,7 @@ export default function CampaignDashboardPage() {
                 </div>
               </div>
             )}
-
+            
             {/* Geographic */}
             {(campaign.regions.length > 0 || campaign.countries.length > 0) && (
               <div className="md:col-span-2">
@@ -423,7 +431,7 @@ export default function CampaignDashboardPage() {
           </div>
         </CardContent>
       </Card>
-
+      
       {/* Metrics - All Event Types */}
       <motion.div
         variants={staggerContainer}
@@ -621,7 +629,7 @@ export default function CampaignDashboardPage() {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Users className="h-5 w-5 text-growi-blue" />
-              Active Influencers
+              Influencers
             </CardTitle>
             <Badge variant="outline">{campaign.participations.length} active</Badge>
           </div>

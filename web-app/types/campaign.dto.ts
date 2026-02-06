@@ -65,8 +65,9 @@ export const CreateLinkDTO = z.object({
   expiresAt: z.string().datetime().optional().nullable(),
 });
 
-export const UpdateCampaignDTO = CreateCampaignDTO.extend({
+export const UpdateCampaignDTO = CreateCampaignDTO.partial().extend({
   status: z.nativeEnum(CampaignStatus).optional(),
+  isHot: z.boolean().optional(),
 });
 
 export type UpdateCampaignInput = z.infer<typeof UpdateCampaignDTO>;
@@ -103,40 +104,6 @@ export const RewardEventSummarySchema = z.object({
 
 export type RewardEventSummary = z.infer<typeof RewardEventSummarySchema>;
 
-// Schema for campaign summary (used in dashboard)
-export const CampaignSummarySchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string().optional().nullable(),
-  status: z.nativeEnum(CampaignStatus),
-  budgetTotal: z.number(),
-  budgetSpent: z.number(),
-  isHot: z.boolean().optional(),
-  slots: z.number().optional(),
-  interests: z.array(z.string()).optional(),
-  demographics: z.array(z.string()).optional(),
-  regions: z.array(z.string()).optional(),
-  countries: z.array(z.string()).optional(),
-  startDate: z.string().optional().nullable(),
-  endDate: z.string().optional().nullable(),
-  rewardEvents: z.array(RewardEventSummarySchema),
-  participationsCount: z.number(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
-export type CampaignSummary = z.infer<typeof CampaignSummarySchema>;
-
-// Schema for user campaigns list response
-export const UserCampaignsResponseSchema = z.object({
-  campaigns: z.array(CampaignSummarySchema),
-  total: z.number(),
-})
-
-export type UserCampaignsResponse = z.infer<typeof UserCampaignsResponseSchema>;
-
-// --- Influencer campaign types ---
-
 export const CampaignOwnerSchema = z.object({
   id: z.string(),
   name: z.string().nullable(),
@@ -145,33 +112,41 @@ export const CampaignOwnerSchema = z.object({
 
 export type CampaignOwner = z.infer<typeof CampaignOwnerSchema>;
 
-export const InfluencerCampaignDetailSchema = z.object({
+// Schema for campaign summary (used in dashboard)
+export const CampaignResponseSchema = z.object({
   id: z.string(),
   title: z.string(),
+  description: z.string().default(''),
   status: z.nativeEnum(CampaignStatus),
   budgetTotal: z.number(),
   budgetSpent: z.number(),
-  owner: CampaignOwnerSchema,
+  isHot: z.boolean().optional(),
+  slots: z.number().optional(),
+  interests: z.array(z.string()).default([]),
+  demographics: z.array(z.string()).default([]),
+  regions: z.array(z.string()).default([]),
+  countries: z.array(z.string()).default([]),
+  startDate: z.string(),
+  endDate: z.string(),
   rewardEvents: z.array(RewardEventSummarySchema),
   participationsCount: z.number(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  owner: CampaignOwnerSchema.optional(),
+  userRole: z.enum([ 'manager', 'influencer' ]),
 });
 
-export type InfluencerCampaignDetail = z.infer<typeof InfluencerCampaignDetailSchema>;
+export type CampaignResponse = z.infer<typeof CampaignResponseSchema>;
 
-export const InfluencerCampaignSummarySchema = z.object({
-  participationId: z.string(),
-  currentBalance: z.number(),
-  totalEvents: z.number(),
-  campaign: InfluencerCampaignDetailSchema,
-});
-
-export type InfluencerCampaignSummary = z.infer<typeof InfluencerCampaignSummarySchema>;
-
-export const InfluencerCampaignsResponseSchema = z.object({
-  campaigns: z.array(InfluencerCampaignSummarySchema),
+export const UserCampaignsResponseSchema = z.object({
+  campaigns: z.array(CampaignResponseSchema),
   total: z.number(),
 });
 
-export type InfluencerCampaignsResponse = z.infer<typeof InfluencerCampaignsResponseSchema>;
+export type UserCampaignsResponse = z.infer<typeof UserCampaignsResponseSchema>;
+
+export const InfluencerCampaignSummarySchema = CampaignResponseSchema.extend({
+  participationId: z.string(),
+});
+
+export type InfluencerCampaignSummary = z.infer<typeof InfluencerCampaignSummarySchema>;

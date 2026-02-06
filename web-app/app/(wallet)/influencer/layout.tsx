@@ -16,7 +16,7 @@ export default function InfluencerLayout({ children }: PropsWithChildren) {
       />
       
       <AppSidebar
-        type="influencer"
+        userRole="influencer"
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />

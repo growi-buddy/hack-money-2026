@@ -45,7 +45,6 @@ const EVENT_TYPE_LABELS: Record<EventType, string> = {
 const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
   name: '',
   description: '',
-  duration: undefined,
   startDate: '',
   endDate: '',
   targetAudience: {
@@ -151,19 +150,21 @@ export default function CreateCampaignPage() {
           if (newData && Object.keys(newData).length > 0) {
             setCampaignData((prev) => ({
               ...prev,
-              ...newData,
-              targetAudience: {
-                ...prev.targetAudience,
-                ...newData.targetAudience,
-              },
+              name: newData?.name || prev.name,
+              description: newData?.description || prev.description,
+              startDate: newData?.startDate || prev.startDate,
+              endDate: newData?.endDate || prev.endDate,
               geographic: {
                 ...prev.geographic,
                 ...newData.geographic,
               },
-              rewards: {
-                ...prev.rewards,
-                ...newData.rewards,
+              interests: newData?.interests || prev.interests,
+              targetAudience: {
+                ...prev.targetAudience,
+                ...newData.targetAudience,
               },
+              budget: newData?.budget || prev.budget,
+              slots: newData?.slots || prev.slots,
             }));
             
             const updatedFields = Object.keys(newData).filter(
@@ -174,9 +175,12 @@ export default function CreateCampaignPage() {
                 name: 'Name',
                 description: 'Description',
                 budget: 'Budget',
-                duration: 'Duration',
                 startDate: 'Start Date',
                 endDate: 'End Date',
+                slots: 'Slots',
+                interests: 'Interests',
+                targetAudience: 'Target Audience',
+                geographic: 'Geographic',
               };
               
               const readableFields = updatedFields.map((f) => fieldNames[f] || f);
@@ -214,11 +218,11 @@ export default function CreateCampaignPage() {
     
     if (campaignData.name) filled++;
     if (campaignData.description) filled++;
-    if (campaignData.duration) filled++;
     if (campaignData.startDate) filled++;
     if (campaignData.endDate) filled++;
-    if (campaignData.targetAudience?.demographics?.length) filled++;
     if (campaignData.geographic?.regions?.length) filled++;
+    if (campaignData.interests?.length) filled++;
+    if (campaignData.targetAudience?.demographics?.length) filled++;
     if (campaignData.interests?.length) filled++;
     if (campaignData.budget) filled++;
     if (campaignData.slots) filled++;
@@ -268,7 +272,7 @@ export default function CreateCampaignPage() {
       
       setShowSuccess(true);
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      router.push(`/manager/campaign/${result.data.id}`);
+      router.push(`/manager/campaigns/${result.data.id}`);
     } catch (error) {
       console.error('Error creating campaign:', error);
       setCreationError(error instanceof Error ? error.message : 'Unknown error creating campaign');
@@ -487,17 +491,6 @@ export default function CreateCampaignPage() {
               </InfoCard>
               
               <InfoCard icon={<Calendar className="h-4 w-4" />} title="Duration" color="green">
-                <Field
-                  label="Duration (days)"
-                  value={campaignData.duration?.toString()}
-                  type="number"
-                  onChange={(value) =>
-                    setCampaignData((prev) => ({
-                      ...prev,
-                      duration: value ? parseInt(value) : undefined,
-                    }))
-                  }
-                />
                 <div className="grid grid-cols-2 gap-2">
                   <Field
                     label="Start"
@@ -563,7 +556,7 @@ export default function CreateCampaignPage() {
                   </div>
                   
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Target Demographics</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Target Audience</label>
                     <div className="flex flex-wrap gap-1.5">
                       {AUDIENCE_DEMOGRAPHIC_OPTIONS.map((demo) => (
                         <button
@@ -843,7 +836,7 @@ function InfoCard({
   };
   
   return (
-    <div className="rounded-xl border border-border bg-card p-3">
+    <div className="pb-3">
       <div className="mb-2 flex items-center gap-2 border-b border-border pb-2">
         <div className={`rounded-lg p-1.5 ${colorClasses[color]}`}>{icon}</div>
         <h3 className="text-sm font-semibold text-foreground">{title}</h3>

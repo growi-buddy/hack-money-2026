@@ -1,23 +1,22 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
-import { Send, CheckCheck, ArrowLeft, Loader2, MessageSquare } from 'lucide-react';
+import { AblyChatProvider } from '@/components/providers/ably-chat-provider';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { staggerContainer, staggerItem } from '@/lib/animations';
 import { useWallet } from '@/contexts/wallet-context';
-import { AblyChatProvider } from '@/components/providers/ably-chat-provider';
-import { ChatRoomProvider, useMessages } from '@ably/chat/react';
+import { staggerContainer, staggerItem } from '@/lib/animations';
+import { cn } from '@/lib/utils';
+import type { ChatMessageEvent, Message as AblyMessage } from '@ably/chat';
 import { ChatMessageEventType } from '@ably/chat';
-import type { Message as AblyMessage, ChatMessageEvent } from '@ably/chat';
-
-// ---- Types ----
+import { ChatWindow } from '@ably/chat-react-ui-kit';
+import { ChatRoomProvider, useMessages } from '@ably/chat/react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowLeft, CheckCheck, Loader2, MessageSquare, Send } from 'lucide-react';
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface ChatRoomUser {
   id: string;
@@ -34,6 +33,7 @@ interface ChatRoomCampaign {
   interests: string[];
   startDate: string | null;
   endDate: string | null;
+  ownerId: string;
   rewardEvents: {
     name: string;
     eventType: string;
@@ -51,7 +51,7 @@ interface ChatRoomLastMessage {
 
 interface ChatRoomData {
   id: string;
-  ablyRoomId: string;
+  // ablyRoomId: string;
   otherUser: ChatRoomUser;
   campaign: ChatRoomCampaign | null;
   lastMessage: ChatRoomLastMessage | null;
@@ -82,7 +82,7 @@ function ChatMessages({ currentUserId }: { currentUserId: string }) {
   const [ messages, setMessages ] = useState<AblyMessage[]>([]);
   const [ loadingHistory, setLoadingHistory ] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  
   const { sendMessage, historyBeforeSubscribe } = useMessages({
     listener: (event: ChatMessageEvent) => {
       if (event.type === ChatMessageEventType.Created) {
@@ -94,7 +94,7 @@ function ChatMessages({ currentUserId }: { currentUserId: string }) {
       }
     },
   });
-
+  
   // Load history before subscription
   useEffect(() => {
     const loadHistory = async () => {
@@ -113,19 +113,19 @@ function ChatMessages({ currentUserId }: { currentUserId: string }) {
     };
     loadHistory();
   }, [ historyBeforeSubscribe ]);
-
+  
   // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [ messages ]);
-
+  
   const [ inputValue, setInputValue ] = useState('');
   const [ sending, setSending ] = useState(false);
-
+  
   const handleSend = async () => {
     const text = inputValue.trim();
     if (!text || sending) return;
-
+    
     setSending(true);
     setInputValue('');
     try {
@@ -137,7 +137,7 @@ function ChatMessages({ currentUserId }: { currentUserId: string }) {
       setSending(false);
     }
   };
-
+  
   if (loadingHistory) {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -145,7 +145,7 @@ function ChatMessages({ currentUserId }: { currentUserId: string }) {
       </div>
     );
   }
-
+  
   return (
     <>
       {/* Messages */}
@@ -196,7 +196,7 @@ function ChatMessages({ currentUserId }: { currentUserId: string }) {
         </AnimatePresence>
         <div ref={messagesEndRef} />
       </div>
-
+      
       {/* Input */}
       <div className="border-t border-border p-4">
         <form
@@ -237,19 +237,19 @@ export default function InfluencerInboxPage() {
   const [ showMobileChat, setShowMobileChat ] = useState(false);
   const [ loading, setLoading ] = useState(true);
   const [ initialRoomSelected, setInitialRoomSelected ] = useState(false);
-
+  
   const fetchRooms = useCallback(async () => {
     if (!address) {
       setChatRooms([]);
       setLoading(false);
       return;
     }
-
+    
     try {
       setLoading(true);
       const res = await fetch(`/api/influencer/${address}/chat-rooms`);
       const data = await res.json();
-
+      
       if (res.ok && data.success) {
         setChatRooms(data.data.chatRooms);
       }
@@ -259,11 +259,11 @@ export default function InfluencerInboxPage() {
       setLoading(false);
     }
   }, [ address ]);
-
+  
   useEffect(() => {
     fetchRooms();
   }, [ fetchRooms ]);
-
+  
   // Auto-select room from URL param or fallback to first room
   useEffect(() => {
     if (chatRooms.length > 0 && !initialRoomSelected) {
@@ -283,16 +283,16 @@ export default function InfluencerInboxPage() {
       setInitialRoomSelected(true);
     }
   }, [ chatRooms, roomIdParam, initialRoomSelected, selectedRoom ]);
-
+  
   const handleSelectRoom = (room: ChatRoomData) => {
     setSelectedRoom(room);
     setShowMobileChat(true);
   };
-
+  
   const handleBack = () => {
     setShowMobileChat(false);
   };
-
+  
   if (!isConnected) {
     return (
       <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
@@ -303,7 +303,7 @@ export default function InfluencerInboxPage() {
       </div>
     );
   }
-
+  
   if (loading) {
     return (
       <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
@@ -311,7 +311,10 @@ export default function InfluencerInboxPage() {
       </div>
     );
   }
-
+  
+  console.log({ chatRooms, selectedRoom });
+  const roomId = `${selectedRoom?.campaign?.id}_${selectedRoom?.campaign?.ownerId}_${selectedRoom?.otherUser?.id}`;
+  
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -321,188 +324,198 @@ export default function InfluencerInboxPage() {
           Connect with campaign managers about opportunities
         </p>
       </div>
-
+      
       <AblyChatProvider clientId={address!}>
         <div className="flex h-[calc(100vh-8rem)] gap-4 overflow-hidden">
-        {/* Conversations List */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className={cn(
-            'w-full shrink-0 overflow-y-auto rounded-lg border border-border bg-card md:w-80',
-            showMobileChat && 'hidden md:block',
-          )}
-        >
-          <div className="border-b border-border p-4">
-            <h2 className="font-semibold text-foreground">Messages</h2>
-            <p className="text-sm text-muted-foreground">{chatRooms.length} conversations</p>
-          </div>
-
-          {chatRooms.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center px-4">
-              <MessageSquare className="h-10 w-10 text-muted-foreground/30" />
-              <p className="mt-3 text-sm text-muted-foreground">No conversations yet</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Messages from campaign managers will appear here
-              </p>
+          {/* Conversations List */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className={cn(
+              'w-full shrink-0 overflow-y-auto rounded-lg border border-border bg-card md:w-80',
+              showMobileChat && 'hidden md:block',
+            )}
+          >
+            <div className="border-b border-border p-4">
+              <h2 className="font-semibold text-foreground">Messages</h2>
+              <p className="text-sm text-muted-foreground">{chatRooms.length} conversations</p>
             </div>
-          ) : (
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-              className="divide-y divide-border"
-            >
-              {chatRooms.map((room) => (
-                <motion.div
-                  key={room.id}
-                  variants={staggerItem}
-                  onClick={() => handleSelectRoom(room)}
-                  className={cn(
-                    'flex cursor-pointer items-start gap-3 p-4 transition-colors hover:bg-secondary/50',
-                    selectedRoom?.id === room.id && 'bg-secondary/50',
-                  )}
-                >
-                  <div className="relative shrink-0">
-                    <Image
-                      src={room.otherUser.avatar || '/growi-mascot.png'}
-                      alt={formatUserName(room.otherUser)}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-foreground">{formatUserName(room.otherUser)}</p>
-                      <span className="text-xs text-muted-foreground">
-                        {room.lastMessage ? timeAgo(room.lastMessage.createdAt) : timeAgo(room.createdAt)}
-                      </span>
-                    </div>
-                    {room.campaign && (
-                      <p className="text-xs text-growi-blue">{room.campaign.title}</p>
+            
+            {chatRooms.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+                <MessageSquare className="h-10 w-10 text-muted-foreground/30" />
+                <p className="mt-3 text-sm text-muted-foreground">No conversations yet</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Messages from campaign managers will appear here
+                </p>
+              </div>
+            ) : (
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+                className="divide-y divide-border"
+              >
+                {chatRooms.map((room) => (
+                  <motion.div
+                    key={room.id}
+                    variants={staggerItem}
+                    onClick={() => handleSelectRoom(room)}
+                    className={cn(
+                      'flex cursor-pointer items-start gap-3 p-4 transition-colors hover:bg-secondary/50',
+                      selectedRoom?.id === room.id && 'bg-secondary/50',
                     )}
-                    <p className="mt-1 truncate text-sm text-muted-foreground">
-                      {room.lastMessage?.text || 'No messages yet'}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Chat Area */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className={cn(
-            'flex flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card',
-            !showMobileChat && 'hidden md:flex',
-          )}
-        >
-          {selectedRoom ? (
-            <>
-              {/* Chat Header */}
-              <div className="flex items-center gap-3 border-b border-border p-4">
-                <Button variant="ghost" size="icon" className="md:hidden" onClick={handleBack}>
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-                <Image
-                  src={selectedRoom.otherUser.avatar || '/growi-mascot.png'}
-                  alt={formatUserName(selectedRoom.otherUser)}
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-foreground">{formatUserName(selectedRoom.otherUser)}</p>
-                  {selectedRoom.campaign && (
-                    <Badge
-                      className={cn(
-                        'text-xs',
-                        selectedRoom.campaign.status === 'ACTIVE' && 'bg-growi-success/20 text-growi-success',
-                        selectedRoom.campaign.status === 'COMPLETED' && 'bg-growi-blue/20 text-growi-blue',
-                        selectedRoom.campaign.status === 'PAUSED' && 'bg-growi-yellow/20 text-growi-yellow',
-                      )}
-                    >
-                      {selectedRoom.campaign.status}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-
-              {/* Campaign Details Card */}
-              {selectedRoom.campaign && (
-                <div className="border-b border-border p-4">
-                  <Card className="bg-growi-blue/5 border-growi-blue/20">
-                    <CardContent className="p-4">
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div>
-                          <p className="font-semibold text-foreground">{selectedRoom.campaign.title}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {selectedRoom.campaign.startDate
-                              ? new Date(selectedRoom.campaign.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                              : 'TBD'}
-                            {' - '}
-                            {selectedRoom.campaign.endDate
-                              ? new Date(selectedRoom.campaign.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                              : 'TBD'}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-foreground">
-                            Budget: ${selectedRoom.campaign.budgetTotal.toLocaleString()}
-                          </p>
-                        </div>
+                  >
+                    <div className="relative shrink-0">
+                      <Image
+                        src={room.otherUser.avatar || '/growi-mascot.png'}
+                        alt={formatUserName(room.otherUser)}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium text-foreground">{formatUserName(room.otherUser)}</p>
+                        <span className="text-xs text-muted-foreground">
+                          {room.lastMessage ? timeAgo(room.lastMessage.createdAt) : timeAgo(room.createdAt)}
+                        </span>
                       </div>
-                      {selectedRoom.campaign.rewardEvents.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-4 text-sm">
-                          {selectedRoom.campaign.rewardEvents.map((event, i) => {
-                            const labels: Record<string, string> = {
-                              LANDING_PAGE_VIEW: 'View',
-                              VIEW_ITEM: 'View Item',
-                              ADD_TO_CART: 'Add to Cart',
-                              CHECKOUT: 'Checkout',
-                              PURCHASE_SUCCESS: 'Purchase',
-                            };
-                            return (
-                              <div key={i}>
-                                <span className="text-muted-foreground">{labels[event.eventType] || event.eventType}: </span>
-                                <span className="font-medium text-growi-money">${event.amount.toFixed(3)}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
+                      {room.campaign && (
+                        <p className="text-xs text-growi-blue">{room.campaign.title}</p>
                       )}
-                      {selectedRoom.campaign.interests.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-1">
-                          {selectedRoom.campaign.interests.map((interest) => (
-                            <Badge key={interest} variant="secondary" className="text-xs">
-                              {interest}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                      <p className="mt-1 truncate text-sm text-muted-foreground">
+                        {room.lastMessage?.text || 'No messages yet'}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </motion.div>
+          
+          {/* Chat Area */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className={cn(
+              'flex flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card',
+              !showMobileChat && 'hidden md:flex',
+            )}
+          >
+            {selectedRoom ? (
+              <>
+                {/* Chat Header */}
+                <div className="flex items-center gap-3 border-b border-border p-4">
+                  <Button variant="ghost" size="icon" className="md:hidden" onClick={handleBack}>
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <Image
+                    src={selectedRoom.otherUser.avatar || '/growi-mascot.png'}
+                    alt={formatUserName(selectedRoom.otherUser)}
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-foreground">{formatUserName(selectedRoom.otherUser)}</p>
+                    {selectedRoom.campaign && (
+                      <Badge
+                        className={cn(
+                          'text-xs',
+                          selectedRoom.campaign.status === 'ACTIVE' && 'bg-growi-success/20 text-growi-success',
+                          selectedRoom.campaign.status === 'COMPLETED' && 'bg-growi-blue/20 text-growi-blue',
+                          selectedRoom.campaign.status === 'PAUSED' && 'bg-growi-yellow/20 text-growi-yellow',
+                        )}
+                      >
+                        {selectedRoom.campaign.status}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-              )}
-
-              {/* Chat Room with Ably */}
-              <ChatRoomProvider key={selectedRoom.ablyRoomId} name={selectedRoom.ablyRoomId}>
-                <ChatMessages currentUserId={address!} />
-              </ChatRoomProvider>
-            </>
-          ) : (
-            <div className="flex flex-1 items-center justify-center">
-              <div className="text-center">
-                <MessageSquare className="mx-auto h-10 w-10 text-muted-foreground/30" />
-                <p className="mt-3 text-muted-foreground">Select a conversation to start messaging</p>
+                {/* Campaign Details Card */}
+                {selectedRoom.campaign && (
+                  <div className="border-b border-border p-4">
+                    <Card className="bg-growi-blue/5 border-growi-blue/20">
+                      <CardContent className="p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                          <div>
+                            <p className="font-semibold text-foreground">{selectedRoom.campaign.title}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {selectedRoom.campaign.startDate
+                                ? new Date(selectedRoom.campaign.startDate).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                })
+                                : 'TBD'}
+                              {' - '}
+                              {selectedRoom.campaign.endDate
+                                ? new Date(selectedRoom.campaign.endDate).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                })
+                                : 'TBD'}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium text-foreground">
+                              Budget: ${selectedRoom.campaign.budgetTotal.toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                        {selectedRoom.campaign.rewardEvents.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                            {selectedRoom.campaign.rewardEvents.map((event, i) => {
+                              const labels: Record<string, string> = {
+                                LANDING_PAGE_VIEW: 'View',
+                                VIEW_ITEM: 'View Item',
+                                ADD_TO_CART: 'Add to Cart',
+                                CHECKOUT: 'Checkout',
+                                PURCHASE_SUCCESS: 'Purchase',
+                              };
+                              return (
+                                <div key={i}>
+                                  <span className="text-muted-foreground">{labels[event.eventType] || event.eventType}:</span>
+                                  <span className="font-medium text-growi-money">${event.amount.toFixed(3)}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        {selectedRoom.campaign.interests.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-1">
+                            {selectedRoom.campaign.interests.map((interest) => (
+                              <Badge key={interest} variant="secondary" className="text-xs">
+                                {interest}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+                {/* Chat Room with Ably */}
+                <ChatRoomProvider key={roomId} name={roomId}>
+                  <ChatWindow
+                    roomName={roomId}
+                    className="window-container-chat"
+                    enableTypingIndicators
+                    autoEnterPresence
+                  />
+                  s
+                </ChatRoomProvider>
+              </>
+            ) : (
+              <div className="flex flex-1 items-center justify-center">
+                <div className="text-center">
+                  <MessageSquare className="mx-auto h-10 w-10 text-muted-foreground/30" />
+                  <p className="mt-3 text-muted-foreground">Select a conversation to start messaging</p>
+                </div>
               </div>
-            </div>
-          )}
-        </motion.div>
+            )}
+          </motion.div>
         </div>
       </AblyChatProvider>
     </div>

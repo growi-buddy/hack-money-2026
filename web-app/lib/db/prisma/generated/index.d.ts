@@ -2119,13 +2119,11 @@ export namespace Prisma {
   export type CampaignCountOutputType = {
     rewardEvents: number
     participations: number
-    chatRooms: number
   }
 
   export type CampaignCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     rewardEvents?: boolean | CampaignCountOutputTypeCountRewardEventsArgs
     participations?: boolean | CampaignCountOutputTypeCountParticipationsArgs
-    chatRooms?: boolean | CampaignCountOutputTypeCountChatRoomsArgs
   }
 
   // Custom InputTypes
@@ -2151,13 +2149,6 @@ export namespace Prisma {
    */
   export type CampaignCountOutputTypeCountParticipationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ParticipationWhereInput
-  }
-
-  /**
-   * CampaignCountOutputType without action
-   */
-  export type CampaignCountOutputTypeCountChatRoomsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ChatRoomWhereInput
   }
 
 
@@ -5062,7 +5053,6 @@ export namespace Prisma {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     rewardEvents?: boolean | Campaign$rewardEventsArgs<ExtArgs>
     participations?: boolean | Campaign$participationsArgs<ExtArgs>
-    chatRooms?: boolean | Campaign$chatRoomsArgs<ExtArgs>
     _count?: boolean | CampaignCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["campaign"]>
 
@@ -5136,7 +5126,6 @@ export namespace Prisma {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     rewardEvents?: boolean | Campaign$rewardEventsArgs<ExtArgs>
     participations?: boolean | Campaign$participationsArgs<ExtArgs>
-    chatRooms?: boolean | Campaign$chatRoomsArgs<ExtArgs>
     _count?: boolean | CampaignCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CampaignIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5152,7 +5141,6 @@ export namespace Prisma {
       owner: Prisma.$UserPayload<ExtArgs>
       rewardEvents: Prisma.$CampaignRewardEventPayload<ExtArgs>[]
       participations: Prisma.$ParticipationPayload<ExtArgs>[]
-      chatRooms: Prisma.$ChatRoomPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5570,7 +5558,6 @@ export namespace Prisma {
     owner<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     rewardEvents<T extends Campaign$rewardEventsArgs<ExtArgs> = {}>(args?: Subset<T, Campaign$rewardEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignRewardEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     participations<T extends Campaign$participationsArgs<ExtArgs> = {}>(args?: Subset<T, Campaign$participationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ParticipationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    chatRooms<T extends Campaign$chatRoomsArgs<ExtArgs> = {}>(args?: Subset<T, Campaign$chatRoomsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatRoomPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6059,30 +6046,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ParticipationScalarFieldEnum | ParticipationScalarFieldEnum[]
-  }
-
-  /**
-   * Campaign.chatRooms
-   */
-  export type Campaign$chatRoomsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ChatRoom
-     */
-    select?: ChatRoomSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the ChatRoom
-     */
-    omit?: ChatRoomOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ChatRoomInclude<ExtArgs> | null
-    where?: ChatRoomWhereInput
-    orderBy?: ChatRoomOrderByWithRelationInput | ChatRoomOrderByWithRelationInput[]
-    cursor?: ChatRoomWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: ChatRoomScalarFieldEnum | ChatRoomScalarFieldEnum[]
   }
 
   /**
@@ -15044,8 +15007,6 @@ export namespace Prisma {
     id: string | null
     userOneId: string | null
     userTwoId: string | null
-    campaignId: string | null
-    ablyRoomId: string | null
     lastActivityAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -15055,8 +15016,6 @@ export namespace Prisma {
     id: string | null
     userOneId: string | null
     userTwoId: string | null
-    campaignId: string | null
-    ablyRoomId: string | null
     lastActivityAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -15066,8 +15025,6 @@ export namespace Prisma {
     id: number
     userOneId: number
     userTwoId: number
-    campaignId: number
-    ablyRoomId: number
     lastActivityAt: number
     createdAt: number
     updatedAt: number
@@ -15079,8 +15036,6 @@ export namespace Prisma {
     id?: true
     userOneId?: true
     userTwoId?: true
-    campaignId?: true
-    ablyRoomId?: true
     lastActivityAt?: true
     createdAt?: true
     updatedAt?: true
@@ -15090,8 +15045,6 @@ export namespace Prisma {
     id?: true
     userOneId?: true
     userTwoId?: true
-    campaignId?: true
-    ablyRoomId?: true
     lastActivityAt?: true
     createdAt?: true
     updatedAt?: true
@@ -15101,8 +15054,6 @@ export namespace Prisma {
     id?: true
     userOneId?: true
     userTwoId?: true
-    campaignId?: true
-    ablyRoomId?: true
     lastActivityAt?: true
     createdAt?: true
     updatedAt?: true
@@ -15185,8 +15136,6 @@ export namespace Prisma {
     id: string
     userOneId: string
     userTwoId: string
-    campaignId: string | null
-    ablyRoomId: string
     lastActivityAt: Date
     createdAt: Date
     updatedAt: Date
@@ -15213,14 +15162,11 @@ export namespace Prisma {
     id?: boolean
     userOneId?: boolean
     userTwoId?: boolean
-    campaignId?: boolean
-    ablyRoomId?: boolean
     lastActivityAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     userOne?: boolean | UserDefaultArgs<ExtArgs>
     userTwo?: boolean | UserDefaultArgs<ExtArgs>
-    campaign?: boolean | ChatRoom$campaignArgs<ExtArgs>
     messages?: boolean | ChatRoom$messagesArgs<ExtArgs>
     _count?: boolean | ChatRoomCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["chatRoom"]>
@@ -15229,58 +15175,47 @@ export namespace Prisma {
     id?: boolean
     userOneId?: boolean
     userTwoId?: boolean
-    campaignId?: boolean
-    ablyRoomId?: boolean
     lastActivityAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     userOne?: boolean | UserDefaultArgs<ExtArgs>
     userTwo?: boolean | UserDefaultArgs<ExtArgs>
-    campaign?: boolean | ChatRoom$campaignArgs<ExtArgs>
   }, ExtArgs["result"]["chatRoom"]>
 
   export type ChatRoomSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userOneId?: boolean
     userTwoId?: boolean
-    campaignId?: boolean
-    ablyRoomId?: boolean
     lastActivityAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     userOne?: boolean | UserDefaultArgs<ExtArgs>
     userTwo?: boolean | UserDefaultArgs<ExtArgs>
-    campaign?: boolean | ChatRoom$campaignArgs<ExtArgs>
   }, ExtArgs["result"]["chatRoom"]>
 
   export type ChatRoomSelectScalar = {
     id?: boolean
     userOneId?: boolean
     userTwoId?: boolean
-    campaignId?: boolean
-    ablyRoomId?: boolean
     lastActivityAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ChatRoomOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userOneId" | "userTwoId" | "campaignId" | "ablyRoomId" | "lastActivityAt" | "createdAt" | "updatedAt", ExtArgs["result"]["chatRoom"]>
+  export type ChatRoomOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userOneId" | "userTwoId" | "lastActivityAt" | "createdAt" | "updatedAt", ExtArgs["result"]["chatRoom"]>
   export type ChatRoomInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     userOne?: boolean | UserDefaultArgs<ExtArgs>
     userTwo?: boolean | UserDefaultArgs<ExtArgs>
-    campaign?: boolean | ChatRoom$campaignArgs<ExtArgs>
     messages?: boolean | ChatRoom$messagesArgs<ExtArgs>
     _count?: boolean | ChatRoomCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ChatRoomIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     userOne?: boolean | UserDefaultArgs<ExtArgs>
     userTwo?: boolean | UserDefaultArgs<ExtArgs>
-    campaign?: boolean | ChatRoom$campaignArgs<ExtArgs>
   }
   export type ChatRoomIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     userOne?: boolean | UserDefaultArgs<ExtArgs>
     userTwo?: boolean | UserDefaultArgs<ExtArgs>
-    campaign?: boolean | ChatRoom$campaignArgs<ExtArgs>
   }
 
   export type $ChatRoomPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15288,15 +15223,12 @@ export namespace Prisma {
     objects: {
       userOne: Prisma.$UserPayload<ExtArgs>
       userTwo: Prisma.$UserPayload<ExtArgs>
-      campaign: Prisma.$CampaignPayload<ExtArgs> | null
       messages: Prisma.$ChatMessagePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userOneId: string
       userTwoId: string
-      campaignId: string | null
-      ablyRoomId: string
       lastActivityAt: Date
       createdAt: Date
       updatedAt: Date
@@ -15696,7 +15628,6 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     userOne<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     userTwo<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    campaign<T extends ChatRoom$campaignArgs<ExtArgs> = {}>(args?: Subset<T, ChatRoom$campaignArgs<ExtArgs>>): Prisma__CampaignClient<$Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     messages<T extends ChatRoom$messagesArgs<ExtArgs> = {}>(args?: Subset<T, ChatRoom$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -15730,8 +15661,6 @@ export namespace Prisma {
     readonly id: FieldRef<"ChatRoom", 'String'>
     readonly userOneId: FieldRef<"ChatRoom", 'String'>
     readonly userTwoId: FieldRef<"ChatRoom", 'String'>
-    readonly campaignId: FieldRef<"ChatRoom", 'String'>
-    readonly ablyRoomId: FieldRef<"ChatRoom", 'String'>
     readonly lastActivityAt: FieldRef<"ChatRoom", 'DateTime'>
     readonly createdAt: FieldRef<"ChatRoom", 'DateTime'>
     readonly updatedAt: FieldRef<"ChatRoom", 'DateTime'>
@@ -16128,25 +16057,6 @@ export namespace Prisma {
      * Limit how many ChatRooms to delete.
      */
     limit?: number
-  }
-
-  /**
-   * ChatRoom.campaign
-   */
-  export type ChatRoom$campaignArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Campaign
-     */
-    select?: CampaignSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Campaign
-     */
-    omit?: CampaignOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CampaignInclude<ExtArgs> | null
-    where?: CampaignWhereInput
   }
 
   /**
@@ -17461,8 +17371,6 @@ export namespace Prisma {
     id: 'id',
     userOneId: 'userOneId',
     userTwoId: 'userTwoId',
-    campaignId: 'campaignId',
-    ablyRoomId: 'ablyRoomId',
     lastActivityAt: 'lastActivityAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -17903,7 +17811,6 @@ export namespace Prisma {
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
     rewardEvents?: CampaignRewardEventListRelationFilter
     participations?: ParticipationListRelationFilter
-    chatRooms?: ChatRoomListRelationFilter
   }
 
   export type CampaignOrderByWithRelationInput = {
@@ -17928,7 +17835,6 @@ export namespace Prisma {
     owner?: UserOrderByWithRelationInput
     rewardEvents?: CampaignRewardEventOrderByRelationAggregateInput
     participations?: ParticipationOrderByRelationAggregateInput
-    chatRooms?: ChatRoomOrderByRelationAggregateInput
   }
 
   export type CampaignWhereUniqueInput = Prisma.AtLeast<{
@@ -17956,7 +17862,6 @@ export namespace Prisma {
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
     rewardEvents?: CampaignRewardEventListRelationFilter
     participations?: ParticipationListRelationFilter
-    chatRooms?: ChatRoomListRelationFilter
   }, "id">
 
   export type CampaignOrderByWithAggregationInput = {
@@ -18559,14 +18464,11 @@ export namespace Prisma {
     id?: StringFilter<"ChatRoom"> | string
     userOneId?: StringFilter<"ChatRoom"> | string
     userTwoId?: StringFilter<"ChatRoom"> | string
-    campaignId?: StringNullableFilter<"ChatRoom"> | string | null
-    ablyRoomId?: StringFilter<"ChatRoom"> | string
     lastActivityAt?: DateTimeFilter<"ChatRoom"> | Date | string
     createdAt?: DateTimeFilter<"ChatRoom"> | Date | string
     updatedAt?: DateTimeFilter<"ChatRoom"> | Date | string
     userOne?: XOR<UserScalarRelationFilter, UserWhereInput>
     userTwo?: XOR<UserScalarRelationFilter, UserWhereInput>
-    campaign?: XOR<CampaignNullableScalarRelationFilter, CampaignWhereInput> | null
     messages?: ChatMessageListRelationFilter
   }
 
@@ -18574,42 +18476,34 @@ export namespace Prisma {
     id?: SortOrder
     userOneId?: SortOrder
     userTwoId?: SortOrder
-    campaignId?: SortOrderInput | SortOrder
-    ablyRoomId?: SortOrder
     lastActivityAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     userOne?: UserOrderByWithRelationInput
     userTwo?: UserOrderByWithRelationInput
-    campaign?: CampaignOrderByWithRelationInput
     messages?: ChatMessageOrderByRelationAggregateInput
   }
 
   export type ChatRoomWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    ablyRoomId?: string
-    userOneId_userTwoId_campaignId?: ChatRoomUserOneIdUserTwoIdCampaignIdCompoundUniqueInput
+    userOneId_userTwoId?: ChatRoomUserOneIdUserTwoIdCompoundUniqueInput
     AND?: ChatRoomWhereInput | ChatRoomWhereInput[]
     OR?: ChatRoomWhereInput[]
     NOT?: ChatRoomWhereInput | ChatRoomWhereInput[]
     userOneId?: StringFilter<"ChatRoom"> | string
     userTwoId?: StringFilter<"ChatRoom"> | string
-    campaignId?: StringNullableFilter<"ChatRoom"> | string | null
     lastActivityAt?: DateTimeFilter<"ChatRoom"> | Date | string
     createdAt?: DateTimeFilter<"ChatRoom"> | Date | string
     updatedAt?: DateTimeFilter<"ChatRoom"> | Date | string
     userOne?: XOR<UserScalarRelationFilter, UserWhereInput>
     userTwo?: XOR<UserScalarRelationFilter, UserWhereInput>
-    campaign?: XOR<CampaignNullableScalarRelationFilter, CampaignWhereInput> | null
     messages?: ChatMessageListRelationFilter
-  }, "id" | "ablyRoomId" | "userOneId_userTwoId_campaignId">
+  }, "id" | "userOneId_userTwoId">
 
   export type ChatRoomOrderByWithAggregationInput = {
     id?: SortOrder
     userOneId?: SortOrder
     userTwoId?: SortOrder
-    campaignId?: SortOrderInput | SortOrder
-    ablyRoomId?: SortOrder
     lastActivityAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -18625,8 +18519,6 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"ChatRoom"> | string
     userOneId?: StringWithAggregatesFilter<"ChatRoom"> | string
     userTwoId?: StringWithAggregatesFilter<"ChatRoom"> | string
-    campaignId?: StringNullableWithAggregatesFilter<"ChatRoom"> | string | null
-    ablyRoomId?: StringWithAggregatesFilter<"ChatRoom"> | string
     lastActivityAt?: DateTimeWithAggregatesFilter<"ChatRoom"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"ChatRoom"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ChatRoom"> | Date | string
@@ -18937,7 +18829,6 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutCampaignsCreatedInput
     rewardEvents?: CampaignRewardEventCreateNestedManyWithoutCampaignInput
     participations?: ParticipationCreateNestedManyWithoutCampaignInput
-    chatRooms?: ChatRoomCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignUncheckedCreateInput = {
@@ -18961,7 +18852,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     rewardEvents?: CampaignRewardEventUncheckedCreateNestedManyWithoutCampaignInput
     participations?: ParticipationUncheckedCreateNestedManyWithoutCampaignInput
-    chatRooms?: ChatRoomUncheckedCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignUpdateInput = {
@@ -18985,7 +18875,6 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutCampaignsCreatedNestedInput
     rewardEvents?: CampaignRewardEventUpdateManyWithoutCampaignNestedInput
     participations?: ParticipationUpdateManyWithoutCampaignNestedInput
-    chatRooms?: ChatRoomUpdateManyWithoutCampaignNestedInput
   }
 
   export type CampaignUncheckedUpdateInput = {
@@ -19009,7 +18898,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rewardEvents?: CampaignRewardEventUncheckedUpdateManyWithoutCampaignNestedInput
     participations?: ParticipationUncheckedUpdateManyWithoutCampaignNestedInput
-    chatRooms?: ChatRoomUncheckedUpdateManyWithoutCampaignNestedInput
   }
 
   export type CampaignCreateManyInput = {
@@ -19636,13 +19524,11 @@ export namespace Prisma {
 
   export type ChatRoomCreateInput = {
     id?: string
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
     userOne: UserCreateNestedOneWithoutChatRoomsAsOneInput
     userTwo: UserCreateNestedOneWithoutChatRoomsAsTwoInput
-    campaign?: CampaignCreateNestedOneWithoutChatRoomsInput
     messages?: ChatMessageCreateNestedManyWithoutChatRoomInput
   }
 
@@ -19650,8 +19536,6 @@ export namespace Prisma {
     id?: string
     userOneId: string
     userTwoId: string
-    campaignId?: string | null
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19660,13 +19544,11 @@ export namespace Prisma {
 
   export type ChatRoomUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userOne?: UserUpdateOneRequiredWithoutChatRoomsAsOneNestedInput
     userTwo?: UserUpdateOneRequiredWithoutChatRoomsAsTwoNestedInput
-    campaign?: CampaignUpdateOneWithoutChatRoomsNestedInput
     messages?: ChatMessageUpdateManyWithoutChatRoomNestedInput
   }
 
@@ -19674,8 +19556,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userOneId?: StringFieldUpdateOperationsInput | string
     userTwoId?: StringFieldUpdateOperationsInput | string
-    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19686,8 +19566,6 @@ export namespace Prisma {
     id?: string
     userOneId: string
     userTwoId: string
-    campaignId?: string | null
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19695,7 +19573,6 @@ export namespace Prisma {
 
   export type ChatRoomUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19705,8 +19582,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userOneId?: StringFieldUpdateOperationsInput | string
     userTwoId?: StringFieldUpdateOperationsInput | string
-    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20669,23 +20544,15 @@ export namespace Prisma {
     payoutGenerated?: SortOrder
   }
 
-  export type CampaignNullableScalarRelationFilter = {
-    is?: CampaignWhereInput | null
-    isNot?: CampaignWhereInput | null
-  }
-
-  export type ChatRoomUserOneIdUserTwoIdCampaignIdCompoundUniqueInput = {
+  export type ChatRoomUserOneIdUserTwoIdCompoundUniqueInput = {
     userOneId: string
     userTwoId: string
-    campaignId: string
   }
 
   export type ChatRoomCountOrderByAggregateInput = {
     id?: SortOrder
     userOneId?: SortOrder
     userTwoId?: SortOrder
-    campaignId?: SortOrder
-    ablyRoomId?: SortOrder
     lastActivityAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -20695,8 +20562,6 @@ export namespace Prisma {
     id?: SortOrder
     userOneId?: SortOrder
     userTwoId?: SortOrder
-    campaignId?: SortOrder
-    ablyRoomId?: SortOrder
     lastActivityAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -20706,8 +20571,6 @@ export namespace Prisma {
     id?: SortOrder
     userOneId?: SortOrder
     userTwoId?: SortOrder
-    campaignId?: SortOrder
-    ablyRoomId?: SortOrder
     lastActivityAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -21130,13 +20993,6 @@ export namespace Prisma {
     connect?: ParticipationWhereUniqueInput | ParticipationWhereUniqueInput[]
   }
 
-  export type ChatRoomCreateNestedManyWithoutCampaignInput = {
-    create?: XOR<ChatRoomCreateWithoutCampaignInput, ChatRoomUncheckedCreateWithoutCampaignInput> | ChatRoomCreateWithoutCampaignInput[] | ChatRoomUncheckedCreateWithoutCampaignInput[]
-    connectOrCreate?: ChatRoomCreateOrConnectWithoutCampaignInput | ChatRoomCreateOrConnectWithoutCampaignInput[]
-    createMany?: ChatRoomCreateManyCampaignInputEnvelope
-    connect?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
-  }
-
   export type CampaignRewardEventUncheckedCreateNestedManyWithoutCampaignInput = {
     create?: XOR<CampaignRewardEventCreateWithoutCampaignInput, CampaignRewardEventUncheckedCreateWithoutCampaignInput> | CampaignRewardEventCreateWithoutCampaignInput[] | CampaignRewardEventUncheckedCreateWithoutCampaignInput[]
     connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutCampaignInput | CampaignRewardEventCreateOrConnectWithoutCampaignInput[]
@@ -21149,13 +21005,6 @@ export namespace Prisma {
     connectOrCreate?: ParticipationCreateOrConnectWithoutCampaignInput | ParticipationCreateOrConnectWithoutCampaignInput[]
     createMany?: ParticipationCreateManyCampaignInputEnvelope
     connect?: ParticipationWhereUniqueInput | ParticipationWhereUniqueInput[]
-  }
-
-  export type ChatRoomUncheckedCreateNestedManyWithoutCampaignInput = {
-    create?: XOR<ChatRoomCreateWithoutCampaignInput, ChatRoomUncheckedCreateWithoutCampaignInput> | ChatRoomCreateWithoutCampaignInput[] | ChatRoomUncheckedCreateWithoutCampaignInput[]
-    connectOrCreate?: ChatRoomCreateOrConnectWithoutCampaignInput | ChatRoomCreateOrConnectWithoutCampaignInput[]
-    createMany?: ChatRoomCreateManyCampaignInputEnvelope
-    connect?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
   }
 
   export type DecimalFieldUpdateOperationsInput = {
@@ -21242,20 +21091,6 @@ export namespace Prisma {
     deleteMany?: ParticipationScalarWhereInput | ParticipationScalarWhereInput[]
   }
 
-  export type ChatRoomUpdateManyWithoutCampaignNestedInput = {
-    create?: XOR<ChatRoomCreateWithoutCampaignInput, ChatRoomUncheckedCreateWithoutCampaignInput> | ChatRoomCreateWithoutCampaignInput[] | ChatRoomUncheckedCreateWithoutCampaignInput[]
-    connectOrCreate?: ChatRoomCreateOrConnectWithoutCampaignInput | ChatRoomCreateOrConnectWithoutCampaignInput[]
-    upsert?: ChatRoomUpsertWithWhereUniqueWithoutCampaignInput | ChatRoomUpsertWithWhereUniqueWithoutCampaignInput[]
-    createMany?: ChatRoomCreateManyCampaignInputEnvelope
-    set?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
-    disconnect?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
-    delete?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
-    connect?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
-    update?: ChatRoomUpdateWithWhereUniqueWithoutCampaignInput | ChatRoomUpdateWithWhereUniqueWithoutCampaignInput[]
-    updateMany?: ChatRoomUpdateManyWithWhereWithoutCampaignInput | ChatRoomUpdateManyWithWhereWithoutCampaignInput[]
-    deleteMany?: ChatRoomScalarWhereInput | ChatRoomScalarWhereInput[]
-  }
-
   export type CampaignRewardEventUncheckedUpdateManyWithoutCampaignNestedInput = {
     create?: XOR<CampaignRewardEventCreateWithoutCampaignInput, CampaignRewardEventUncheckedCreateWithoutCampaignInput> | CampaignRewardEventCreateWithoutCampaignInput[] | CampaignRewardEventUncheckedCreateWithoutCampaignInput[]
     connectOrCreate?: CampaignRewardEventCreateOrConnectWithoutCampaignInput | CampaignRewardEventCreateOrConnectWithoutCampaignInput[]
@@ -21282,20 +21117,6 @@ export namespace Prisma {
     update?: ParticipationUpdateWithWhereUniqueWithoutCampaignInput | ParticipationUpdateWithWhereUniqueWithoutCampaignInput[]
     updateMany?: ParticipationUpdateManyWithWhereWithoutCampaignInput | ParticipationUpdateManyWithWhereWithoutCampaignInput[]
     deleteMany?: ParticipationScalarWhereInput | ParticipationScalarWhereInput[]
-  }
-
-  export type ChatRoomUncheckedUpdateManyWithoutCampaignNestedInput = {
-    create?: XOR<ChatRoomCreateWithoutCampaignInput, ChatRoomUncheckedCreateWithoutCampaignInput> | ChatRoomCreateWithoutCampaignInput[] | ChatRoomUncheckedCreateWithoutCampaignInput[]
-    connectOrCreate?: ChatRoomCreateOrConnectWithoutCampaignInput | ChatRoomCreateOrConnectWithoutCampaignInput[]
-    upsert?: ChatRoomUpsertWithWhereUniqueWithoutCampaignInput | ChatRoomUpsertWithWhereUniqueWithoutCampaignInput[]
-    createMany?: ChatRoomCreateManyCampaignInputEnvelope
-    set?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
-    disconnect?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
-    delete?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
-    connect?: ChatRoomWhereUniqueInput | ChatRoomWhereUniqueInput[]
-    update?: ChatRoomUpdateWithWhereUniqueWithoutCampaignInput | ChatRoomUpdateWithWhereUniqueWithoutCampaignInput[]
-    updateMany?: ChatRoomUpdateManyWithWhereWithoutCampaignInput | ChatRoomUpdateManyWithWhereWithoutCampaignInput[]
-    deleteMany?: ChatRoomScalarWhereInput | ChatRoomScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutRewardEventsInput = {
@@ -21710,12 +21531,6 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type CampaignCreateNestedOneWithoutChatRoomsInput = {
-    create?: XOR<CampaignCreateWithoutChatRoomsInput, CampaignUncheckedCreateWithoutChatRoomsInput>
-    connectOrCreate?: CampaignCreateOrConnectWithoutChatRoomsInput
-    connect?: CampaignWhereUniqueInput
-  }
-
   export type ChatMessageCreateNestedManyWithoutChatRoomInput = {
     create?: XOR<ChatMessageCreateWithoutChatRoomInput, ChatMessageUncheckedCreateWithoutChatRoomInput> | ChatMessageCreateWithoutChatRoomInput[] | ChatMessageUncheckedCreateWithoutChatRoomInput[]
     connectOrCreate?: ChatMessageCreateOrConnectWithoutChatRoomInput | ChatMessageCreateOrConnectWithoutChatRoomInput[]
@@ -21744,16 +21559,6 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutChatRoomsAsTwoInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutChatRoomsAsTwoInput, UserUpdateWithoutChatRoomsAsTwoInput>, UserUncheckedUpdateWithoutChatRoomsAsTwoInput>
-  }
-
-  export type CampaignUpdateOneWithoutChatRoomsNestedInput = {
-    create?: XOR<CampaignCreateWithoutChatRoomsInput, CampaignUncheckedCreateWithoutChatRoomsInput>
-    connectOrCreate?: CampaignCreateOrConnectWithoutChatRoomsInput
-    upsert?: CampaignUpsertWithoutChatRoomsInput
-    disconnect?: CampaignWhereInput | boolean
-    delete?: CampaignWhereInput | boolean
-    connect?: CampaignWhereUniqueInput
-    update?: XOR<XOR<CampaignUpdateToOneWithWhereWithoutChatRoomsInput, CampaignUpdateWithoutChatRoomsInput>, CampaignUncheckedUpdateWithoutChatRoomsInput>
   }
 
   export type ChatMessageUpdateManyWithoutChatRoomNestedInput = {
@@ -22171,7 +21976,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     rewardEvents?: CampaignRewardEventCreateNestedManyWithoutCampaignInput
     participations?: ParticipationCreateNestedManyWithoutCampaignInput
-    chatRooms?: ChatRoomCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignUncheckedCreateWithoutOwnerInput = {
@@ -22194,7 +21998,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     rewardEvents?: CampaignRewardEventUncheckedCreateNestedManyWithoutCampaignInput
     participations?: ParticipationUncheckedCreateNestedManyWithoutCampaignInput
-    chatRooms?: ChatRoomUncheckedCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignCreateOrConnectWithoutOwnerInput = {
@@ -22269,20 +22072,16 @@ export namespace Prisma {
 
   export type ChatRoomCreateWithoutUserOneInput = {
     id?: string
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
     userTwo: UserCreateNestedOneWithoutChatRoomsAsTwoInput
-    campaign?: CampaignCreateNestedOneWithoutChatRoomsInput
     messages?: ChatMessageCreateNestedManyWithoutChatRoomInput
   }
 
   export type ChatRoomUncheckedCreateWithoutUserOneInput = {
     id?: string
     userTwoId: string
-    campaignId?: string | null
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22301,20 +22100,16 @@ export namespace Prisma {
 
   export type ChatRoomCreateWithoutUserTwoInput = {
     id?: string
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
     userOne: UserCreateNestedOneWithoutChatRoomsAsOneInput
-    campaign?: CampaignCreateNestedOneWithoutChatRoomsInput
     messages?: ChatMessageCreateNestedManyWithoutChatRoomInput
   }
 
   export type ChatRoomUncheckedCreateWithoutUserTwoInput = {
     id?: string
     userOneId: string
-    campaignId?: string | null
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22508,8 +22303,6 @@ export namespace Prisma {
     id?: StringFilter<"ChatRoom"> | string
     userOneId?: StringFilter<"ChatRoom"> | string
     userTwoId?: StringFilter<"ChatRoom"> | string
-    campaignId?: StringNullableFilter<"ChatRoom"> | string | null
-    ablyRoomId?: StringFilter<"ChatRoom"> | string
     lastActivityAt?: DateTimeFilter<"ChatRoom"> | Date | string
     createdAt?: DateTimeFilter<"ChatRoom"> | Date | string
     updatedAt?: DateTimeFilter<"ChatRoom"> | Date | string
@@ -22773,38 +22566,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type ChatRoomCreateWithoutCampaignInput = {
-    id?: string
-    ablyRoomId: string
-    lastActivityAt?: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    userOne: UserCreateNestedOneWithoutChatRoomsAsOneInput
-    userTwo: UserCreateNestedOneWithoutChatRoomsAsTwoInput
-    messages?: ChatMessageCreateNestedManyWithoutChatRoomInput
-  }
-
-  export type ChatRoomUncheckedCreateWithoutCampaignInput = {
-    id?: string
-    userOneId: string
-    userTwoId: string
-    ablyRoomId: string
-    lastActivityAt?: Date | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    messages?: ChatMessageUncheckedCreateNestedManyWithoutChatRoomInput
-  }
-
-  export type ChatRoomCreateOrConnectWithoutCampaignInput = {
-    where: ChatRoomWhereUniqueInput
-    create: XOR<ChatRoomCreateWithoutCampaignInput, ChatRoomUncheckedCreateWithoutCampaignInput>
-  }
-
-  export type ChatRoomCreateManyCampaignInputEnvelope = {
-    data: ChatRoomCreateManyCampaignInput | ChatRoomCreateManyCampaignInput[]
-    skipDuplicates?: boolean
-  }
-
   export type UserUpsertWithoutCampaignsCreatedInput = {
     update: XOR<UserUpdateWithoutCampaignsCreatedInput, UserUncheckedUpdateWithoutCampaignsCreatedInput>
     create: XOR<UserCreateWithoutCampaignsCreatedInput, UserUncheckedCreateWithoutCampaignsCreatedInput>
@@ -22903,22 +22664,6 @@ export namespace Prisma {
   export type ParticipationUpdateManyWithWhereWithoutCampaignInput = {
     where: ParticipationScalarWhereInput
     data: XOR<ParticipationUpdateManyMutationInput, ParticipationUncheckedUpdateManyWithoutCampaignInput>
-  }
-
-  export type ChatRoomUpsertWithWhereUniqueWithoutCampaignInput = {
-    where: ChatRoomWhereUniqueInput
-    update: XOR<ChatRoomUpdateWithoutCampaignInput, ChatRoomUncheckedUpdateWithoutCampaignInput>
-    create: XOR<ChatRoomCreateWithoutCampaignInput, ChatRoomUncheckedCreateWithoutCampaignInput>
-  }
-
-  export type ChatRoomUpdateWithWhereUniqueWithoutCampaignInput = {
-    where: ChatRoomWhereUniqueInput
-    data: XOR<ChatRoomUpdateWithoutCampaignInput, ChatRoomUncheckedUpdateWithoutCampaignInput>
-  }
-
-  export type ChatRoomUpdateManyWithWhereWithoutCampaignInput = {
-    where: ChatRoomScalarWhereInput
-    data: XOR<ChatRoomUpdateManyMutationInput, ChatRoomUncheckedUpdateManyWithoutCampaignInput>
   }
 
   export type UserCreateWithoutRewardEventsInput = {
@@ -23148,7 +22893,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutCampaignsCreatedInput
     participations?: ParticipationCreateNestedManyWithoutCampaignInput
-    chatRooms?: ChatRoomCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignUncheckedCreateWithoutRewardEventsInput = {
@@ -23171,7 +22915,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     participations?: ParticipationUncheckedCreateNestedManyWithoutCampaignInput
-    chatRooms?: ChatRoomUncheckedCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignCreateOrConnectWithoutRewardEventsInput = {
@@ -23263,7 +23006,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutCampaignsCreatedNestedInput
     participations?: ParticipationUpdateManyWithoutCampaignNestedInput
-    chatRooms?: ChatRoomUpdateManyWithoutCampaignNestedInput
   }
 
   export type CampaignUncheckedUpdateWithoutRewardEventsInput = {
@@ -23286,7 +23028,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     participations?: ParticipationUncheckedUpdateManyWithoutCampaignNestedInput
-    chatRooms?: ChatRoomUncheckedUpdateManyWithoutCampaignNestedInput
   }
 
   export type RewardEventUpsertWithoutCampaignsInput = {
@@ -23626,7 +23367,6 @@ export namespace Prisma {
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutCampaignsCreatedInput
     rewardEvents?: CampaignRewardEventCreateNestedManyWithoutCampaignInput
-    chatRooms?: ChatRoomCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignUncheckedCreateWithoutParticipationsInput = {
@@ -23649,7 +23389,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     rewardEvents?: CampaignRewardEventUncheckedCreateNestedManyWithoutCampaignInput
-    chatRooms?: ChatRoomUncheckedCreateNestedManyWithoutCampaignInput
   }
 
   export type CampaignCreateOrConnectWithoutParticipationsInput = {
@@ -23801,7 +23540,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutCampaignsCreatedNestedInput
     rewardEvents?: CampaignRewardEventUpdateManyWithoutCampaignNestedInput
-    chatRooms?: ChatRoomUpdateManyWithoutCampaignNestedInput
   }
 
   export type CampaignUncheckedUpdateWithoutParticipationsInput = {
@@ -23824,7 +23562,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rewardEvents?: CampaignRewardEventUncheckedUpdateManyWithoutCampaignNestedInput
-    chatRooms?: ChatRoomUncheckedUpdateManyWithoutCampaignNestedInput
   }
 
   export type TrackingLinkUpsertWithWhereUniqueWithoutParticipationInput = {
@@ -24096,57 +23833,6 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutChatRoomsAsTwoInput, UserUncheckedCreateWithoutChatRoomsAsTwoInput>
   }
 
-  export type CampaignCreateWithoutChatRoomsInput = {
-    id?: string
-    title: string
-    description?: string | null
-    escrowAddress: string
-    budgetTotal: Decimal | DecimalJsLike | number | string
-    isHot?: boolean
-    slots?: number
-    interests?: CampaignCreateinterestsInput | string[]
-    demographics?: CampaignCreatedemographicsInput | string[]
-    regions?: CampaignCreateregionsInput | string[]
-    countries?: CampaignCreatecountriesInput | string[]
-    startDate?: Date | string | null
-    endDate?: Date | string | null
-    yellowChannelId?: string | null
-    status?: $Enums.CampaignStatus
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    owner: UserCreateNestedOneWithoutCampaignsCreatedInput
-    rewardEvents?: CampaignRewardEventCreateNestedManyWithoutCampaignInput
-    participations?: ParticipationCreateNestedManyWithoutCampaignInput
-  }
-
-  export type CampaignUncheckedCreateWithoutChatRoomsInput = {
-    id?: string
-    ownerId: string
-    title: string
-    description?: string | null
-    escrowAddress: string
-    budgetTotal: Decimal | DecimalJsLike | number | string
-    isHot?: boolean
-    slots?: number
-    interests?: CampaignCreateinterestsInput | string[]
-    demographics?: CampaignCreatedemographicsInput | string[]
-    regions?: CampaignCreateregionsInput | string[]
-    countries?: CampaignCreatecountriesInput | string[]
-    startDate?: Date | string | null
-    endDate?: Date | string | null
-    yellowChannelId?: string | null
-    status?: $Enums.CampaignStatus
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    rewardEvents?: CampaignRewardEventUncheckedCreateNestedManyWithoutCampaignInput
-    participations?: ParticipationUncheckedCreateNestedManyWithoutCampaignInput
-  }
-
-  export type CampaignCreateOrConnectWithoutChatRoomsInput = {
-    where: CampaignWhereUniqueInput
-    create: XOR<CampaignCreateWithoutChatRoomsInput, CampaignUncheckedCreateWithoutChatRoomsInput>
-  }
-
   export type ChatMessageCreateWithoutChatRoomInput = {
     id?: string
     text: string
@@ -24285,63 +23971,6 @@ export namespace Prisma {
     chatMessages?: ChatMessageUncheckedUpdateManyWithoutSenderNestedInput
   }
 
-  export type CampaignUpsertWithoutChatRoomsInput = {
-    update: XOR<CampaignUpdateWithoutChatRoomsInput, CampaignUncheckedUpdateWithoutChatRoomsInput>
-    create: XOR<CampaignCreateWithoutChatRoomsInput, CampaignUncheckedCreateWithoutChatRoomsInput>
-    where?: CampaignWhereInput
-  }
-
-  export type CampaignUpdateToOneWithWhereWithoutChatRoomsInput = {
-    where?: CampaignWhereInput
-    data: XOR<CampaignUpdateWithoutChatRoomsInput, CampaignUncheckedUpdateWithoutChatRoomsInput>
-  }
-
-  export type CampaignUpdateWithoutChatRoomsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    escrowAddress?: StringFieldUpdateOperationsInput | string
-    budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    isHot?: BoolFieldUpdateOperationsInput | boolean
-    slots?: IntFieldUpdateOperationsInput | number
-    interests?: CampaignUpdateinterestsInput | string[]
-    demographics?: CampaignUpdatedemographicsInput | string[]
-    regions?: CampaignUpdateregionsInput | string[]
-    countries?: CampaignUpdatecountriesInput | string[]
-    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    owner?: UserUpdateOneRequiredWithoutCampaignsCreatedNestedInput
-    rewardEvents?: CampaignRewardEventUpdateManyWithoutCampaignNestedInput
-    participations?: ParticipationUpdateManyWithoutCampaignNestedInput
-  }
-
-  export type CampaignUncheckedUpdateWithoutChatRoomsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    ownerId?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    escrowAddress?: StringFieldUpdateOperationsInput | string
-    budgetTotal?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    isHot?: BoolFieldUpdateOperationsInput | boolean
-    slots?: IntFieldUpdateOperationsInput | number
-    interests?: CampaignUpdateinterestsInput | string[]
-    demographics?: CampaignUpdatedemographicsInput | string[]
-    regions?: CampaignUpdateregionsInput | string[]
-    countries?: CampaignUpdatecountriesInput | string[]
-    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    rewardEvents?: CampaignRewardEventUncheckedUpdateManyWithoutCampaignNestedInput
-    participations?: ParticipationUncheckedUpdateManyWithoutCampaignNestedInput
-  }
-
   export type ChatMessageUpsertWithWhereUniqueWithoutChatRoomInput = {
     where: ChatMessageWhereUniqueInput
     update: XOR<ChatMessageUpdateWithoutChatRoomInput, ChatMessageUncheckedUpdateWithoutChatRoomInput>
@@ -24360,21 +23989,17 @@ export namespace Prisma {
 
   export type ChatRoomCreateWithoutMessagesInput = {
     id?: string
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
     userOne: UserCreateNestedOneWithoutChatRoomsAsOneInput
     userTwo: UserCreateNestedOneWithoutChatRoomsAsTwoInput
-    campaign?: CampaignCreateNestedOneWithoutChatRoomsInput
   }
 
   export type ChatRoomUncheckedCreateWithoutMessagesInput = {
     id?: string
     userOneId: string
     userTwoId: string
-    campaignId?: string | null
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -24447,21 +24072,17 @@ export namespace Prisma {
 
   export type ChatRoomUpdateWithoutMessagesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userOne?: UserUpdateOneRequiredWithoutChatRoomsAsOneNestedInput
     userTwo?: UserUpdateOneRequiredWithoutChatRoomsAsTwoNestedInput
-    campaign?: CampaignUpdateOneWithoutChatRoomsNestedInput
   }
 
   export type ChatRoomUncheckedUpdateWithoutMessagesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userOneId?: StringFieldUpdateOperationsInput | string
     userTwoId?: StringFieldUpdateOperationsInput | string
-    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24571,8 +24192,6 @@ export namespace Prisma {
   export type ChatRoomCreateManyUserOneInput = {
     id?: string
     userTwoId: string
-    campaignId?: string | null
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -24581,8 +24200,6 @@ export namespace Prisma {
   export type ChatRoomCreateManyUserTwoInput = {
     id?: string
     userOneId: string
-    campaignId?: string | null
-    ablyRoomId: string
     lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -24647,7 +24264,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rewardEvents?: CampaignRewardEventUpdateManyWithoutCampaignNestedInput
     participations?: ParticipationUpdateManyWithoutCampaignNestedInput
-    chatRooms?: ChatRoomUpdateManyWithoutCampaignNestedInput
   }
 
   export type CampaignUncheckedUpdateWithoutOwnerInput = {
@@ -24670,7 +24286,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rewardEvents?: CampaignRewardEventUncheckedUpdateManyWithoutCampaignNestedInput
     participations?: ParticipationUncheckedUpdateManyWithoutCampaignNestedInput
-    chatRooms?: ChatRoomUncheckedUpdateManyWithoutCampaignNestedInput
   }
 
   export type CampaignUncheckedUpdateManyWithoutOwnerInput = {
@@ -24751,20 +24366,16 @@ export namespace Prisma {
 
   export type ChatRoomUpdateWithoutUserOneInput = {
     id?: StringFieldUpdateOperationsInput | string
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userTwo?: UserUpdateOneRequiredWithoutChatRoomsAsTwoNestedInput
-    campaign?: CampaignUpdateOneWithoutChatRoomsNestedInput
     messages?: ChatMessageUpdateManyWithoutChatRoomNestedInput
   }
 
   export type ChatRoomUncheckedUpdateWithoutUserOneInput = {
     id?: StringFieldUpdateOperationsInput | string
     userTwoId?: StringFieldUpdateOperationsInput | string
-    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24774,8 +24385,6 @@ export namespace Prisma {
   export type ChatRoomUncheckedUpdateManyWithoutUserOneInput = {
     id?: StringFieldUpdateOperationsInput | string
     userTwoId?: StringFieldUpdateOperationsInput | string
-    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24783,20 +24392,16 @@ export namespace Prisma {
 
   export type ChatRoomUpdateWithoutUserTwoInput = {
     id?: StringFieldUpdateOperationsInput | string
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userOne?: UserUpdateOneRequiredWithoutChatRoomsAsOneNestedInput
-    campaign?: CampaignUpdateOneWithoutChatRoomsNestedInput
     messages?: ChatMessageUpdateManyWithoutChatRoomNestedInput
   }
 
   export type ChatRoomUncheckedUpdateWithoutUserTwoInput = {
     id?: StringFieldUpdateOperationsInput | string
     userOneId?: StringFieldUpdateOperationsInput | string
-    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24806,8 +24411,6 @@ export namespace Prisma {
   export type ChatRoomUncheckedUpdateManyWithoutUserTwoInput = {
     id?: StringFieldUpdateOperationsInput | string
     userOneId?: StringFieldUpdateOperationsInput | string
-    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24853,16 +24456,6 @@ export namespace Prisma {
     id?: string
     influencerId: string
     currentBalance?: Decimal | DecimalJsLike | number | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type ChatRoomCreateManyCampaignInput = {
-    id?: string
-    userOneId: string
-    userTwoId: string
-    ablyRoomId: string
-    lastActivityAt?: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -24920,38 +24513,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     influencerId?: StringFieldUpdateOperationsInput | string
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ChatRoomUpdateWithoutCampaignInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
-    lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    userOne?: UserUpdateOneRequiredWithoutChatRoomsAsOneNestedInput
-    userTwo?: UserUpdateOneRequiredWithoutChatRoomsAsTwoNestedInput
-    messages?: ChatMessageUpdateManyWithoutChatRoomNestedInput
-  }
-
-  export type ChatRoomUncheckedUpdateWithoutCampaignInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userOneId?: StringFieldUpdateOperationsInput | string
-    userTwoId?: StringFieldUpdateOperationsInput | string
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
-    lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    messages?: ChatMessageUncheckedUpdateManyWithoutChatRoomNestedInput
-  }
-
-  export type ChatRoomUncheckedUpdateManyWithoutCampaignInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userOneId?: StringFieldUpdateOperationsInput | string
-    userTwoId?: StringFieldUpdateOperationsInput | string
-    ablyRoomId?: StringFieldUpdateOperationsInput | string
-    lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

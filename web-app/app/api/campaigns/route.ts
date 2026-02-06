@@ -1,5 +1,6 @@
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
+import { CampaignStatus } from '@/lib/db/enums';
 import { Campaign } from '@/lib/db/prisma/generated';
 import { getOrCreateUserByWallet } from '@/lib/services/user.service';
 import { ApiDataResponse, ApiListResponse, CreateCampaignDTO } from '@/types';
@@ -10,8 +11,8 @@ export async function GET(req: Request) {
     const page = parseInt(searchParams.get('page') ?? '1');
     const limit = parseInt(searchParams.get('limit') ?? '10');
     const skip = (page - 1) * limit;
-
-    const [campaigns, total] = await Promise.all([
+    
+    const [ campaigns, total ] = await Promise.all([
       prisma.campaign.findMany({
         skip,
         take: limit,
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
       }),
       prisma.campaign.count(),
     ]);
-
+    
     const response: ApiListResponse<Campaign> = {
       success: true,
       data: campaigns,
@@ -34,10 +35,10 @@ export async function POST(req: Request) {
   return safeRoute(async () => {
     const body = await req.json();
     const validatedData = CreateCampaignDTO.parse(body);
-
+    
     const campaign = await prisma.$transaction(async (tx) => {
       const user = await getOrCreateUserByWallet(validatedData.walletAddress, tx);
-
+      
       // Verify all reward events exist and belong to the user
       if (validatedData.rewardEvents.length > 0) {
         const rewardEventIds = validatedData.rewardEvents.map(re => re.rewardEventId);
@@ -47,14 +48,15 @@ export async function POST(req: Request) {
             ownerId: user.id,
           },
         });
-
+        
         if (existingRewardEvents.length !== rewardEventIds.length) {
           throw new Error('One or more reward events not found or do not belong to the user');
         }
       }
-
+      
       return tx.campaign.create({
         data: {
+          status: CampaignStatus.DRAFT,
           ownerId: user.id,
           title: validatedData.title,
           description: validatedData.description,
@@ -86,7 +88,7 @@ export async function POST(req: Request) {
         },
       });
     });
-
+    
     const response: ApiDataResponse<Campaign> = {
       success: true,
       data: campaign,

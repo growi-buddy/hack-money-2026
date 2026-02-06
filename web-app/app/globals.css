@@ -107,3 +107,13 @@
         @apply bg-background text-foreground;
     }
 }
+
+.window-container-chat {
+    p, input {
+        color: var(--muted-foreground) !important;
+    }
+
+    .bg-gray-900 {
+        background: var(--card);
+    }
+}

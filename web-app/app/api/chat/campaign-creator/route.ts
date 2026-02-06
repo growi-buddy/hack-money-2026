@@ -22,8 +22,7 @@ Tu objetivo es ayudar al usuario a configurar una campaña de marketing completa
    - Fecha de finalización
 
 3. **Público Objetivo:**
-   - Género (masculino, femenino, no binario, todos)
-   - Rango de edad (mínimo y máximo)
+   - Target Demographics (ej: Gen Z, Millennials, Gen X, Baby Boomers, Profesionales, Estudiantes, etc.)
 
 4. **Geográfico:**
    - Regiones objetivo (ej: Norte América, Europa, Asia, etc.)
@@ -35,7 +34,10 @@ Tu objetivo es ayudar al usuario a configurar una campaña de marketing completa
 6. **Presupuesto:**
    - Budget total de la campaña en USD
 
-7. **Estructura de Recompensas (Rewards):**
+7. **Slots:**
+   - Número de influencers que pueden unirse a la campaña (por defecto 10)
+
+8. **Estructura de Recompensas (Rewards):**
    Para cada tipo de evento, pregunta si quieren activarlo y el precio por acción:
    
    - **Landing Page View** ($): Pago por visitar la página de destino
@@ -88,9 +90,7 @@ ${JSON.stringify(campaignData, null, 2)}
           startDate: z.string().optional(),
           endDate: z.string().optional(),
           targetAudience: z.object({
-            gender: z.array(z.enum([ 'male', 'female', 'non-binary', 'all' ])).optional(),
-            ageMin: z.number().optional(),
-            ageMax: z.number().optional(),
+            demographics: z.array(z.string()).optional(),
           }).optional(),
           geographic: z.object({
             regions: z.array(z.string()).optional(),
@@ -98,6 +98,12 @@ ${JSON.stringify(campaignData, null, 2)}
           }).optional(),
           interests: z.array(z.string()).optional(),
           budget: z.number().optional(),
+          slots: z.number().int().positive().optional(),
+          selectedRewardEvents: z.array(z.object({
+            rewardEventId: z.string(),
+            amount: z.number().positive(),
+            volumeStep: z.number().int().positive().optional(),
+          })).optional(),
           rewards: z.object({
             landingPageView: z.object({
               enabled: z.boolean().optional(),
