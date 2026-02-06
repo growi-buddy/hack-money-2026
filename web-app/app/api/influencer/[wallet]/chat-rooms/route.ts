@@ -37,22 +37,6 @@ export async function GET(
           userTwo: {
             select: { id: true, name: true, walletAddress: true, avatar: true },
           },
-          campaign: {
-            select: {
-              id: true,
-              title: true,
-              status: true,
-              budgetTotal: true,
-              interests: true,
-              startDate: true,
-              endDate: true,
-              rewardEvents: {
-                include: {
-                  rewardEvent: { select: { name: true, eventType: true } },
-                },
-              },
-            },
-          },
           messages: {
             orderBy: { createdAt: 'desc' },
             take: 1,
@@ -125,22 +109,6 @@ export async function GET(
             walletAddress: otherUser.walletAddress,
             avatar: otherUser.avatar,
           },
-          campaign: room.campaign
-            ? {
-              id: room.campaign.id,
-              title: room.campaign.title,
-              status: room.campaign.status,
-              budgetTotal: Number(room.campaign.budgetTotal),
-              interests: room.campaign.interests,
-              startDate: room.campaign.startDate?.toISOString() ?? null,
-              endDate: room.campaign.endDate?.toISOString() ?? null,
-              rewardEvents: room.campaign.rewardEvents.map((cre) => ({
-                name: cre.rewardEvent.name,
-                eventType: cre.rewardEvent.eventType,
-                amount: Number(cre.amount),
-              })),
-            }
-            : null,
           relatedCampaigns: relatedCampaigns.map((campaign) => ({
             id: campaign.id,
             title: campaign.title,

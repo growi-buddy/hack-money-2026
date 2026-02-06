@@ -8,7 +8,6 @@ import { z } from 'zod';
 const CreateChatRoomSchema = z.object({
   walletOne: z.string().min(1, 'walletOne is required'),
   walletTwo: z.string().min(1, 'walletTwo is required'),
-  campaignId: z.string().optional(),
   initialMessages: z.array(z.object({
     text: z.string().min(1, 'Message text is required'),
     senderWallet: z.string().min(1, 'Sender wallet is required'),
@@ -18,7 +17,7 @@ const CreateChatRoomSchema = z.object({
 export async function POST(req: Request) {
   return safeRoute(async () => {
     const body = await req.json();
-    const { walletOne, walletTwo, campaignId, initialMessages } = CreateChatRoomSchema.parse(body);
+    const { walletOne, walletTwo, initialMessages } = CreateChatRoomSchema.parse(body);
 
     const [userOne, userTwo] = await Promise.all([
       getOrCreateUserByWallet(walletOne),
@@ -42,7 +41,6 @@ export async function POST(req: Request) {
       include: {
         userOne: { select: { id: true, name: true, walletAddress: true, avatar: true } },
         userTwo: { select: { id: true, name: true, walletAddress: true, avatar: true } },
-        campaign: { select: { id: true, title: true, status: true } },
         messages: {
           orderBy: { createdAt: 'asc' },
           include: {
@@ -58,12 +56,10 @@ export async function POST(req: Request) {
         data: {
           userOneId: orderedOneId,
           userTwoId: orderedTwoId,
-          campaignId: campaignId || null,
         },
         include: {
           userOne: { select: { id: true, name: true, walletAddress: true, avatar: true } },
           userTwo: { select: { id: true, name: true, walletAddress: true, avatar: true } },
-          campaign: { select: { id: true, title: true, status: true } },
           messages: {
             orderBy: { createdAt: 'asc' },
             include: {
@@ -130,7 +126,6 @@ export async function POST(req: Request) {
         include: {
           userOne: { select: { id: true, name: true, walletAddress: true, avatar: true } },
           userTwo: { select: { id: true, name: true, walletAddress: true, avatar: true } },
-          campaign: { select: { id: true, title: true, status: true } },
           messages: {
             orderBy: { createdAt: 'asc' },
             include: {
