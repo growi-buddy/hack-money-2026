@@ -9,16 +9,17 @@ generator client {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  walletAddress String   @unique
-  name          String?
-  email         String?  @unique
-  phone         String?
-  location      String?
-  bio           String?
-  avatar        String?
-  interests     String[] @default([])
-  affinities    String[] @default([])
+  id                     String                       @id @default(cuid())
+  walletAddress          String                       @unique
+  name                   String?
+  email                  String?                      @unique
+  phone                  String?
+  location               String?
+  bio                    String?
+  avatar                 String?
+  interests              String[]                     @default([])
+  affinities             String[]                     @default([])
+  influencerVerification InfluencerVerificationStatus @default(NONE)
 
   socialMedias     SocialMedia[]
   campaignsCreated Campaign[]      @relation("UserCampaigns")
@@ -279,4 +280,11 @@ enum CampaignStatus {
   DEPLETED
   COMPLETED
   DELETED
+}
+
+enum InfluencerVerificationStatus {
+  NONE
+  PENDING
+  VERIFIED
+  REJECTED
 }

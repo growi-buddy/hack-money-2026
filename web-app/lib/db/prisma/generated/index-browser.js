@@ -131,6 +131,7 @@ exports.Prisma.UserScalarFieldEnum = {
   avatar: 'avatar',
   interests: 'interests',
   affinities: 'affinities',
+  influencerVerification: 'influencerVerification',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -288,6 +289,13 @@ exports.Prisma.JsonNullValueFilter = {
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
+exports.InfluencerVerificationStatus = exports.$Enums.InfluencerVerificationStatus = {
+  NONE: 'NONE',
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED'
+};
+
 exports.SocialMediaPlatform = exports.$Enums.SocialMediaPlatform = {
   INSTAGRAM: 'INSTAGRAM',
   TIKTOK: 'TIKTOK',

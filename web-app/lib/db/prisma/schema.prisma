@@ -19,6 +19,7 @@ model User {
   avatar        String?
   interests     String[] @default([])
   affinities    String[] @default([])
+  influencerVerification InfluencerVerificationStatus @default(NONE)
 
   socialMedias     SocialMedia[]
   campaignsCreated Campaign[]      @relation("UserCampaigns")
@@ -279,4 +280,11 @@ enum CampaignStatus {
   DEPLETED
   COMPLETED
   DELETED
+}
+
+enum InfluencerVerificationStatus {
+  NONE
+  PENDING
+  VERIFIED
+  REJECTED
 }

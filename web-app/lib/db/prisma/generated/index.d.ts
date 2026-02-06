@@ -125,6 +125,16 @@ export const CampaignStatus: {
 
 export type CampaignStatus = (typeof CampaignStatus)[keyof typeof CampaignStatus]
 
+
+export const InfluencerVerificationStatus: {
+  NONE: 'NONE',
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED'
+};
+
+export type InfluencerVerificationStatus = (typeof InfluencerVerificationStatus)[keyof typeof InfluencerVerificationStatus]
+
 }
 
 export type EventType = $Enums.EventType
@@ -142,6 +152,10 @@ export const SocialMediaPlatform: typeof $Enums.SocialMediaPlatform
 export type CampaignStatus = $Enums.CampaignStatus
 
 export const CampaignStatus: typeof $Enums.CampaignStatus
+
+export type InfluencerVerificationStatus = $Enums.InfluencerVerificationStatus
+
+export const InfluencerVerificationStatus: typeof $Enums.InfluencerVerificationStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -2343,6 +2357,7 @@ export namespace Prisma {
     location: string | null
     bio: string | null
     avatar: string | null
+    influencerVerification: $Enums.InfluencerVerificationStatus | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2356,6 +2371,7 @@ export namespace Prisma {
     location: string | null
     bio: string | null
     avatar: string | null
+    influencerVerification: $Enums.InfluencerVerificationStatus | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2371,6 +2387,7 @@ export namespace Prisma {
     avatar: number
     interests: number
     affinities: number
+    influencerVerification: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2386,6 +2403,7 @@ export namespace Prisma {
     location?: true
     bio?: true
     avatar?: true
+    influencerVerification?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2399,6 +2417,7 @@ export namespace Prisma {
     location?: true
     bio?: true
     avatar?: true
+    influencerVerification?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2414,6 +2433,7 @@ export namespace Prisma {
     avatar?: true
     interests?: true
     affinities?: true
+    influencerVerification?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2502,6 +2522,7 @@ export namespace Prisma {
     avatar: string | null
     interests: string[]
     affinities: string[]
+    influencerVerification: $Enums.InfluencerVerificationStatus
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -2534,6 +2555,7 @@ export namespace Prisma {
     avatar?: boolean
     interests?: boolean
     affinities?: boolean
+    influencerVerification?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     socialMedias?: boolean | User$socialMediasArgs<ExtArgs>
@@ -2557,6 +2579,7 @@ export namespace Prisma {
     avatar?: boolean
     interests?: boolean
     affinities?: boolean
+    influencerVerification?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2572,6 +2595,7 @@ export namespace Prisma {
     avatar?: boolean
     interests?: boolean
     affinities?: boolean
+    influencerVerification?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2587,11 +2611,12 @@ export namespace Prisma {
     avatar?: boolean
     interests?: boolean
     affinities?: boolean
+    influencerVerification?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "walletAddress" | "name" | "email" | "phone" | "location" | "bio" | "avatar" | "interests" | "affinities" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "walletAddress" | "name" | "email" | "phone" | "location" | "bio" | "avatar" | "interests" | "affinities" | "influencerVerification" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     socialMedias?: boolean | User$socialMediasArgs<ExtArgs>
     campaignsCreated?: boolean | User$campaignsCreatedArgs<ExtArgs>
@@ -2627,6 +2652,7 @@ export namespace Prisma {
       avatar: string | null
       interests: string[]
       affinities: string[]
+      influencerVerification: $Enums.InfluencerVerificationStatus
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -3069,6 +3095,7 @@ export namespace Prisma {
     readonly avatar: FieldRef<"User", 'String'>
     readonly interests: FieldRef<"User", 'String[]'>
     readonly affinities: FieldRef<"User", 'String[]'>
+    readonly influencerVerification: FieldRef<"User", 'InfluencerVerificationStatus'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -17255,6 +17282,7 @@ export namespace Prisma {
     avatar: 'avatar',
     interests: 'interests',
     affinities: 'affinities',
+    influencerVerification: 'influencerVerification',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -17487,6 +17515,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'InfluencerVerificationStatus'
+   */
+  export type EnumInfluencerVerificationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InfluencerVerificationStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'InfluencerVerificationStatus[]'
+   */
+  export type ListEnumInfluencerVerificationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InfluencerVerificationStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -17636,6 +17678,7 @@ export namespace Prisma {
     avatar?: StringNullableFilter<"User"> | string | null
     interests?: StringNullableListFilter<"User">
     affinities?: StringNullableListFilter<"User">
+    influencerVerification?: EnumInfluencerVerificationStatusFilter<"User"> | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     socialMedias?: SocialMediaListRelationFilter
@@ -17658,6 +17701,7 @@ export namespace Prisma {
     avatar?: SortOrderInput | SortOrder
     interests?: SortOrder
     affinities?: SortOrder
+    influencerVerification?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     socialMedias?: SocialMediaOrderByRelationAggregateInput
@@ -17683,6 +17727,7 @@ export namespace Prisma {
     avatar?: StringNullableFilter<"User"> | string | null
     interests?: StringNullableListFilter<"User">
     affinities?: StringNullableListFilter<"User">
+    influencerVerification?: EnumInfluencerVerificationStatusFilter<"User"> | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     socialMedias?: SocialMediaListRelationFilter
@@ -17705,6 +17750,7 @@ export namespace Prisma {
     avatar?: SortOrderInput | SortOrder
     interests?: SortOrder
     affinities?: SortOrder
+    influencerVerification?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -17726,6 +17772,7 @@ export namespace Prisma {
     avatar?: StringNullableWithAggregatesFilter<"User"> | string | null
     interests?: StringNullableListFilter<"User">
     affinities?: StringNullableListFilter<"User">
+    influencerVerification?: EnumInfluencerVerificationStatusWithAggregatesFilter<"User"> | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -18619,6 +18666,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
@@ -18641,6 +18689,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
@@ -18663,6 +18712,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
@@ -18685,6 +18735,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
@@ -18707,6 +18758,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -18722,6 +18774,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -18737,6 +18790,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19698,6 +19752,13 @@ export namespace Prisma {
     isEmpty?: boolean
   }
 
+  export type EnumInfluencerVerificationStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.InfluencerVerificationStatus | EnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InfluencerVerificationStatus[] | ListEnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InfluencerVerificationStatus[] | ListEnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInfluencerVerificationStatusFilter<$PrismaModel> | $Enums.InfluencerVerificationStatus
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -19785,6 +19846,7 @@ export namespace Prisma {
     avatar?: SortOrder
     interests?: SortOrder
     affinities?: SortOrder
+    influencerVerification?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19798,6 +19860,7 @@ export namespace Prisma {
     location?: SortOrder
     bio?: SortOrder
     avatar?: SortOrder
+    influencerVerification?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19811,6 +19874,7 @@ export namespace Prisma {
     location?: SortOrder
     bio?: SortOrder
     avatar?: SortOrder
+    influencerVerification?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19849,6 +19913,16 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type EnumInfluencerVerificationStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InfluencerVerificationStatus | EnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InfluencerVerificationStatus[] | ListEnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InfluencerVerificationStatus[] | ListEnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInfluencerVerificationStatusWithAggregatesFilter<$PrismaModel> | $Enums.InfluencerVerificationStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInfluencerVerificationStatusFilter<$PrismaModel>
+    _max?: NestedEnumInfluencerVerificationStatusFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -20727,6 +20801,10 @@ export namespace Prisma {
   export type UserUpdateaffinitiesInput = {
     set?: string[]
     push?: string | string[]
+  }
+
+  export type EnumInfluencerVerificationStatusFieldUpdateOperationsInput = {
+    set?: $Enums.InfluencerVerificationStatus
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -21666,6 +21744,13 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedEnumInfluencerVerificationStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.InfluencerVerificationStatus | EnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InfluencerVerificationStatus[] | ListEnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InfluencerVerificationStatus[] | ListEnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInfluencerVerificationStatusFilter<$PrismaModel> | $Enums.InfluencerVerificationStatus
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -21731,6 +21816,16 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumInfluencerVerificationStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InfluencerVerificationStatus | EnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.InfluencerVerificationStatus[] | ListEnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InfluencerVerificationStatus[] | ListEnumInfluencerVerificationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumInfluencerVerificationStatusWithAggregatesFilter<$PrismaModel> | $Enums.InfluencerVerificationStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInfluencerVerificationStatusFilter<$PrismaModel>
+    _max?: NestedEnumInfluencerVerificationStatusFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -22371,6 +22466,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     campaignsCreated?: CampaignCreateNestedManyWithoutOwnerInput
@@ -22392,6 +22488,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     campaignsCreated?: CampaignUncheckedCreateNestedManyWithoutOwnerInput
@@ -22429,6 +22526,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaignsCreated?: CampaignUpdateManyWithoutOwnerNestedInput
@@ -22450,6 +22548,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaignsCreated?: CampaignUncheckedUpdateManyWithoutOwnerNestedInput
@@ -22471,6 +22570,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
@@ -22492,6 +22592,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
@@ -22621,6 +22722,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
@@ -22642,6 +22744,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
@@ -22724,6 +22827,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
@@ -22745,6 +22849,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
@@ -22840,6 +22945,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
@@ -22861,6 +22967,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
@@ -23344,6 +23451,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
@@ -23365,6 +23473,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
@@ -23505,6 +23614,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
@@ -23526,6 +23636,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
@@ -23769,6 +23880,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
@@ -23790,6 +23902,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
@@ -23816,6 +23929,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
@@ -23837,6 +23951,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
@@ -23947,6 +24062,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
@@ -23968,6 +24084,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
@@ -24000,6 +24117,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
@@ -24021,6 +24139,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
@@ -24136,6 +24255,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaCreateNestedManyWithoutUserInput
@@ -24157,6 +24277,7 @@ export namespace Prisma {
     avatar?: string | null
     interests?: UserCreateinterestsInput | string[]
     affinities?: UserCreateaffinitiesInput | string[]
+    influencerVerification?: $Enums.InfluencerVerificationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     socialMedias?: SocialMediaUncheckedCreateNestedManyWithoutUserInput
@@ -24227,6 +24348,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUpdateManyWithoutUserNestedInput
@@ -24248,6 +24370,7 @@ export namespace Prisma {
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     interests?: UserUpdateinterestsInput | string[]
     affinities?: UserUpdateaffinitiesInput | string[]
+    influencerVerification?: EnumInfluencerVerificationStatusFieldUpdateOperationsInput | $Enums.InfluencerVerificationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     socialMedias?: SocialMediaUncheckedUpdateManyWithoutUserNestedInput
