@@ -31,16 +31,16 @@ const liveCampaignManagers = [
 ];
 
 const clientLinks = [
-  { href: '/client', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/client/events-tracking', icon: Zap, label: 'Events Tracking' },
-  { href: '/client/create', icon: PlusCircle, label: 'Create Campaign' },
+  { href: '/client/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/client/events-tracking', icon: Zap, label: 'Site Tracking' },
+  { href: '/client/create', icon: PlusCircle, label: 'Campaigns' },
   { href: '/client/influencers', icon: Users, label: 'Influencers' },
   { href: '/client/inbox', icon: Inbox, label: 'Inbox' },
   { href: '/client/profile', icon: UserCircle, label: 'Profile' },
 ];
 
 const influencerLinks = [
-  { href: '/influencer', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/influencer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/influencer/campaigns', icon: Package, label: 'Campaigns' },
   { href: '/influencer/managers', icon: Users, label: 'Campaign Managers' },
   { href: '/influencer/inbox', icon: Inbox, label: 'Inbox' },
@@ -74,7 +74,10 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-border bg-background shadow-xl md:hidden"
+            className={cn(
+              "fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-border shadow-xl md:hidden",
+              type === 'client' ? 'bg-growi-blue/5' : 'bg-growi-lime/5'
+            )}
           >
             {/* Close button for mobile */}
             <div className="flex items-center justify-between border-b border-border p-4">
@@ -98,7 +101,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
               className="flex-1 space-y-1 p-4"
             >
               {links.map((link) => {
-                const isActive = pathname === link.href || (link.href !== '/client' && link.href !== '/influencer' && pathname.startsWith(link.href));
+                const isActive = pathname === link.href || (link.href !== '/client/dashboard' && link.href !== '/influencer/dashboard' && pathname.startsWith(link.href));
                 return (
                   <motion.div key={link.href} variants={staggerItem}>
                     <Link
@@ -107,7 +110,9 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                       className={cn(
                         'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                         isActive
-                          ? 'bg-growi-blue/10 text-growi-blue'
+                          ? type === 'client'
+                            ? 'bg-growi-blue/10 text-growi-blue'
+                            : 'bg-growi-lime/10 text-growi-lime'
                           : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
                       )}
                     >
@@ -118,15 +123,35 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                 );
               })}
             </motion.nav>
+
+            {/* Mobile Footer */}
+            <div className="border-t border-border p-4 text-center">
+              <p className="text-xs text-muted-foreground">
+                {type === 'client' ? 'Campaign Manager Portal' : 'Influencer Portal'}
+              </p>
+              <div className="mt-6 flex justify-center">
+                <Image
+                  src={type === 'client' ? '/growi-manager.png' : '/growi-influencer.png'}
+                  alt={type === 'client' ? 'Manager' : 'Influencer'}
+                  width={120}
+                  height={120}
+                  className="h-28 w-28 object-contain"
+                  style={{ transform: 'scaleX(-1)' }}
+                />
+              </div>
+            </div>
           </motion.aside>
         )}
       </AnimatePresence>
       
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-16 bottom-0 z-40 hidden w-56 overflow-y-auto border-r border-border bg-card md:block lg:w-64">
+      <aside className={cn(
+          "fixed left-0 top-16 bottom-0 z-40 hidden w-56 overflow-y-auto border-r border-border md:block lg:w-64",
+          type === 'client' ? 'bg-growi-blue/5' : 'bg-growi-lime/5'
+        )}>
         <nav className="space-y-1 p-4">
           {links.map((link) => {
-            const isActive = pathname === link.href || (link.href !== '/client' && link.href !== '/influencer' && pathname.startsWith(link.href));
+            const isActive = pathname === link.href || (link.href !== '/client/dashboard' && link.href !== '/influencer/dashboard' && pathname.startsWith(link.href));
             return (
               <Link
                 key={link.href}
@@ -134,7 +159,9 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-growi-blue/10 text-growi-blue'
+                    ? type === 'client'
+                      ? 'bg-growi-blue/10 text-growi-blue'
+                      : 'bg-growi-lime/10 text-growi-lime'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
                 )}
               >
@@ -240,7 +267,7 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
                     <p className="text-xs text-muted-foreground">{manager.campaigns} campaigns</p>
                   </div>
                   <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0">
-                    <Send className="h-3.5 w-3.5 text-growi-blue" />
+                    <Send className="h-3.5 w-3.5 text-growi-lime" />
                   </Button>
                 </motion.div>
               ))}
@@ -258,10 +285,20 @@ export function AppSidebar({ type, isOpen, onClose }: AppSidebarProps) {
         )}
         
         {/* Footer */}
-        <div className="border-t border-border p-4">
+        <div className="border-t border-border p-4 text-center">
           <p className="text-xs text-muted-foreground">
             {type === 'client' ? 'Campaign Manager Portal' : 'Influencer Portal'}
           </p>
+          <div className="mt-6 flex justify-center">
+            <Image
+              src={type === 'client' ? '/growi-manager.png' : '/growi-influencer.png'}
+              alt={type === 'client' ? 'Manager' : 'Influencer'}
+              width={120}
+              height={120}
+              className="h-28 w-28 object-contain"
+              style={{ transform: 'scaleX(-1)' }}
+            />
+          </div>
         </div>
       </aside>
     </>

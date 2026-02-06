@@ -160,8 +160,8 @@ export default function LoginPage() {
                         <Image
                           src="/growi-influencer.png"
                           alt="Influencer"
-                          width={120}
-                          height={120}
+                          width={160}
+                          height={160}
                           className="h-32 w-32 object-contain sm:h-40 sm:w-40"
                         />
                       </motion.div>
