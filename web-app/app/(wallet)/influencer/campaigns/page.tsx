@@ -208,6 +208,14 @@ export default function InfluencerDashboard() {
   
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">My Campaigns</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Track your campaign participation and earnings
+        </p>
+      </div>
+
       {/* Earnings Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

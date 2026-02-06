@@ -275,24 +275,18 @@ export default function ProfilePage() {
       </AnimatePresence>
       
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div>
+      <div>
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Edit Profile</h1>
-          <p className="text-muted-foreground">Manage your public profile visible to brands</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2">
-          {profile.influencerVerification !== InfluencerVerificationStatus.VERIFIED &&
-            profile.influencerVerification !== InfluencerVerificationStatus.PENDING && (
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <div className="flex items-center gap-2">
+            {profile.influencerVerification !== InfluencerVerificationStatus.VERIFIED &&
+              profile.influencerVerification !== InfluencerVerificationStatus.PENDING && (
                 <Button
                   onClick={handleRequestVerification}
                   disabled={isRequestingVerification || socialMedias.length === 0}
                   variant="outline"
-                  className="border-growi-blue text-growi-blue hover:bg-growi-blue/10"
+                  size="sm"
+                  className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
                 >
                   {isRequestingVerification ? (
                     <>
@@ -302,23 +296,23 @@ export default function ProfilePage() {
                   ) : (
                     <>
                       <ShieldCheck className="mr-2 h-4 w-4" />
-                      Request Verification
+                      Verify Profile
                     </>
                   )}
                 </Button>
-              </motion.div>
+              )}
+            {profile.influencerVerification === InfluencerVerificationStatus.PENDING && (
+              <Badge className="bg-yellow-500/20 text-yellow-600 border-yellow-500/30">
+                <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                Pending
+              </Badge>
             )}
-          {profile.influencerVerification === InfluencerVerificationStatus.PENDING && (
-            <Badge className="bg-yellow-500/20 text-yellow-600 border-yellow-500/30 h-10 px-4 flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Verification Pending
-            </Badge>
-          )}
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button
               onClick={handleSave}
               disabled={isSaving}
-              className="bg-growi-blue text-white hover:bg-growi-blue/90"
+              variant="outline"
+              size="sm"
+              className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
             >
               {isSaving ? (
                 <>
@@ -328,13 +322,16 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <Save className="mr-2 h-4 w-4" />
-                  Save Profile
+                  Save
                 </>
               )}
             </Button>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage your public profile visible to brands
+        </p>
+      </div>
       
       {error && (
         <div className="rounded-lg bg-destructive/10 p-4 text-destructive">

@@ -296,8 +296,17 @@ export default function InfluencerInboxPage() {
   }
 
   return (
-    <AblyChatProvider clientId={address!}>
-      <div className="flex h-[calc(100vh-8rem)] gap-4 overflow-hidden">
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Messages</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Connect with campaign managers about opportunities
+        </p>
+      </div>
+
+      <AblyChatProvider clientId={address!}>
+        <div className="flex h-[calc(100vh-8rem)] gap-4 overflow-hidden">
         {/* Conversations List */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -477,7 +486,8 @@ export default function InfluencerInboxPage() {
             </div>
           )}
         </motion.div>
-      </div>
-    </AblyChatProvider>
+        </div>
+      </AblyChatProvider>
+    </div>
   );
 }

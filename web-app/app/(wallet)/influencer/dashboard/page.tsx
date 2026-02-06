@@ -121,22 +121,27 @@ export default function InfluencerDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Influencer Dashboard</h1>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <Button className="relative overflow-hidden bg-growi-lime text-foreground hover:bg-growi-lime/90">
-            <motion.div
-              className="absolute inset-0 bg-white/20"
-              animate={{ x: [ '-100%', '100%' ] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            />
-            <Wallet className="mr-2 h-4 w-4" />
-            Withdraw to Wallet
-          </Button>
-        </motion.div>
+      <div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-foreground">Influencer Dashboard</h1>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Button className="relative overflow-hidden bg-growi-lime text-foreground hover:bg-growi-lime/90">
+              <motion.div
+                className="absolute inset-0 bg-white/20"
+                animate={{ x: [ '-100%', '100%' ] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              />
+              <Wallet className="mr-2 h-4 w-4" />
+              Withdraw to Wallet
+            </Button>
+          </motion.div>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Track your earnings and campaign performance
+        </p>
       </div>
       
       {/* Total Earnings Card */}

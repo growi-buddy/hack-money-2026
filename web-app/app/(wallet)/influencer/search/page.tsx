@@ -105,19 +105,17 @@ export default function CampaignsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div>
+      <div>
+        <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Search Campaigns</h1>
-          <p className="text-muted-foreground">Browse and apply to campaigns that match your style</p>
+          <Badge variant="outline" className="w-fit">
+            {campaigns.length} campaigns available
+          </Badge>
         </div>
-        <Badge variant="outline" className="w-fit">
-          {campaigns.length} campaigns available
-        </Badge>
-      </motion.div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Browse and apply to campaigns that match your style
+        </p>
+      </div>
       
       {/* Manager Filter Banner */}
       {selectedManagerName && (
