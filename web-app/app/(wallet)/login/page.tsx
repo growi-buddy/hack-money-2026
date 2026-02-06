@@ -118,7 +118,7 @@ export default function LoginPage() {
             {showManagerCard && (
               <motion.div variants={staggerItem} className={`h-full ${showSingleCard ? 'w-full max-w-md' : ''}`}>
                 <div
-                  onClick={(e) => handleCardClick(e, '/manager/profile')}
+                  onClick={(e) => handleCardClick(e, '/manager')}
                   className="block h-full"
                 >
                   <motion.div
@@ -164,7 +164,7 @@ export default function LoginPage() {
             {showInfluencerCard && (
               <motion.div variants={staggerItem} className={`h-full ${showSingleCard ? 'w-full max-w-md' : ''}`}>
                 <div
-                  onClick={(e) => handleCardClick(e, '/influencer/profile')}
+                  onClick={(e) => handleCardClick(e, '/influencer')}
                   className="block h-full"
                 >
                   <motion.div
