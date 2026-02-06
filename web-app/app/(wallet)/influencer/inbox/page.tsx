@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { Send, CheckCheck, ArrowLeft, Loader2, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -229,10 +230,13 @@ function ChatMessages({ currentUserId }: { currentUserId: string }) {
 
 export default function InfluencerInboxPage() {
   const { address, isConnected } = useWallet();
+  const searchParams = useSearchParams();
+  const roomIdParam = searchParams.get('roomId');
   const [ chatRooms, setChatRooms ] = useState<ChatRoomData[]>([]);
   const [ selectedRoom, setSelectedRoom ] = useState<ChatRoomData | null>(null);
   const [ showMobileChat, setShowMobileChat ] = useState(false);
   const [ loading, setLoading ] = useState(true);
+  const [ initialRoomSelected, setInitialRoomSelected ] = useState(false);
 
   const fetchRooms = useCallback(async () => {
     if (!address) {
@@ -260,12 +264,25 @@ export default function InfluencerInboxPage() {
     fetchRooms();
   }, [ fetchRooms ]);
 
-  // Auto-select first room when rooms load
+  // Auto-select room from URL param or fallback to first room
   useEffect(() => {
-    if (chatRooms.length > 0 && !selectedRoom) {
-      setSelectedRoom(chatRooms[0]);
+    if (chatRooms.length > 0 && !initialRoomSelected) {
+      if (roomIdParam) {
+        const targetRoom = chatRooms.find((r) => r.id === roomIdParam);
+        if (targetRoom) {
+          setSelectedRoom(targetRoom);
+          setShowMobileChat(true);
+          setInitialRoomSelected(true);
+          return;
+        }
+      }
+      // Fallback: select first room
+      if (!selectedRoom) {
+        setSelectedRoom(chatRooms[0]);
+      }
+      setInitialRoomSelected(true);
     }
-  }, [ chatRooms, selectedRoom ]);
+  }, [ chatRooms, roomIdParam, initialRoomSelected, selectedRoom ]);
 
   const handleSelectRoom = (room: ChatRoomData) => {
     setSelectedRoom(room);

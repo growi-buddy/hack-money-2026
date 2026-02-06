@@ -5,6 +5,11 @@ import { getOrCreateUserByWallet } from '@/lib/services/user.service';
 import { ApiDataResponse, ApiErrorResponse } from '@/types';
 import { z } from 'zod';
 
+function buildAblyRoomId(userOneId: string, userTwoId: string, campaignId?: string): string {
+  const [orderedOne, orderedTwo] = userOneId < userTwoId ? [userOneId, userTwoId] : [userTwoId, userOneId];
+  return `chat:${orderedOne}:${orderedTwo}${campaignId ? `:${campaignId}` : ''}`;
+}
+
 const ParticipateSchema = z.object({
   walletAddress: z.string().min(1, 'Wallet address is required'),
 });
@@ -98,9 +103,55 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       },
     });
 
-    const response: ApiDataResponse<typeof participation> = {
+    // Create chat room between influencer and campaign owner
+    const [orderedOneId, orderedTwoId] =
+      user.id < campaign.ownerId
+        ? [user.id, campaign.ownerId]
+        : [campaign.ownerId, user.id];
+
+    const ablyRoomId = buildAblyRoomId(user.id, campaign.ownerId, campaignId);
+
+    const chatRoom = await prisma.chatRoom.upsert({
+      where: {
+        userOneId_userTwoId_campaignId: {
+          userOneId: orderedOneId,
+          userTwoId: orderedTwoId,
+          campaignId,
+        },
+      },
+      update: {},
+      create: {
+        userOneId: orderedOneId,
+        userTwoId: orderedTwoId,
+        campaignId,
+        ablyRoomId,
+      },
+    });
+
+    // Create initial message from the influencer
+    const influencerDisplayName = user.name || `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
+    const initialMessageText = `Hi! I just applied to your campaign "${campaign.title}". I'm excited to collaborate and would love to discuss the details. Looking forward to working together! 🚀`;
+
+    await prisma.chatMessage.create({
+      data: {
+        chatRoomId: chatRoom.id,
+        senderId: user.id,
+        text: initialMessageText,
+      },
+    });
+
+    // Update lastActivityAt on the chat room
+    await prisma.chatRoom.update({
+      where: { id: chatRoom.id },
+      data: { lastActivityAt: new Date() },
+    });
+
+    const response: ApiDataResponse<typeof participation & { chatRoomId: string }> = {
       success: true,
-      data: participation,
+      data: {
+        ...participation,
+        chatRoomId: chatRoom.id,
+      },
     };
     return { response, status: 201 };
   });

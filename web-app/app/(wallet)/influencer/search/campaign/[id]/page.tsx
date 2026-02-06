@@ -153,11 +153,12 @@ export default function CampaignDetailsPage() {
       });
       
       const data = await response.json();
-      
+
       if (data.success) {
         setShowSuccess(true);
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        router.push(`/influencer/campaign/${campaignId}/qr`);
+        const chatRoomId = data.data?.chatRoomId;
+        router.push(chatRoomId ? `/influencer/inbox?roomId=${chatRoomId}` : `/influencer/inbox`);
       } else {
         setError(data.error?.message || 'Failed to apply');
       }
