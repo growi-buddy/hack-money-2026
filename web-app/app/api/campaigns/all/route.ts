@@ -116,7 +116,6 @@ export async function GET(req: Request) {
             countries: true,
             startDate: true,
             endDate: true,
-            escrowAddress: true,
             createdAt: true,
             updatedAt: true,
             deletedAt: true,
@@ -188,7 +187,6 @@ export async function GET(req: Request) {
             avatar: campaign.owner.avatar || '',
           },
           userRole: 'manager',
-          escrowAddress: campaign.escrowAddress,
         };
       });
 
