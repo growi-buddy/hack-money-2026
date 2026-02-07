@@ -1,24 +1,16 @@
-import {
-  CampaignDashboardData,
-  getCampaignById,
-  getCampaignDashboard,
-  getCampaignForInfluencer,
-  InfluencerCampaignView,
-} from '@/app/api/campaigns/services';
-import { safeRoute } from '@/helpers';
+import { getCampaignResponseDTO } from '@/app/api/campaigns/services';
+import { safeRoute, safeRouteWithWalletAddress } from '@/helpers';
 import { prisma } from '@/lib/db';
-import { Campaign, CampaignStatus } from '@/lib/db/prisma/generated';
-import { ApiDataResponse, ApiErrorResponse, UpdateCampaignDTO } from '@/types';
+import { ApiDataResponse, ApiErrorResponse, CampaignResponseDTO, UpdateCampaignDTO } from '@/types';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  return safeRoute(async () => {
+  return safeRouteWithWalletAddress(req, async (user) => {
     const { id } = await params;
     const { searchParams } = new URL(req.url);
     const dashboard = searchParams.get('dashboard') === 'true';
-    const view = searchParams.get('view');
     
     if (dashboard) {
-      const campaignData = await getCampaignDashboard(id);
+      const campaignData = await getCampaignResponseDTO(id, user.walletAddress);
       
       if (!campaignData) {
         const response: ApiErrorResponse = {
@@ -28,7 +20,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         return { response, status: 404 };
       }
       
-      const response: ApiDataResponse<CampaignDashboardData> = {
+      const response: ApiDataResponse<CampaignResponseDTO> = {
         success: true,
         data: campaignData,
       };
@@ -36,27 +28,27 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return { response };
     }
     
-    // Influencer view - includes owner info and formatted reward events
-    if (view === 'influencer') {
-      const campaignData = await getCampaignForInfluencer(id);
-      
-      if (!campaignData) {
-        const response: ApiErrorResponse = {
-          success: false,
-          error: { code: 'NOT_FOUND', message: 'Campaign not found' },
-        };
-        return { response, status: 404 };
-      }
-      
-      const response: ApiDataResponse<InfluencerCampaignView> = {
-        success: true,
-        data: campaignData,
-      };
-      
-      return { response };
-    }
+    // // Influencer view - includes owner info and formatted reward events
+    // if (view === 'influencer') {
+    //   const campaignData = await getCampaignForInfluencer(id);
+    //
+    //   if (!campaignData) {
+    //     const response: ApiErrorResponse = {
+    //       success: false,
+    //       error: { code: 'NOT_FOUND', message: 'Campaign not found' },
+    //     };
+    //     return { response, status: 404 };
+    //   }
+    //
+    //   const response: ApiDataResponse<InfluencerCampaignView> = {
+    //     success: true,
+    //     data: campaignData,
+    //   };
+    //
+    //   return { response };
+    // }
     
-    const campaign = await getCampaignById(id);
+    const campaign = await getCampaignResponseDTO(id, user.walletAddress);
     
     if (!campaign) {
       const response: ApiErrorResponse = {
@@ -66,7 +58,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return { response, status: 404 };
     }
     
-    const response: ApiDataResponse<Campaign> = {
+    const response: ApiDataResponse<CampaignResponseDTO> = {
       success: true,
       data: campaign,
     };
@@ -82,22 +74,22 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     
     const validatedData = UpdateCampaignDTO.parse(body);
     
-    const updated = await prisma.$transaction(async (tx) => {
-      const { rewardEvents, ...campaignData } = validatedData;
+    await prisma.$transaction(async (tx) => {
+      const { siteEvents, ...campaignData } = validatedData;
       
       // Only update rewardEvents if they are provided in the request
-      if (rewardEvents !== undefined) {
+      if (siteEvents !== undefined) {
         // Delete existing campaign reward event links
-        await tx.campaignRewardEvent.deleteMany({
+        await tx.campaignSiteEvent.deleteMany({
           where: { campaignId: id },
         });
         
         // Create new campaign reward event links
-        if (rewardEvents.length > 0) {
-          await tx.campaignRewardEvent.createMany({
-            data: rewardEvents.map((event) => ({
+        if (siteEvents.length > 0) {
+          await tx.campaignSiteEvent.createMany({
+            data: siteEvents.map((event) => ({
               campaignId: id,
-              rewardEventId: event.rewardEventId,
+              siteEventId: event.siteEventId,
               amount: event.amount,
               volumeStep: event.volumeStep ?? 1,
             })),
@@ -109,42 +101,64 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         where: { id },
         data: campaignData,
       });
-      
-      return tx.campaign.findUnique({
-        where: { id },
-        include: {
-          rewardEvents: {
-            include: {
-              rewardEvent: {
-                include: { selectors: true },
-              },
-            },
-          },
-        },
-      });
     });
     
-    const response: ApiDataResponse<Campaign> = {
+    const response: ApiDataResponse<true> = {
       success: true,
-      data: updated!,
+      data: true,
     };
     
     return { response };
   });
 }
 
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  return safeRoute(async () => {
+    const { id } = await params;
+    const body = await req.json();
+    const { action } = body;
+
+    // Handle restore action
+    if (action === 'restore') {
+      const restoredCampaign = await prisma.campaign.update({
+        where: { id },
+        data: { deletedAt: null },
+      });
+
+      const response: ApiDataResponse<{ id: string; message: string }> = {
+        success: true,
+        data: {
+          id: restoredCampaign.id,
+          message: 'Campaign restored successfully',
+        },
+      };
+      return { response };
+    }
+
+    // Handle other actions if needed
+    const response: ApiErrorResponse = {
+      success: false,
+      error: {
+        code: 'INVALID_ACTION',
+        message: 'Invalid action. Use "restore" to unarchive a campaign.',
+      },
+    };
+    return { response, status: 400 };
+  });
+}
+
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   return safeRoute(async () => {
     const { id } = await params;
-    
+
     const deletedCampaign = await prisma.campaign.update({
       where: { id },
-      data: { status: CampaignStatus.DELETED },
+      data: { deletedAt: new Date() },
     });
-    
-    const response: ApiDataResponse<{ id: string, status: CampaignStatus }> = {
+
+    const response: ApiDataResponse<{ id: string }> = {
       success: true,
-      data: { id: deletedCampaign.id, status: CampaignStatus.DELETED },
+      data: { id: deletedCampaign.id },
     };
     return { response };
   });

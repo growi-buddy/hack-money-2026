@@ -1,14 +1,31 @@
 'use client';
 
+import { CampaignStatusBadge } from '@/components/campaigns/CampaignStatusBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { staggerContainer, staggerItem } from '@/lib/animations';
+import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
 import { animate, AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
-import { ArrowRight, CreditCard, DollarSign, Eye, Package, ShoppingCart, TrendingUp, Zap } from 'lucide-react';
+import {
+  ArrowLeft,
+  Calendar,
+  CreditCard,
+  DollarSign,
+  Eye,
+  Flame,
+  Globe,
+  Loader2,
+  Package,
+  ShoppingCart,
+  Tag,
+  TrendingUp,
+  Users,
+  Zap,
+} from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -24,6 +41,40 @@ import {
   YAxis,
 } from 'recharts';
 
+// Types based on InfluencerCampaignView from API
+interface CampaignDetail {
+  id: string;
+  title: string;
+  description: string | null;
+  status: CampaignStatus;
+  budgetTotal: number;
+  isHot: boolean;
+  slots: number;
+  filledSlots: number;
+  interests: string[];
+  demographics: string[];
+  regions: string[];
+  countries: string[];
+  startDate: string | null;
+  endDate: string | null;
+  owner: {
+    id: string;
+    name: string | null;
+    walletAddress: string;
+    avatar: string | null;
+  };
+  rewardEvents: {
+    id: string;
+    name: string;
+    eventType: SiteEventType;
+    amount: number;
+    volumeStep: number;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Mock data for charts (will be replaced with real tracking data)
 const timelineData = [
   { date: 'Feb 10', landingViews: 500, viewItems: 280, addToCart: 32, checkout: 12, purchases: 3, earnings: 15.50 },
   { date: 'Feb 11', landingViews: 1200, viewItems: 650, addToCart: 78, checkout: 29, purchases: 8, earnings: 42.30 },
@@ -56,16 +107,6 @@ const timelineData = [
     purchases: 48,
     earnings: 185.70,
   },
-];
-
-const dailyPerformance = [
-  { day: 'Monday', views: 1250, conversions: 45, earnings: 38.50 },
-  { day: 'Tuesday', views: 1890, conversions: 67, earnings: 52.30 },
-  { day: 'Wednesday', views: 2100, conversions: 78, earnings: 61.20 },
-  { day: 'Thursday', views: 1650, conversions: 52, earnings: 45.80 },
-  { day: 'Friday', views: 2450, conversions: 89, earnings: 72.40 },
-  { day: 'Saturday', views: 3200, conversions: 112, earnings: 95.60 },
-  { day: 'Sunday', views: 2800, conversions: 98, earnings: 82.30 },
 ];
 
 const funnelData = [
@@ -112,7 +153,28 @@ function CountUpMoney({ value }: { value: number }) {
   return <motion.span>{rounded}</motion.span>;
 }
 
-export default function ActiveCampaignPage() {
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return 'Not set';
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function getCampaignDuration(startDate: string | null, endDate: string | null): string {
+  if (!startDate || !endDate) return 'Ongoing';
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (start.getTime() === end.getTime()) return 'Ongoing';
+  const diffDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays < 7) return `${diffDays} days`;
+  if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks`;
+  if (diffDays < 365) return `${Math.ceil(diffDays / 30)} months`;
+  return `${Math.ceil(diffDays / 365)} years`;
+}
+
+export default function InfluencerCampaignDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const [ campaign, setCampaign ] = useState<CampaignDetail | null>(null);
+  const [ loading, setLoading ] = useState(true);
+  const [ error, setError ] = useState('');
+  
   const [ earnings, setEarnings ] = useState(245.67);
   const [ transactions, setTransactions ] = useState<Transaction[]>(initialTransactions);
   const [ metrics, setMetrics ] = useState({
@@ -122,6 +184,30 @@ export default function ActiveCampaignPage() {
     checkout: { count: 210, earned: 21.00 },
     purchases: { count: 98, earned: 98.17 },
   });
+  
+  const fetchCampaign = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const { id } = await params;
+      const response = await fetch(`/api/campaigns/${id}?view=influencer`);
+      
+      if (!response.ok) {
+        throw new Error('Campaign not found');
+      }
+      
+      const result = await response.json();
+      setCampaign(result.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  }, [ params ]);
+  
+  useEffect(() => {
+    void fetchCampaign();
+  }, [ fetchCampaign ]);
   
   // Simulate real-time transactions
   useEffect(() => {
@@ -181,12 +267,205 @@ export default function ActiveCampaignPage() {
     }
   };
   
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+  
+  if (error || !campaign) {
+    return (
+      <div className="space-y-4">
+        <Link href="/influencer/campaigns">
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Campaigns
+          </Button>
+        </Link>
+        <Card className="border-destructive/50">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <p className="text-destructive">{error || 'Campaign not found'}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
+  const hasTags = campaign.interests.length > 0 || campaign.demographics.length > 0 ||
+    campaign.regions.length > 0 || campaign.countries.length > 0;
+  
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <Link href="/influencer/campaigns">
+        <Button variant="ghost" size="sm" className="text-muted-foreground">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Campaigns
+        </Button>
+      </Link>
+      
+      {/* Campaign Title */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-2"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold text-foreground">{campaign.title}</h1>
+            {campaign.owner.name && (
+              <p className="text-sm text-muted-foreground">
+                by {campaign.owner.name}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <CampaignStatusBadge status={campaign.status} />
+            {campaign.isHot && (
+              <div className="p-1.5 rounded-full bg-amber-500/20" title="Hot Campaign">
+                <Flame className="h-4 w-4 text-amber-600" />
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+      
+      {/* Campaign Info Card */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <Card className="border-growi-success/30">
+          <CardHeader className="pb-3">
+            {campaign.description && (
+              <p className="text-sm text-muted-foreground">{campaign.description}</p>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Campaign Details Grid */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {/* Dates */}
+              <div className="flex items-start gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Period</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {formatDate(campaign.startDate)} - {formatDate(campaign.endDate)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{getCampaignDuration(campaign.startDate, campaign.endDate)}</p>
+                </div>
+              </div>
+              
+              {/* Influencers */}
+              <div className="flex items-start gap-2">
+                <Users className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Influencers</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {campaign.filledSlots} / {campaign.slots}
+                  </p>
+                  <p className="text-xs text-muted-foreground">slots filled</p>
+                </div>
+              </div>
+              
+              {/* Budget */}
+              <div className="flex items-start gap-2">
+                <DollarSign className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Budget</p>
+                  <p className="text-sm font-medium text-growi-money">
+                    ${campaign.budgetTotal.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground">total</p>
+                </div>
+              </div>
+              
+              {/* Reward Events */}
+              <div className="flex items-start gap-2">
+                <Zap className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Events</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {campaign.rewardEvents.length}
+                  </p>
+                  <p className="text-xs text-muted-foreground">reward types</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Tags Section */}
+            {hasTags && (
+              <div className="space-y-2 pt-2 border-t border-border">
+                {/* Interests */}
+                {campaign.interests.length > 0 && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                    {campaign.interests.map((interest) => (
+                      <Badge
+                        key={interest}
+                        variant="secondary"
+                        className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
+                      >
+                        {interest}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Demographics */}
+                {campaign.demographics.length > 0 && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                    {campaign.demographics.map((demo) => (
+                      <Badge
+                        key={demo}
+                        variant="secondary"
+                        className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
+                      >
+                        {demo}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Regions & Countries */}
+                {(campaign.regions.length > 0 || campaign.countries.length > 0) && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                    {campaign.regions.map((region) => (
+                      <Badge
+                        key={region}
+                        variant="secondary"
+                        className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
+                      >
+                        {region}
+                      </Badge>
+                    ))}
+                    {campaign.countries.map((country) => (
+                      <Badge
+                        key={country}
+                        variant="secondary"
+                        className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
+                      >
+                        {country}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+      
       {/* Earnings Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
       >
         <Card className="border-growi-blue/30 bg-growi-blue/5">
           <CardContent className="p-6 text-center">
@@ -530,22 +809,6 @@ export default function ActiveCampaignPage() {
           </div>
         </CardContent>
       </Card>
-      
-      {/* Complete Campaign Button (for demo) */}
-      <Link href="/influencer/campaign/1/complete">
-        <motion.div
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-        >
-          <Button
-            variant="outline"
-            className="w-full border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
-          >
-            View Campaign Complete Screen (Demo)
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </motion.div>
-      </Link>
     </div>
   );
 }

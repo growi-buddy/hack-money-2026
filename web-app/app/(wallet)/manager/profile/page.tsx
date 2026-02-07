@@ -12,19 +12,19 @@ import { staggerContainer, staggerItem } from '@/lib/animations';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, MapPin, Save, Star, User, X } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function ClientProfilePage() {
-  const [isSaving, setIsSaving] = useState(false);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [ isSaving, setIsSaving ] = useState(false);
+  const [ showWelcomeModal, setShowWelcomeModal ] = useState(false);
+  const [ error, setError ] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const welcome = searchParams.get('welcome');
-
+  
   const { error: errorProfile, profile, isLoading, reload } = useProfile();
-
-  const [formData, setFormData] = useState({
+  
+  const [ formData, setFormData ] = useState({
     name: '',
     email: '',
     phone: '',
@@ -32,7 +32,7 @@ export default function ClientProfilePage() {
     bio: '',
     avatar: '/growi-mascot.png',
   });
-
+  
   useEffect(() => {
     setFormData({
       name: profile.name || '',
@@ -42,24 +42,24 @@ export default function ClientProfilePage() {
       bio: profile.bio || '',
       avatar: profile.avatar || '/growi-mascot.png',
     });
-  }, [profile]);
-
+  }, [ profile ]);
+  
   useEffect(() => {
     if (welcome) {
       setShowWelcomeModal(true);
     }
-  }, [welcome]);
-
+  }, [ welcome ]);
+  
   const closeWelcomeModal = () => {
     setShowWelcomeModal(false);
   };
-
+  
   const handleSave = async () => {
     setIsSaving(true);
     setError(null);
-
+    
     try {
-      await fetch(`/api/users/profile?walletAddress=${profile.walletAddress}`, {
+      const response = await fetch(`/api/users/profile?walletAddress=${profile.walletAddress}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -71,7 +71,13 @@ export default function ClientProfilePage() {
           avatar: formData.avatar || null,
         }),
       });
-
+      
+      const data = await response.json();
+      
+      if (data?.error) {
+        setError(data.error?.message || 'An error occurred');
+      }
+      
       reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -79,7 +85,7 @@ export default function ClientProfilePage() {
       setIsSaving(false);
     }
   };
-
+  
   const formatBudget = (amount: number): string => {
     if (amount >= 1000000) {
       return `$${(amount / 1000000).toFixed(1)}M`;
@@ -89,15 +95,15 @@ export default function ClientProfilePage() {
     }
     return `$${amount.toFixed(0)}`;
   };
-
+  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
-
+  
   return (
     <div className="space-y-6">
       {/* Welcome Modal */}
@@ -137,12 +143,18 @@ export default function ClientProfilePage() {
           </motion.div>
         )}
       </AnimatePresence>
-
+      
       {/* Header */}
       <div>
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Edit Profile</h1>
-          <Button onClick={handleSave} disabled={isSaving} variant="outline" size="sm" className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent">
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            variant="outline"
+            size="sm"
+            className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
+          >
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -160,11 +172,11 @@ export default function ClientProfilePage() {
           Manage your campaign manager profile
         </p>
       </div>
-
+      
       {error && <div className="rounded-lg bg-destructive/10 p-4 text-destructive">{error}</div>}
-
+      
       {errorProfile && <div className="rounded-lg bg-destructive/10 p-4 text-destructive">{errorProfile}</div>}
-
+      
       <motion.div
         variants={staggerContainer}
         initial="hidden"
@@ -197,7 +209,7 @@ export default function ClientProfilePage() {
               {/* Star Rating - placeholder */}
               <div className="text-center">
                 <div className="flex justify-center gap-1">
-                  {[...Array(5)].map((_, i) => (
+                  {[ ...Array(5) ].map((_, i) => (
                     <Star
                       key={i}
                       className={`h-5 w-5 ${
@@ -208,9 +220,9 @@ export default function ClientProfilePage() {
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">Campaign Manager</p>
               </div>
-
+              
               <Separator />
-
+              
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
                   <p className="text-2xl font-bold text-growi-blue">{formatBudget(profile.budgetSpent || 0)}</p>
@@ -224,7 +236,7 @@ export default function ClientProfilePage() {
             </CardContent>
           </Card>
         </motion.div>
-
+        
         {/* Edit Form */}
         <motion.div variants={staggerItem} className="lg:col-span-2 h-full">
           {/* Personal Information */}

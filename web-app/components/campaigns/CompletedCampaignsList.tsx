@@ -7,10 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ErrorCard } from '@/components/ui/error-card';
 import { LoadingCard } from '@/components/ui/loading-card';
 import { useWallet } from '@/contexts/wallet-context';
-import { groupRewardEventsByType } from '@/helpers/campaigns';
+import { groupTrackedEventsByType } from '@/helpers/campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { CampaignStatus, EventType } from '@/lib/db/enums';
-import { ApiListResponse, CampaignResponse, UserRoleType } from '@/types';
+import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
+import { ApiListResponse, CampaignResponseDTO, UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
 import { Archive, CheckCircle2, Flame, Star } from 'lucide-react';
 import Link from 'next/link';
@@ -18,28 +18,48 @@ import { useCallback, useEffect, useState } from 'react';
 
 interface CompletedCampaignsListProps {
   userRole: UserRoleType;
-  onRateCampaign?: (campaign: CampaignResponse) => void;
+  onRateCampaign?: (campaign: CampaignResponseDTO) => void;
   deps?: (number | Date | string)[],
+  onReload: () => void;
 }
 
-function getTotalPurchases(campaign: CampaignResponse): number {
-  const grouped = groupRewardEventsByType(campaign.rewardEvents);
-  const purchases = grouped.find(e => e.eventType === EventType.PURCHASE_SUCCESS);
+function getTotalPurchases(campaign: CampaignResponseDTO): number {
+  const grouped = groupTrackedEventsByType(campaign.sites);
+  const purchases = grouped.find(e => e.eventType === SiteEventType.PURCHASE_SUCCESS);
   return purchases?.trackedEventsCount ?? 0;
 }
 
-function calculateROI(campaign: CampaignResponse): number {
+function calculateROI(campaign: CampaignResponseDTO): number {
   if (campaign.budgetSpent === 0) return 0;
   const purchases = getTotalPurchases(campaign);
   const estimatedRevenue = purchases * 50;
   return Math.round((estimatedRevenue / campaign.budgetSpent) * 100);
 }
 
-export const CompletedCampaignsList = ({ userRole, onRateCampaign, deps }: CompletedCampaignsListProps) => {
+export const CompletedCampaignsList = ({ userRole, onRateCampaign, deps, onReload }: CompletedCampaignsListProps) => {
   const { address } = useWallet();
-  const [ campaigns, setCampaigns ] = useState<CampaignResponse[]>([]);
+  const [ campaigns, setCampaigns ] = useState<CampaignResponseDTO[]>([]);
   const [ isLoading, setIsLoading ] = useState(false);
   const [ error, setError ] = useState('');
+  const [ archivingId, setArchivingId ] = useState<string | null>(null);
+  
+  const handleArchiveCampaign = async (campaignId: string) => {
+    try {
+      setArchivingId(campaignId);
+      const response = await fetch(`/api/campaigns/${campaignId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to archive campaign');
+      }
+      onReload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to archive campaign');
+    } finally {
+      setArchivingId(null);
+    }
+  };
   
   const fetchCampaigns = useCallback(async () => {
     if (!address) {
@@ -51,13 +71,13 @@ export const CompletedCampaignsList = ({ userRole, onRateCampaign, deps }: Compl
       setIsLoading(true);
       setError('');
       
-      const response = await fetch(`/api/wallet/${address}/all-campaigns?status=${CampaignStatus.COMPLETED}`);
+      const response = await fetch(`/api/campaigns/all?walletAddress=${address}&status=${CampaignStatus.COMPLETED},${CampaignStatus.EXPIRED}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch campaigns');
       }
       
-      const result: ApiListResponse<CampaignResponse> = await response.json();
+      const result: ApiListResponse<CampaignResponseDTO> = await response.json();
       
       // Filter campaigns by userRole (manager or influencer)
       const filteredCampaigns = result.data.filter(
@@ -173,7 +193,13 @@ export const CompletedCampaignsList = ({ userRole, onRateCampaign, deps }: Compl
                               View Summary
                             </Button>
                           </Link>
-                          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-muted-foreground hover:text-foreground"
+                            onClick={() => handleArchiveCampaign(campaign.id)}
+                            disabled={archivingId === campaign.id}
+                          >
                             <Archive className="h-4 w-4" />
                           </Button>
                         </>
@@ -187,9 +213,6 @@ export const CompletedCampaignsList = ({ userRole, onRateCampaign, deps }: Compl
                           >
                             <Star className="mr-2 h-4 w-4" />
                             Rate Campaign
-                          </Button>
-                          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                            <Archive className="h-4 w-4" />
                           </Button>
                         </>
                       )}

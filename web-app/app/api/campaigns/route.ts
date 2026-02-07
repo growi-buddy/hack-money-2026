@@ -35,25 +35,34 @@ export async function POST(req: Request) {
   return safeRoute(async () => {
     const body = await req.json();
     const validatedData = CreateCampaignDTO.parse(body);
-    
+
     const campaign = await prisma.$transaction(async (tx) => {
       const user = await getOrCreateUserByWallet(validatedData.walletAddress, tx);
-      
-      // Verify all reward events exist and belong to the user
-      if (validatedData.rewardEvents.length > 0) {
-        const rewardEventIds = validatedData.rewardEvents.map(re => re.rewardEventId);
-        const existingRewardEvents = await tx.rewardEvent.findMany({
+
+      // Verify all site events exist and belong to the user
+      if (validatedData.siteEvents.length > 0) {
+        const siteEventIds = validatedData.siteEvents.map(se => se.siteEventId);
+        const existingSiteEvents = await tx.siteEvent.findMany({
           where: {
-            id: { in: rewardEventIds },
-            ownerId: user.id,
+            id: { in: siteEventIds },
+          },
+          include: {
+            site: true,
           },
         });
-        
-        if (existingRewardEvents.length !== rewardEventIds.length) {
-          throw new Error('One or more reward events not found or do not belong to the user');
+
+        // Verify all site events exist
+        if (existingSiteEvents.length !== siteEventIds.length) {
+          throw new Error('One or more site events not found');
+        }
+
+        // Verify all sites belong to the user
+        const invalidSites = existingSiteEvents.filter(se => se.site.ownerId !== user.id);
+        if (invalidSites.length > 0) {
+          throw new Error('One or more site events do not belong to the user');
         }
       }
-      
+
       return tx.campaign.create({
         data: {
           status: CampaignStatus.DRAFT,
@@ -69,26 +78,29 @@ export async function POST(req: Request) {
           countries: validatedData.countries ?? [],
           startDate: validatedData.startDate ? new Date(validatedData.startDate) : null,
           endDate: validatedData.endDate ? new Date(validatedData.endDate) : null,
-          rewardEvents: {
-            create: validatedData.rewardEvents.map(event => ({
-              rewardEventId: event.rewardEventId,
+          siteEvents: {
+            create: validatedData.siteEvents.map(event => ({
+              siteEventId: event.siteEventId,
               amount: event.amount,
               volumeStep: event.volumeStep ?? 1,
             })),
           },
         },
         include: {
-          rewardEvents: {
+          siteEvents: {
             include: {
-              rewardEvent: {
-                include: { selectors: true },
+              siteEvent: {
+                include: {
+                  site: true,
+                  selectors: true,
+                },
               },
             },
           },
         },
       });
     });
-    
+
     const response: ApiDataResponse<Campaign> = {
       success: true,
       data: campaign,

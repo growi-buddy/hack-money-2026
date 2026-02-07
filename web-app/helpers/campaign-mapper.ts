@@ -9,13 +9,13 @@ export function mapCampaignFormToAPI(
   formData: CampaignFormData,
   walletAddress: string,
 ): CreateCampaignInput {
-  const rewardEvents: CampaignRewardEventInput[] = [];
+  const siteEvents: CampaignRewardEventInput[] = [];
   
   // Map selected reward events from the form
   if (formData.selectedRewardEvents) {
     for (const selectedEvent of formData.selectedRewardEvents) {
-      rewardEvents.push({
-        rewardEventId: selectedEvent.rewardEventId,
+      siteEvents.push({
+        siteEventId: selectedEvent.rewardEventId,
         amount: selectedEvent.amount,
         volumeStep: selectedEvent.volumeStep || 1,
       });
@@ -34,7 +34,7 @@ export function mapCampaignFormToAPI(
     countries: formData.geographic?.countries || [],
     startDate: formData.startDate ? new Date(formData.startDate).toISOString() : null,
     endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
-    rewardEvents,
+    siteEvents,
   };
 }
 

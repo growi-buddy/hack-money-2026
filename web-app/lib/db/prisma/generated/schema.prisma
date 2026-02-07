@@ -23,7 +23,7 @@ model User {
 
   socialMedias     SocialMedia[]
   campaignsCreated Campaign[]      @relation("UserCampaigns")
-  rewardEvents     RewardEvent[]   @relation("UserRewardEvents")
+  sites            Site[]          @relation("UserSites")
   participations   Participation[]
 
   chatRoomsAsOne ChatRoom[]    @relation("ChatRoomUserOne")
@@ -60,7 +60,6 @@ model Campaign {
   escrowAddress String
   budgetTotal   Decimal
 
-  // Campaign settings
   isHot        Boolean   @default(false)
   slots        Int       @default(10)
   interests    String[]  @default([])
@@ -70,50 +69,69 @@ model Campaign {
   startDate    DateTime?
   endDate      DateTime?
 
-  rewardEvents CampaignRewardEvent[]
+  siteEvents CampaignSiteEvent[]
 
   yellowChannelId String?
   status          CampaignStatus  @default(DRAFT)
   participations  Participation[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
-model RewardEvent {
+model Site {
+  id      String @id @default(cuid())
+  ownerId String
+  owner   User   @relation("UserSites", fields: [ownerId], references: [id])
+
+  name        String
+  url         String
+  description String
+
+  siteEvents SiteEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ownerId, url])
+}
+
+model SiteEvent {
   id String @id @default(cuid())
 
-  ownerId String
-  owner   User   @relation("UserRewardEvents", fields: [ownerId], references: [id])
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id])
 
   name      String
-  eventType EventType
+  eventType SiteEventType
 
-  selectors Selector[]
-  campaigns CampaignRewardEvent[]
+  selectors         SiteEventSelector[]
+  campaigns         CampaignSiteEvent[]
+  trackedSiteEvents TrackedSiteEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([siteId])
 }
 
-model CampaignRewardEvent {
+model CampaignSiteEvent {
   id String @id @default(cuid())
 
   campaignId String
   campaign   Campaign @relation(fields: [campaignId], references: [id])
 
-  rewardEventId String
-  rewardEvent   RewardEvent @relation(fields: [rewardEventId], references: [id])
+  siteEventId String
+  siteEvent   SiteEvent @relation(fields: [siteEventId], references: [id])
 
   amount     Decimal
   volumeStep Int     @default(1)
 
-  trackedEvents TrackedEvent[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([campaignId, rewardEventId])
+  @@unique([campaignId, siteEventId])
 }
 
 model Client {
@@ -122,20 +140,23 @@ model Client {
   userAgent String?
   ipAddress String?
 
-  trackedEvents TrackedEvent[]
+  trackedSiteEvents TrackedSiteEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model TrackedEvent {
+model TrackedSiteEvent {
   id String @id @default(cuid())
-
-  campaignRewardEventId String
-  campaignRewardEvent   CampaignRewardEvent @relation(fields: [campaignRewardEventId], references: [id])
 
   clientId String
   client   Client @relation(fields: [clientId], references: [id])
+
+  siteEventId String
+  siteEvent   SiteEvent @relation(fields: [siteEventId], references: [id])
+
+  participationId String
+  participation   Participation @relation(fields: [participationId], references: [id])
 
   data      Json?
   timestamp DateTime @default(now())
@@ -143,15 +164,16 @@ model TrackedEvent {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([campaignRewardEventId])
   @@index([clientId])
+  @@index([siteEventId])
+  @@index([participationId])
   @@index([timestamp])
 }
 
-model Selector {
-  id            String      @id @default(cuid())
-  rewardEventId String
-  rewardEvent   RewardEvent @relation(fields: [rewardEventId], references: [id])
+model SiteEventSelector {
+  id          String    @id @default(cuid())
+  siteEventId String
+  siteEvent   SiteEvent @relation(fields: [siteEventId], references: [id])
 
   selector  String
   eventType SelectorEventType
@@ -160,7 +182,7 @@ model Selector {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([rewardEventId, selector])
+  @@unique([siteEventId, selector])
 }
 
 model Participation {
@@ -173,7 +195,8 @@ model Participation {
   links          TrackingLink[]
   currentBalance Decimal        @default(0)
 
-  events AnalyticsEvent[]
+  rewards           Reward[]
+  trackedSiteEvents TrackedSiteEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -194,9 +217,9 @@ model TrackingLink {
   updatedAt DateTime @updatedAt
 }
 
-model AnalyticsEvent {
-  id   String    @id @default(cuid())
-  type EventType
+model Reward {
+  id   String        @id @default(cuid())
+  type SiteEventType
 
   participationId String
   participation   Participation @relation(fields: [participationId], references: [id])
@@ -248,7 +271,7 @@ model ChatMessage {
   @@index([senderId])
 }
 
-enum EventType {
+enum SiteEventType {
   LANDING_PAGE_VIEW
   VIEW_ITEM
   ADD_TO_CART
@@ -272,11 +295,12 @@ enum SocialMediaPlatform {
 
 enum CampaignStatus {
   DRAFT
+  PUBLISHED
   ACTIVE
   PAUSED
   DEPLETED
+  EXPIRED
   COMPLETED
-  DELETED
 }
 
 enum InfluencerVerificationStatus {

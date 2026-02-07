@@ -1,13 +1,16 @@
-import { prisma } from '@/lib/db';
 import { corsJsonResponse, handleOptions } from '@/lib/cors';
+import { prisma } from '@/lib/db';
 
 interface SelectorData {
-  campaignRewardEventId: string;
-  rewardEventId: string;
-  rewardEventName: string;
+  campaignSiteEventId: string;
+  siteEventId: string;
+  siteEventName: string;
   eventType: string;
   selector: string;
   selectorEventType: string;
+  siteId: string;
+  siteName: string;
+  siteUrl: string;
 }
 
 // Handle CORS preflight
@@ -27,7 +30,7 @@ export async function GET(req: Request) {
           success: false,
           error: { code: 'BAD_REQUEST', message: 'Campaign ID (id) is required' },
         },
-        400
+        400,
       );
     }
 
@@ -42,16 +45,23 @@ export async function GET(req: Request) {
           success: false,
           error: { code: 'NOT_FOUND', message: 'Campaign not found' },
         },
-        404
+        404,
       );
     }
 
-    // Fetch all CampaignRewardEvents with RewardEvents and their Selectors
-    const campaignRewardEvents = await prisma.campaignRewardEvent.findMany({
+    // Fetch all CampaignSiteEvents with SiteEvents and their Selectors
+    const campaignSiteEvents = await prisma.campaignSiteEvent.findMany({
       where: { campaignId },
       include: {
-        rewardEvent: {
+        siteEvent: {
           include: {
+            site: {
+              select: {
+                id: true,
+                name: true,
+                url: true,
+              },
+            },
             selectors: {
               where: { isActive: true },
             },
@@ -63,15 +73,18 @@ export async function GET(req: Request) {
     // Flatten the data structure for the client script
     const selectors: SelectorData[] = [];
 
-    for (const cre of campaignRewardEvents) {
-      for (const selector of cre.rewardEvent.selectors) {
+    for (const cse of campaignSiteEvents) {
+      for (const selector of cse.siteEvent.selectors) {
         selectors.push({
-          campaignRewardEventId: cre.id,
-          rewardEventId: cre.rewardEvent.id,
-          rewardEventName: cre.rewardEvent.name,
-          eventType: cre.rewardEvent.eventType,
+          campaignSiteEventId: cse.id,
+          siteEventId: cse.siteEvent.id,
+          siteEventName: cse.siteEvent.name,
+          eventType: cse.siteEvent.eventType,
           selector: selector.selector,
           selectorEventType: selector.eventType,
+          siteId: cse.siteEvent.site.id,
+          siteName: cse.siteEvent.site.name,
+          siteUrl: cse.siteEvent.site.url,
         });
       }
     }
@@ -87,7 +100,7 @@ export async function GET(req: Request) {
         success: false,
         error: { code: 'SERVER_ERROR', message: 'Internal server error' },
       },
-      500
+      500,
     );
   }
 }

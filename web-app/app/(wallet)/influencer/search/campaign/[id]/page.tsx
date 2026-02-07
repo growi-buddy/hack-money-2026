@@ -1,11 +1,15 @@
 'use client';
 
+import { BackButton } from '@/components/ui/back-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ErrorCard } from '@/components/ui/error-card';
 import { useWallet } from '@/contexts/wallet-context';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { EventType } from '@/lib/db/enums';
+import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
+import { SiteEventType } from '@/lib/db/enums';
+import { CampaignResponseDTO, TrackedSiteEventSummaryResponseDTO } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -24,51 +28,21 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-interface RewardEvent {
-  id: string;
-  name: string;
-  eventType: EventType;
-  amount: number;
-  volumeStep: number;
-}
-
-interface CampaignDetail {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  budgetTotal: number;
-  isHot: boolean;
-  slots: number;
-  filledSlots: number;
-  interests: string[];
-  startDate: string | null;
-  endDate: string | null;
-  owner: {
-    id: string;
-    name: string | null;
-    walletAddress: string;
-    avatar: string | null;
-  };
-  rewardEvents: RewardEvent[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-const EVENT_TYPE_ICONS: Record<EventType, typeof Eye> = {
-  [EventType.LANDING_PAGE_VIEW]: Eye,
-  [EventType.VIEW_ITEM]: Package,
-  [EventType.ADD_TO_CART]: ShoppingCart,
-  [EventType.CHECKOUT]: CreditCard,
-  [EventType.PURCHASE_SUCCESS]: DollarSign,
+const EVENT_TYPE_ICONS: Record<SiteEventType, typeof Eye> = {
+  [SiteEventType.LANDING_PAGE_VIEW]: Eye,
+  [SiteEventType.VIEW_ITEM]: Package,
+  [SiteEventType.ADD_TO_CART]: ShoppingCart,
+  [SiteEventType.CHECKOUT]: CreditCard,
+  [SiteEventType.PURCHASE_SUCCESS]: DollarSign,
 };
 
-const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  [EventType.LANDING_PAGE_VIEW]: 'Landing Page View',
-  [EventType.VIEW_ITEM]: 'View Item',
-  [EventType.ADD_TO_CART]: 'Add to Cart',
-  [EventType.CHECKOUT]: 'Checkout',
-  [EventType.PURCHASE_SUCCESS]: 'Purchase Success',
+const formatDate = (dateStr: string | number | null) => {
+  if (!dateStr) return 'TBD';
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 };
 
 export default function CampaignDetailsPage() {
@@ -77,20 +51,17 @@ export default function CampaignDetailsPage() {
   const campaignId = params.id as string;
   const { address } = useWallet();
   
-  const [ campaign, setCampaign ] = useState<CampaignDetail | null>(null);
+  const [ campaign, setCampaign ] = useState<CampaignResponseDTO | null>(null);
   const [ loading, setLoading ] = useState(true);
-  const [ error, setError ] = useState<string | null>(null);
+  const [ error, setError ] = useState<string>('');
   const [ showSuccess, setShowSuccess ] = useState(false);
   const [ isApplying, setIsApplying ] = useState(false);
-  const [ isParticipating, setIsParticipating ] = useState(false);
-  const [ checkingParticipation, setCheckingParticipation ] = useState(true);
   
-  // Fetch campaign details
   useEffect(() => {
     const fetchCampaign = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/campaigns/${campaignId}?view=influencer`);
+        const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`);
         const data = await response.json();
         
         if (data.success) {
@@ -107,53 +78,23 @@ export default function CampaignDetailsPage() {
     };
     
     if (campaignId) {
-      fetchCampaign();
+      void fetchCampaign();
     }
-  }, [ campaignId ]);
-  
-  // Check if user is already participating
-  useEffect(() => {
-    const checkParticipation = async () => {
-      if (!address || !campaignId) {
-        setCheckingParticipation(false);
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/api/campaigns/${campaignId}/participate?walletAddress=${address}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          setIsParticipating(data.data.isParticipating);
-        }
-      } catch (err) {
-        console.error('Error checking participation:', err);
-      } finally {
-        setCheckingParticipation(false);
-      }
-    };
-    
-    checkParticipation();
-  }, [ address, campaignId ]);
+  }, [ campaignId, address ]);
   
   const handleApply = async () => {
-    if (!address) {
-      setError('Please connect your wallet first');
-      return;
-    }
-    
     setIsApplying(true);
-    setError(null);
+    setError('');
     
     try {
-      const response = await fetch(`/api/campaigns/${campaignId}/participate`, {
+      const response = await fetch(`/api/campaigns/${campaignId}/participate?walletAddress=${address}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress: address }),
       });
       
       const data = await response.json();
-
+      
       if (data.success) {
         setShowSuccess(true);
         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -170,27 +111,18 @@ export default function CampaignDetailsPage() {
     }
   };
   
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return 'TBD';
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-  
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
   
-  if (error && !campaign) {
+  if (!campaign) {
     return (
       <div className="mx-auto max-w-3xl text-center py-20">
-        <p className="text-destructive">{error}</p>
+        <ErrorCard error={error} />
         <Button onClick={() => router.back()} variant="outline" className="mt-4">
           Go Back
         </Button>
@@ -200,11 +132,13 @@ export default function CampaignDetailsPage() {
   
   if (!campaign) return null;
   
-  const slotsProgress = campaign.slots > 0 ? Math.round((campaign.filledSlots / campaign.slots) * 100) : 0;
+  const slotsProgress = campaign.slots > 0 ? Math.round((campaign.participants.length / campaign.slots) * 100) : 0;
+  const isParticipant = campaign.participants.some(({ walletAddress }) => walletAddress === address);
   
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      {/* Header */}
+      <BackButton href="/influencer/search" label="Back to Search" />
+      
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -217,13 +151,15 @@ export default function CampaignDetailsPage() {
             HOT
           </Badge>
         )}
-        {isParticipating && (
+        {isParticipant && (
           <Badge className="bg-growi-success/20 text-growi-success">
             <Check className="mr-1 h-3 w-3" />
             Participating
           </Badge>
         )}
       </motion.div>
+      
+      {error && <ErrorCard error={error} />}
       
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <Card>
@@ -279,7 +215,7 @@ export default function CampaignDetailsPage() {
                     Slots
                   </div>
                   <p className="mt-1 font-semibold text-foreground">
-                    {campaign.filledSlots}/{campaign.slots}
+                    {campaign.participants.length}/{campaign.slots}
                   </p>
                 </div>
               </motion.div>
@@ -314,21 +250,19 @@ export default function CampaignDetailsPage() {
                 </motion.div>
               )}
               
-              {/* Available Bounties */}
               <motion.div variants={staggerItem}>
                 <h3 className="mb-3 font-semibold text-foreground">Available Bounties</h3>
                 <div className="space-y-3">
-                  {campaign.rewardEvents.map((event) => {
-                    const Icon = EVENT_TYPE_ICONS[event.eventType] || Eye;
+                  {campaign.sites.reduce((sum, { trackedSiteEventsGroupedByType }) => [ ...sum, ...trackedSiteEventsGroupedByType ], [] as TrackedSiteEventSummaryResponseDTO[]).map(event => {
+                    const Icon = EVENT_TYPE_ICONS[event.siteEventType] || Eye;
                     return (
                       <div
-                        key={event.id}
+                        key={event.siteEventType}
                         className="flex items-center gap-4 rounded-lg border border-border bg-secondary/30 p-4"
                       >
                         <Icon className="h-5 w-5 text-growi-blue" />
                         <div className="flex-1">
-                          <p className="font-medium text-foreground">{event.name}</p>
-                          <p className="text-xs text-muted-foreground">{EVENT_TYPE_LABELS[event.eventType]}</p>
+                          <p className="font-medium text-foreground">{SITE_EVENT_TYPE_LABELS[event.siteEventType]}</p>
                         </div>
                         <p className="text-sm font-semibold text-growi-money">
                           ${event.amount.toFixed(3)}/event
@@ -339,25 +273,8 @@ export default function CampaignDetailsPage() {
                 </div>
               </motion.div>
               
-              {/* Error Message */}
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive"
-                >
-                  {error}
-                </motion.div>
-              )}
-              
-              {/* Apply Button */}
               <motion.div variants={staggerItem}>
-                {checkingParticipation ? (
-                  <Button disabled className="w-full">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Checking status...
-                  </Button>
-                ) : isParticipating ? (
+                {isParticipant ? (
                   <Button
                     onClick={() => router.push(`/influencer/campaign/${campaignId}/active`)}
                     className="w-full bg-growi-success text-white hover:bg-growi-success/90"
@@ -366,7 +283,7 @@ export default function CampaignDetailsPage() {
                     View Active Campaign
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                ) : campaign.filledSlots >= campaign.slots ? (
+                ) : campaign.participants.length >= campaign.slots ? (
                   <Button disabled className="w-full">
                     <Users className="mr-2 h-4 w-4" />
                     Campaign Full

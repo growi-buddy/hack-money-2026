@@ -8,6 +8,9 @@ export const CreateUserDTO = z.object({
 
 export const UpdateUserDTO = CreateUserDTO.partial();
 
-export type CreateUserInput = z.infer<typeof CreateUserDTO>;
-
-export type UpdateUserInput = z.infer<typeof UpdateUserDTO>;
+export interface BasicUserResponseDTO {
+  id: string,
+  name: string,
+  walletAddress: string,
+  avatar: string,
+}

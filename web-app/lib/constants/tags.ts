@@ -1,6 +1,3 @@
-// Shared tag options used across the application
-// These arrays are used in both influencer profiles and campaign creation
-
 export const INTEREST_OPTIONS = [
   'Fashion',
   'Sports',

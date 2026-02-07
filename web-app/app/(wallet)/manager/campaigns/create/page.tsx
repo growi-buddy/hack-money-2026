@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWallet } from '@/contexts/wallet-context';
 import { mapCampaignFormToAPI, validateCampaignForm } from '@/helpers/campaign-mapper';
+import { useSite } from '@/hooks';
 import { float, scaleIn } from '@/lib/animations';
-import { AUDIENCE_DEMOGRAPHIC_OPTIONS, INTEREST_OPTIONS } from '@/lib/constants/tags';
-import { EventType } from '@/lib/db/prisma/generated';
-import { RewardEventDTO } from '@/types';
+import { AUDIENCE_DEMOGRAPHIC_OPTIONS, INTEREST_OPTIONS, SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignFormData } from '@/types/campaign-form';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
@@ -33,14 +32,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-
-const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  [EventType.LANDING_PAGE_VIEW]: 'Landing Page View',
-  [EventType.VIEW_ITEM]: 'View Item',
-  [EventType.ADD_TO_CART]: 'Add to Cart',
-  [EventType.CHECKOUT]: 'Checkout',
-  [EventType.PURCHASE_SUCCESS]: 'Purchase Success',
-};
 
 const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
   name: '',
@@ -94,35 +85,7 @@ export default function CreateCampaignPage() {
   const [ showSuccess, setShowSuccess ] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  // Reward Events state
-  const [ rewardEvents, setRewardEvents ] = useState<RewardEventDTO[]>([]);
-  const [ loadingRewardEvents, setLoadingRewardEvents ] = useState(false);
-  
-  // Fetch reward events
-  useEffect(() => {
-    const fetchRewardEvents = async () => {
-      if (!address) {
-        setRewardEvents([]);
-        return;
-      }
-      
-      try {
-        setLoadingRewardEvents(true);
-        const response = await fetch(`/api/reward-events?walletAddress=${address}`);
-        const data = await response.json();
-        
-        if (response.ok) {
-          setRewardEvents(data.data);
-        }
-      } catch (err) {
-        console.error('Error fetching reward events:', err);
-      } finally {
-        setLoadingRewardEvents(false);
-      }
-    };
-    
-    fetchRewardEvents();
-  }, [ address ]);
+  const { sites, hasSiteEvents, isLoading } = useSite();
   
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
@@ -192,8 +155,6 @@ export default function CreateCampaignPage() {
       }
     },
   });
-  
-  const isLoading = status === 'streaming' || status === 'submitted';
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -611,70 +572,82 @@ export default function CreateCampaignPage() {
               </InfoCard>
               
               <InfoCard icon={<Zap className="h-4 w-4" />} title="Reward Events" color="amber">
-                {loadingRewardEvents ? (
+                {isLoading ? (
                   <div className="flex items-center justify-center py-4">
                     <Loader2 className="h-5 w-5 animate-spin text-growi-blue" />
                   </div>
-                ) : rewardEvents.length === 0 ? (
+                ) : !hasSiteEvents ? (
                   <div className="text-center py-4">
                     <p className="text-sm text-muted-foreground mb-2">
-                      No tienes eventos de recompensa configurados
+                      You don&apos;t have any reward events configured
                     </p>
                     <a
                       href="/manager/sites-tracking"
                       className="text-sm text-growi-blue hover:underline"
                     >
-                      Configurar eventos →
+                      Configure events →
                     </a>
                   </div>
                 ) : (
-                  <div className="space-y-2">
-                    {rewardEvents.map((event) => {
-                      const isSelected = campaignData.selectedRewardEvents?.some(
-                        (e) => e.rewardEventId === event.id,
-                      );
-                      const selectedEvent = campaignData.selectedRewardEvents?.find(
-                        (e) => e.rewardEventId === event.id,
-                      );
-                      
-                      return (
-                        <RewardEventField
-                          key={event.id}
-                          label={event.name}
-                          eventType={EVENT_TYPE_LABELS[event.eventType]}
-                          enabled={isSelected}
-                          amount={selectedEvent?.amount}
-                          onToggle={(enabled) => {
-                            setCampaignData((prev) => {
-                              if (enabled) {
-                                return {
+                  <div className="space-y-4">
+                    {sites.map((site) => (
+                      <div key={site.id} className="space-y-2">
+                        <div className="flex items-center gap-2 pb-1 border-b border-border/50">
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                            {site.name}
+                          </h4>
+                          <span className="text-xs text-muted-foreground/60">
+                            ({site.events.length} event{site.events.length !== 1 ? 's' : ''})
+                          </span>
+                        </div>
+                        {site.events.map((event) => {
+                          const isSelected = campaignData.selectedRewardEvents?.some(
+                            (e) => e.rewardEventId === event.id,
+                          );
+                          const selectedEvent = campaignData.selectedRewardEvents?.find(
+                            (e) => e.rewardEventId === event.id,
+                          );
+                          
+                          return (
+                            <RewardEventField
+                              key={event.id}
+                              label={event.name}
+                              eventType={SITE_EVENT_TYPE_LABELS[event.eventType]}
+                              enabled={isSelected}
+                              amount={selectedEvent?.amount}
+                              onToggle={(enabled) => {
+                                setCampaignData((prev) => {
+                                  if (enabled) {
+                                    return {
+                                      ...prev,
+                                      selectedRewardEvents: [
+                                        ...(prev.selectedRewardEvents || []),
+                                        { rewardEventId: event.id!, amount: 0.01, volumeStep: 1 },
+                                      ],
+                                    };
+                                  } else {
+                                    return {
+                                      ...prev,
+                                      selectedRewardEvents: (prev.selectedRewardEvents || []).filter(
+                                        (e) => e.rewardEventId !== event.id,
+                                      ),
+                                    };
+                                  }
+                                });
+                              }}
+                              onAmountChange={(amount) => {
+                                setCampaignData((prev) => ({
                                   ...prev,
-                                  selectedRewardEvents: [
-                                    ...(prev.selectedRewardEvents || []),
-                                    { rewardEventId: event.id!, amount: 0.01, volumeStep: 1 },
-                                  ],
-                                };
-                              } else {
-                                return {
-                                  ...prev,
-                                  selectedRewardEvents: (prev.selectedRewardEvents || []).filter(
-                                    (e) => e.rewardEventId !== event.id,
+                                  selectedRewardEvents: (prev.selectedRewardEvents || []).map((e) =>
+                                    e.rewardEventId === event.id ? { ...e, amount } : e,
                                   ),
-                                };
-                              }
-                            });
-                          }}
-                          onAmountChange={(amount) => {
-                            setCampaignData((prev) => ({
-                              ...prev,
-                              selectedRewardEvents: (prev.selectedRewardEvents || []).map((e) =>
-                                e.rewardEventId === event.id ? { ...e, amount } : e,
-                              ),
-                            }));
-                          }}
-                        />
-                      );
-                    })}
+                                }));
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    ))}
                   </div>
                 )}
               </InfoCard>
@@ -766,7 +739,7 @@ export default function CreateCampaignPage() {
       
       {/* No Reward Events Modal - covers only content area */}
       <AnimatePresence>
-        {!loadingRewardEvents && rewardEvents.length === 0 && address && (
+        {!isLoading && !hasSiteEvents && address && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -789,19 +762,19 @@ export default function CreateCampaignPage() {
                   >
                     <AlertTriangle className="h-8 w-8 text-amber-500" />
                   </motion.div>
-                  <h3 className="text-xl font-bold text-foreground">Configuración Requerida</h3>
+                  <h3 className="text-xl font-bold text-foreground">Configuration Required</h3>
                   <p className="mt-3 text-sm text-muted-foreground">
-                    Para crear una campaña, primero necesitas configurar los eventos de tracking en tu sitio web.
+                    To create a campaign, you first need to configure tracking events on your website.
                   </p>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Esto te permitirá definir qué acciones de los usuarios quieres recompensar.
+                    This will allow you to define which user actions you want to reward.
                   </p>
                   <Button
                     onClick={() => router.push('/manager/sites-tracking')}
                     className="mt-6 w-full bg-growi-blue text-white hover:bg-growi-blue/90"
                   >
                     <Settings className="mr-2 h-4 w-4" />
-                    Configurar Events Tracking
+                    Configure Events Tracking
                   </Button>
                 </CardContent>
               </Card>

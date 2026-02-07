@@ -31,16 +31,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (!window.waap) {
         throw new Error('WaaP no está inicializado');
       }
-
+      
       // Abre el modal de WaaP - el usuario elige Google, MetaMask, Email, etc.
       const type = await window.waap.login();
       setLoginType(type);
-      localStorage.setItem('waap_login_type', type);
+      localStorage.setItem('waap_login_type', type || '');
       console.log('Login type:', type);
       const accounts = await window.waap.request({
         method: 'eth_requestAccounts',
       });
-
+      
       if (accounts && accounts.length > 0) {
         setAddress(accounts[0]);
       }
@@ -58,7 +58,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (window.waap) {
         await window.waap.logout();
       }
-
+      
       setAddress('');
       setError('');
       setLoginType(null);
@@ -69,7 +69,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       console.error('Logout error:', error);
     }
   }, []);
-
+  
   // Auto-reconnect on mount if WaaP has an active session
   useEffect(() => {
     const tryAutoConnect = async () => {
@@ -77,22 +77,22 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         console.log('[Wallet] WaaP not initialized yet');
         return;
       }
-
+      
       try {
         console.log('[Wallet] Attempting auto-reconnect...');
         const accounts = await window.waap.request({
           method: 'eth_requestAccounts',
         });
-
+        
         if (accounts && accounts.length > 0) {
           setAddress(accounts[0]);
-
+          
           // Restore login type from localStorage if available
           const savedType = localStorage.getItem('waap_login_type');
-          if (savedType) {
+          if (savedType && [ 'human', 'walletconnect', 'injected' ].includes(savedType)) {
             setLoginType(savedType as 'human' | 'walletconnect' | 'injected');
           }
-
+          
           console.log('[Wallet] Auto-reconnected:', accounts[0]);
         }
       } catch (error) {
@@ -100,12 +100,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         console.log('[Wallet] No active session available');
       }
     };
-
+    
     // Small delay to ensure WaaP is initialized
     const timer = setTimeout(tryAutoConnect, 100);
     return () => clearTimeout(timer);
   }, []);
-
+  
   return (
     <WalletContext.Provider
       value={{
