@@ -140,6 +140,7 @@ export interface CampaignResponseDTO {
   createdAt: number,
   updatedAt: number,
   isDeleted: boolean,
+  escrowAddress?: string,
 }
 
 export interface InfluencerCampaignSummaryResponseDTO extends CampaignResponseDTO {

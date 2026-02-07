@@ -1,4 +1,4 @@
-import { safeRouteWithWalletAddress } from '@/helpers';
+import { safeRoute, safeRouteWithWalletAddress } from '@/helpers';
 import { prisma } from '@/lib/db';
 import { SiteEventType } from '@/lib/db/enums';
 import { $Enums } from '@/lib/db/prisma/generated';
@@ -81,9 +81,128 @@ function groupTrackedEventsBySite(
 }
 
 export async function GET(req: Request) {
-  return safeRouteWithWalletAddress(req, async (user) => {
-    const { searchParams } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
+  const isAdmin = searchParams.get('isAdmin') === 'true';
 
+  if (isAdmin) {
+    return safeRoute(async () => {
+      const page = parseInt(searchParams.get('page') ?? '1');
+      const limit = parseInt(searchParams.get('limit') ?? '50');
+      const skip = (page - 1) * limit;
+      const ownerWallet = searchParams.get('ownerWallet') || null;
+
+      const where: Record<string, unknown> = {};
+      if (ownerWallet) {
+        where.owner = { walletAddress: ownerWallet };
+      }
+
+      const [campaigns, total] = await Promise.all([
+        prisma.campaign.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: limit,
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+            budgetTotal: true,
+            isHot: true,
+            slots: true,
+            interests: true,
+            demographics: true,
+            regions: true,
+            countries: true,
+            startDate: true,
+            endDate: true,
+            escrowAddress: true,
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true,
+            owner: {
+              select: { id: true, name: true, walletAddress: true, avatar: true },
+            },
+            siteEvents: {
+              include: {
+                siteEvent: {
+                  include: { site: true },
+                },
+              },
+            },
+            participations: {
+              include: {
+                influencer: {
+                  select: { id: true, name: true, walletAddress: true, avatar: true },
+                },
+                trackedSiteEvents: {
+                  select: { siteEventId: true },
+                },
+              },
+            },
+            _count: {
+              select: { participations: true },
+            },
+          },
+        }),
+        prisma.campaign.count({ where }),
+      ]);
+
+      const data: CampaignResponseDTO[] = campaigns.map(campaign => {
+        const sites = groupTrackedEventsBySite(campaign.siteEvents, campaign.participations);
+        const budgetSpent = sites.reduce((total, site) => {
+          return total + site.trackedSiteEventsGroupedByType.reduce((siteTotal, event) => {
+            return siteTotal + (event.trackedEventsCount * event.amount);
+          }, 0);
+        }, 0);
+
+        return {
+          id: campaign.id,
+          title: campaign.title,
+          description: campaign.description ?? '',
+          status: campaign.status,
+          budgetTotal: Number(campaign.budgetTotal),
+          budgetSpent,
+          isHot: campaign.isHot,
+          slots: campaign.slots,
+          interests: campaign.interests ?? [],
+          demographics: campaign.demographics ?? [],
+          regions: campaign.regions ?? [],
+          countries: campaign.countries ?? [],
+          startDate: campaign.startDate?.getTime() ?? campaign.createdAt.getTime(),
+          endDate: campaign.endDate?.getTime() ?? campaign.createdAt.getTime(),
+          sites,
+          participants: campaign.participations.map(p => ({
+            id: p.influencer.id,
+            name: p.influencer.name || '',
+            walletAddress: p.influencer.walletAddress,
+            avatar: p.influencer.avatar || '',
+          })),
+          createdAt: campaign.createdAt.getTime(),
+          updatedAt: campaign.updatedAt.getTime(),
+          isDeleted: !!campaign.deletedAt,
+          owner: {
+            id: campaign.owner.id,
+            name: campaign.owner.name || '',
+            walletAddress: campaign.owner.walletAddress,
+            avatar: campaign.owner.avatar || '',
+          },
+          userRole: 'manager',
+          escrowAddress: campaign.escrowAddress,
+        };
+      });
+
+      const response: ApiListResponse<CampaignResponseDTO> = {
+        success: true,
+        data,
+        meta: { total, page, limit },
+      };
+
+      return { response };
+    });
+  }
+
+  return safeRouteWithWalletAddress(req, async (user) => {
     // Parse multiple status values (e.g., status=ACTIVE,PAUSED,COMPLETED)
     const statusParam = searchParams.get('status');
     const statusArray = statusParam
