@@ -14,3 +14,20 @@ export interface BasicUserResponseDTO {
   walletAddress: string,
   avatar: string,
 }
+
+export interface UserResponseDTO extends BasicUserResponseDTO {
+  email: string,
+  phone: string,
+  location: string,
+  bio: string,
+  avatar: string
+  interests: string[],
+  affinities: string[],
+  influencerVerification: boolean,
+  socialMedias: {
+    platform: string,
+    username: string,
+    followers: number,
+    url: string,
+  }[]
+}

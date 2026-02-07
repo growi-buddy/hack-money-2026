@@ -1,10 +1,11 @@
 'use client';
 
+import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWallet } from '@/contexts/wallet-context';
 import { mapCampaignFormToAPI, validateCampaignForm } from '@/helpers/campaign-mapper';
-import { useSite } from '@/hooks';
+import { useSites } from '@/hooks';
 import { float, scaleIn } from '@/lib/animations';
 import { AUDIENCE_DEMOGRAPHIC_OPTIONS, INTEREST_OPTIONS, SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignFormData } from '@/types/campaign-form';
@@ -14,7 +15,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
   AlertTriangle,
-  ArrowLeft,
   Bot,
   Calendar,
   CheckCircle2,
@@ -29,25 +29,23 @@ import {
   Zap,
 } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
   name: '',
   description: '',
   startDate: '',
   endDate: '',
-  targetAudience: {
-    demographics: [],
-  },
+  demographics: [],
   geographic: {
     regions: [],
     countries: [],
   },
   interests: [],
   budget: undefined,
-  slots: 10,
+  slots: 0,
   selectedRewardEvents: [],
 };
 
@@ -74,6 +72,8 @@ const QUICK_PROMPTS = [
   },
 ];
 
+const MOCK_INPUT = 'I need your help building a 1-month campaign for Growi, my finance-themed plushies! We’re launching this Monday in Latin America for finance fans of all ages. Can you come up with a catchy name, a cool description, and a plan to make the most of my $370 USD budget? I’m looking to work with 3 influencers, so help me figure out how to pick them and what they should do each week to boost sales. Keep it friendly, creative, and tailored to the LATAM market!';
+
 export default function CreateCampaignPage() {
   const router = useRouter();
   const { address } = useWallet();
@@ -85,9 +85,9 @@ export default function CreateCampaignPage() {
   const [ showSuccess, setShowSuccess ] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  const { sites, hasSiteEvents, isLoading } = useSite();
+  const { sites, hasSiteEvents, isLoading } = useSites();
   
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage } = useChat({
     transport: new DefaultChatTransport({
       api: '/api/chat/campaign-creator',
       body: () => ({ campaignData }),
@@ -111,6 +111,7 @@ export default function CreateCampaignPage() {
           }
           
           if (newData && Object.keys(newData).length > 0) {
+            console.log({ newData });
             setCampaignData((prev) => ({
               ...prev,
               name: newData?.name || prev.name,
@@ -118,14 +119,11 @@ export default function CreateCampaignPage() {
               startDate: newData?.startDate || prev.startDate,
               endDate: newData?.endDate || prev.endDate,
               geographic: {
-                ...prev.geographic,
-                ...newData.geographic,
+                regions: newData?.geographic?.regions || prev.geographic?.regions,
+                countries: newData?.geographic?.countries || prev.geographic?.countries,
               },
-              interests: newData?.interests || prev.interests,
-              targetAudience: {
-                ...prev.targetAudience,
-                ...newData.targetAudience,
-              },
+              interests: newData?.interests?.map(interest => interest.replace(/\b\w/g, l => l.toUpperCase())) || prev.interests,
+              demographics: newData?.demographics || prev.demographics,
               budget: newData?.budget || prev.budget,
               slots: newData?.slots || prev.slots,
             }));
@@ -162,9 +160,13 @@ export default function CreateCampaignPage() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
     
-    const userMessage = input;
+    const userMessage = input.trim() || MOCK_INPUT;
+    
+    if (!userMessage || isLoading) {
+      return;
+    }
+    
     setInput('');
     
     await sendMessage({
@@ -181,9 +183,9 @@ export default function CreateCampaignPage() {
     if (campaignData.description) filled++;
     if (campaignData.startDate) filled++;
     if (campaignData.endDate) filled++;
-    if (campaignData.geographic?.regions?.length) filled++;
+    if (campaignData.geographic?.regions?.length || campaignData.geographic?.countries?.length) filled++;
     if (campaignData.interests?.length) filled++;
-    if (campaignData.targetAudience?.demographics?.length) filled++;
+    if (campaignData.demographics?.length) filled++;
     if (campaignData.interests?.length) filled++;
     if (campaignData.budget) filled++;
     if (campaignData.slots) filled++;
@@ -214,9 +216,9 @@ export default function CreateCampaignPage() {
     setIsCreating(true);
     
     try {
-      const campaignInput = mapCampaignFormToAPI(campaignData, address);
+      const campaignInput = mapCampaignFormToAPI(campaignData);
       
-      const response = await fetch('/api/campaigns', {
+      const response = await fetch(`/api/campaigns?walletAddress=${address}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -246,24 +248,17 @@ export default function CreateCampaignPage() {
   
   return (
     <div className="relative mx-auto max-w-7xl space-y-6">
-      <div>
-        <div className="flex items-center gap-3">
-          <Link href="/manager/campaigns">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">AI Campaign Creator</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Tell our AI about your campaign goals and let it create the perfect structure for you
-            </p>
-          </div>
+      <BackButton href="/manager/campaigns" />
+      <div className="flex items-center gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">AI Campaign Creator</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Tell our AI about your campaign goals and let it create the perfect structure for you
+          </p>
         </div>
       </div>
       
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 items-stretch">
-        {/* Chat Panel */}
         <motion.div variants={scaleIn} initial="hidden" animate="visible">
           <Card className="flex h-[calc(100vh-220px)] flex-col overflow-hidden p-0 gap-0">
             <CardHeader className="border-b border-border bg-secondary/30 pt-5 min-h-[100px]">
@@ -346,8 +341,13 @@ export default function CreateCampaignPage() {
                       }`}
                     >
                       {messageText && (
-                        <div className="whitespace-pre-wrap text-sm">{messageText}</div>
-                      )}
+                        message.role === 'user' ? <div className="whitespace-pre-wrap text-sm">{messageText}</div> : (
+                          <div className="prose prose-sm max-w-none text-sm">
+                            <ReactMarkdown>
+                              {messageText}
+                            </ReactMarkdown>
+                          </div>
+                        ))}
                       
                       {toolParts.length > 0 && (
                         <div className="mt-2 flex items-center gap-1 text-xs opacity-75">
@@ -393,7 +393,7 @@ export default function CreateCampaignPage() {
                 />
                 <Button
                   type="submit"
-                  disabled={isLoading || !input.trim()}
+                  // disabled={isLoading || !input.trim()} // MOCKED
                   className="bg-growi-blue text-white hover:bg-growi-blue/90"
                 >
                   <Send className="h-4 w-4" />
@@ -468,7 +468,6 @@ export default function CreateCampaignPage() {
                 </div>
               </InfoCard>
               
-              
               <InfoCard icon={<Globe className="h-4 w-4" />} title="Geographic" color="indigo">
                 <Field
                   label="Regions"
@@ -486,6 +485,22 @@ export default function CreateCampaignPage() {
                     }))
                   }
                 />
+                <Field
+                  label="Countries"
+                  value={campaignData.geographic?.countries?.join(', ')}
+                  onChange={(value) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      geographic: {
+                        ...prev.geographic,
+                        countries: value
+                          .split(',')
+                          .map((r) => r.trim())
+                          .filter(Boolean),
+                      },
+                    }))
+                  }
+                />
               </InfoCard>
               
               <InfoCard icon={<Target className="h-4 w-4" />} title="Interests & Audience" color="pink">
@@ -493,7 +508,7 @@ export default function CreateCampaignPage() {
                   <div>
                     <label className="text-xs font-medium text-muted-foreground mb-2 block">Interests</label>
                     <div className="flex flex-wrap gap-1.5">
-                      {INTEREST_OPTIONS.map((interest) => (
+                      {[ ...new Set([ ...INTEREST_OPTIONS, ...(campaignData?.interests || []) ]) ].map((interest) => (
                         <button
                           key={interest}
                           onClick={() =>
@@ -519,21 +534,18 @@ export default function CreateCampaignPage() {
                   <div>
                     <label className="text-xs font-medium text-muted-foreground mb-2 block">Target Audience</label>
                     <div className="flex flex-wrap gap-1.5">
-                      {AUDIENCE_DEMOGRAPHIC_OPTIONS.map((demo) => (
+                      {[ ...new Set([ ...AUDIENCE_DEMOGRAPHIC_OPTIONS, ...(campaignData.demographics || []) ]) ].map((demo) => (
                         <button
                           key={demo}
                           onClick={() => {
-                            const current = campaignData.targetAudience?.demographics || [];
+                            const current = campaignData.demographics || [];
                             setCampaignData((prev) => ({
                               ...prev,
-                              targetAudience: {
-                                ...prev.targetAudience,
-                                demographics: current.includes(demo) ? current.filter((d) => d !== demo) : [ ...current, demo ],
-                              },
+                              demographics: current.includes(demo) ? current.filter((d) => d !== demo) : [ ...current, demo ],
                             }));
                           }}
                           className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
-                            campaignData.targetAudience?.demographics?.includes(demo)
+                            campaignData.demographics?.includes(demo)
                               ? 'bg-purple-500/20 text-purple-600 border border-purple-500/30'
                               : 'bg-secondary text-muted-foreground hover:bg-secondary/80 border border-border'
                           }`}

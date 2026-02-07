@@ -33,7 +33,7 @@ export const ArchivedCampaignsList = ({ userRole, deps, onReload }: ArchivedCamp
   const [ isLoading, setIsLoading ] = useState(false);
   const [ error, setError ] = useState('');
   const [ restoringId, setRestoringId ] = useState<string | null>(null);
-
+  
   const handleRestoreCampaign = async (campaignId: string) => {
     try {
       setRestoringId(campaignId);
@@ -44,14 +44,14 @@ export const ArchivedCampaignsList = ({ userRole, deps, onReload }: ArchivedCamp
         },
         body: JSON.stringify({ action: 'restore' }),
       });
-
+      
       if (!response.ok) {
         throw new Error('Failed to restore campaign');
       }
-
+      
       // Remove the restored campaign from the archived list
       setCampaigns(prev => prev.filter(c => c.id !== campaignId));
-
+      
       // Call onReload to refresh other campaign lists
       onReload();
     } catch (err) {
@@ -60,7 +60,7 @@ export const ArchivedCampaignsList = ({ userRole, deps, onReload }: ArchivedCamp
       setRestoringId(null);
     }
   };
-
+  
   const fetchCampaigns = useCallback(async () => {
     if (!address) {
       setCampaigns([]);
@@ -119,7 +119,7 @@ export const ArchivedCampaignsList = ({ userRole, deps, onReload }: ArchivedCamp
       
       <ErrorCard error={error} />
       
-      {isLoading ? <LoadingCard userRole={userRole} /> : (
+      {(isLoading && !hasCampaigns) ? <LoadingCard userRole={userRole} /> : (
         <motion.div
           variants={staggerContainer}
           initial="hidden"

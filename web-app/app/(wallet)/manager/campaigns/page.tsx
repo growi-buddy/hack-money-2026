@@ -7,7 +7,7 @@ import { DraftCampaignsList } from '@/components/campaigns/DraftCampaignsList';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useWallet } from '@/contexts/wallet-context';
-import { useSite } from '@/hooks';
+import { useSites } from '@/hooks';
 import { pulse, scaleIn } from '@/lib/animations';
 import { motion } from 'framer-motion';
 import { ArrowRight, Download, Plus, RefreshCw } from 'lucide-react';
@@ -20,7 +20,7 @@ export default function CampaignsPage() {
   
   const { address } = useWallet();
   const [ lastUpdated, setLastUpdated ] = useState<Date>(new Date());
-  const { hasSiteEvents } = useSite();
+  const { hasSiteEvents } = useSites();
   
   useEffect(() => {
     if (!address) {

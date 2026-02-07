@@ -167,7 +167,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
       
       <ErrorCard error={error} />
       
-      {isLoading ? <LoadingCard userRole={userRole} /> : hasCampaigns ? (
+      {(isLoading && !hasCampaigns) ? <LoadingCard userRole={userRole} /> : hasCampaigns ? (
         <motion.div
           variants={staggerContainer}
           initial="hidden"

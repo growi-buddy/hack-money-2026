@@ -100,14 +100,8 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
     }
   }, [ address, userRole ]);
   
-  // Define color scheme based on user role
   const isManager = userRole === 'manager';
   const primaryColorClass = isManager ? 'text-growi-blue' : 'text-growi-success';
-  const primaryBgLight = isManager ? 'bg-growi-blue/5' : 'bg-growi-success/5';
-  const primaryBgMedium = isManager ? 'bg-growi-blue/10' : 'bg-growi-success/10';
-  const primaryBg = isManager ? 'bg-growi-blue' : 'bg-growi-success';
-  const primaryBgHover = isManager ? 'hover:bg-growi-blue/90' : 'hover:bg-growi-success/90';
-  const primaryBorder = isManager ? 'border-growi-blue/30' : 'border-growi-success/30';
   const primaryBorderHover = isManager ? 'hover:border-growi-blue/50' : 'hover:border-growi-success/50';
   const primaryBadge = isManager ? 'bg-growi-blue/20 text-growi-blue' : 'bg-growi-success/20 text-growi-success';
   
@@ -137,7 +131,7 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
       );
     } catch (err) {
       console.error('Error toggling hot:', err);
-      // setError(err instanceof Error ? err.message : 'Failed to toggle hot status');
+      setError(err instanceof Error ? err.message : 'Failed to toggle hot status');
     } finally {
       setTogglingHot(null);
     }
@@ -168,7 +162,7 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
       
       <ErrorCard error={error} />
       
-      {isLoading ? <LoadingCard userRole={userRole} /> : (
+      {(isLoading && !hasCampaigns) ? <LoadingCard userRole={userRole} /> : (
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -215,9 +209,6 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
                           )}
                         </div>
                       </div>
-                      {/*<CardDescription>*/}
-                      {/*  Earned: ${item.currentBalance.toFixed(2)} | Events: {item.totalEvents}*/}
-                      {/*</CardDescription>*/}
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {/* Campaign Period and Duration */}
@@ -247,7 +238,6 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
                         </div>
                       </div>
                       
-                      {/* Event Stats */}
                       <div className="grid grid-cols-4 gap-2 text-center">
                         {(() => {
                           const grouped = groupTrackedEventsByType(campaign.sites);
@@ -261,7 +251,6 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
                         })()}
                       </div>
                       
-                      {/* Tags - Interests & Demographics */}
                       {(campaign.interests.length > 0 || campaign.demographics.length > 0) && (
                         <div className="flex flex-wrap gap-1.5 pt-1">
                           {campaign.interests.slice(0, 2).map((interest) => (

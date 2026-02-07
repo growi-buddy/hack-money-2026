@@ -1,3 +1,4 @@
+import { toUserResponseDTO } from '@/helpers/users';
 import { prisma } from '@/lib/db';
 import { ApiDataResponse, ApiErrorResponse, ApiListResponse, UserResponseDTO } from '@/types';
 import { NextResponse } from 'next/server';
@@ -37,7 +38,6 @@ type CB = () => Promise<Response>;
 
 export const safeRouteWithWalletAddress = async (req: Request, cb: (user: UserResponseDTO) => Promise<Response>) => {
   try {
-    // Validate wallet address
     const { searchParams } = new URL(req.url);
     const walletAddress = searchParams.get('walletAddress');
     if (!walletAddress) {
@@ -58,13 +58,12 @@ export const safeRouteWithWalletAddress = async (req: Request, cb: (user: UserRe
       create: {
         walletAddress,
       },
+      include: {
+        socialMedias: true,
+      },
     });
-    
-    const userResponseDTO: UserResponseDTO = {
-      id: user.id,
-      name: user.name || '',
-      walletAddress: user.walletAddress,
-    };
+
+    const userResponseDTO: UserResponseDTO = toUserResponseDTO(user);
     
     const { response, status } = await cb(userResponseDTO);
     return NextResponse.json(response, { status });

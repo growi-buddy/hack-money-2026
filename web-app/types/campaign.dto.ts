@@ -45,7 +45,6 @@ export const CampaignRewardEventSchema = z.object({
 export type CampaignRewardEventInput = z.infer<typeof CampaignRewardEventSchema>;
 
 export const CreateCampaignDTO = z.object({
-  walletAddress: z.string(),
   title: z.string(),
   description: z.string().optional(),
   budgetTotal: z.string().or(z.number()),
@@ -54,8 +53,8 @@ export const CreateCampaignDTO = z.object({
   demographics: z.array(z.string()).optional().default([]),
   regions: z.array(z.string()).optional().default([]),
   countries: z.array(z.string()).optional().default([]),
-  startDate: z.string().datetime().optional().nullable(),
-  endDate: z.string().datetime().optional().nullable(),
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
   siteEvents: z.array(CampaignRewardEventSchema),
 });
 

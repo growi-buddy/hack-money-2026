@@ -3779,8 +3779,18 @@ export namespace Prisma {
 
   export type AggregateSocialMedia = {
     _count: SocialMediaCountAggregateOutputType | null
+    _avg: SocialMediaAvgAggregateOutputType | null
+    _sum: SocialMediaSumAggregateOutputType | null
     _min: SocialMediaMinAggregateOutputType | null
     _max: SocialMediaMaxAggregateOutputType | null
+  }
+
+  export type SocialMediaAvgAggregateOutputType = {
+    followers: number | null
+  }
+
+  export type SocialMediaSumAggregateOutputType = {
+    followers: number | null
   }
 
   export type SocialMediaMinAggregateOutputType = {
@@ -3788,7 +3798,7 @@ export namespace Prisma {
     userId: string | null
     platform: $Enums.SocialMediaPlatform | null
     username: string | null
-    followers: string | null
+    followers: number | null
     url: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3799,7 +3809,7 @@ export namespace Prisma {
     userId: string | null
     platform: $Enums.SocialMediaPlatform | null
     username: string | null
-    followers: string | null
+    followers: number | null
     url: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3817,6 +3827,14 @@ export namespace Prisma {
     _all: number
   }
 
+
+  export type SocialMediaAvgAggregateInputType = {
+    followers?: true
+  }
+
+  export type SocialMediaSumAggregateInputType = {
+    followers?: true
+  }
 
   export type SocialMediaMinAggregateInputType = {
     id?: true
@@ -3890,6 +3908,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: SocialMediaAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SocialMediaSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: SocialMediaMinAggregateInputType
@@ -3920,6 +3950,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: SocialMediaCountAggregateInputType | true
+    _avg?: SocialMediaAvgAggregateInputType
+    _sum?: SocialMediaSumAggregateInputType
     _min?: SocialMediaMinAggregateInputType
     _max?: SocialMediaMaxAggregateInputType
   }
@@ -3929,11 +3961,13 @@ export namespace Prisma {
     userId: string
     platform: $Enums.SocialMediaPlatform
     username: string
-    followers: string | null
+    followers: number | null
     url: string | null
     createdAt: Date
     updatedAt: Date
     _count: SocialMediaCountAggregateOutputType | null
+    _avg: SocialMediaAvgAggregateOutputType | null
+    _sum: SocialMediaSumAggregateOutputType | null
     _min: SocialMediaMinAggregateOutputType | null
     _max: SocialMediaMaxAggregateOutputType | null
   }
@@ -4020,7 +4054,7 @@ export namespace Prisma {
       userId: string
       platform: $Enums.SocialMediaPlatform
       username: string
-      followers: string | null
+      followers: number | null
       url: string | null
       createdAt: Date
       updatedAt: Date
@@ -4452,7 +4486,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"SocialMedia", 'String'>
     readonly platform: FieldRef<"SocialMedia", 'SocialMediaPlatform'>
     readonly username: FieldRef<"SocialMedia", 'String'>
-    readonly followers: FieldRef<"SocialMedia", 'String'>
+    readonly followers: FieldRef<"SocialMedia", 'Int'>
     readonly url: FieldRef<"SocialMedia", 'String'>
     readonly createdAt: FieldRef<"SocialMedia", 'DateTime'>
     readonly updatedAt: FieldRef<"SocialMedia", 'DateTime'>
@@ -18794,6 +18828,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -18811,20 +18859,6 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -19022,7 +19056,7 @@ export namespace Prisma {
     userId?: StringFilter<"SocialMedia"> | string
     platform?: EnumSocialMediaPlatformFilter<"SocialMedia"> | $Enums.SocialMediaPlatform
     username?: StringFilter<"SocialMedia"> | string
-    followers?: StringNullableFilter<"SocialMedia"> | string | null
+    followers?: IntNullableFilter<"SocialMedia"> | number | null
     url?: StringNullableFilter<"SocialMedia"> | string | null
     createdAt?: DateTimeFilter<"SocialMedia"> | Date | string
     updatedAt?: DateTimeFilter<"SocialMedia"> | Date | string
@@ -19050,7 +19084,7 @@ export namespace Prisma {
     userId?: StringFilter<"SocialMedia"> | string
     platform?: EnumSocialMediaPlatformFilter<"SocialMedia"> | $Enums.SocialMediaPlatform
     username?: StringFilter<"SocialMedia"> | string
-    followers?: StringNullableFilter<"SocialMedia"> | string | null
+    followers?: IntNullableFilter<"SocialMedia"> | number | null
     url?: StringNullableFilter<"SocialMedia"> | string | null
     createdAt?: DateTimeFilter<"SocialMedia"> | Date | string
     updatedAt?: DateTimeFilter<"SocialMedia"> | Date | string
@@ -19067,8 +19101,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: SocialMediaCountOrderByAggregateInput
+    _avg?: SocialMediaAvgOrderByAggregateInput
     _max?: SocialMediaMaxOrderByAggregateInput
     _min?: SocialMediaMinOrderByAggregateInput
+    _sum?: SocialMediaSumOrderByAggregateInput
   }
 
   export type SocialMediaScalarWhereWithAggregatesInput = {
@@ -19079,7 +19115,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"SocialMedia"> | string
     platform?: EnumSocialMediaPlatformWithAggregatesFilter<"SocialMedia"> | $Enums.SocialMediaPlatform
     username?: StringWithAggregatesFilter<"SocialMedia"> | string
-    followers?: StringNullableWithAggregatesFilter<"SocialMedia"> | string | null
+    followers?: IntNullableWithAggregatesFilter<"SocialMedia"> | number | null
     url?: StringNullableWithAggregatesFilter<"SocialMedia"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SocialMedia"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"SocialMedia"> | Date | string
@@ -20120,7 +20156,7 @@ export namespace Prisma {
     id?: string
     platform: $Enums.SocialMediaPlatform
     username: string
-    followers?: string | null
+    followers?: number | null
     url?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20132,7 +20168,7 @@ export namespace Prisma {
     userId: string
     platform: $Enums.SocialMediaPlatform
     username: string
-    followers?: string | null
+    followers?: number | null
     url?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20142,7 +20178,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
     username?: StringFieldUpdateOperationsInput | string
-    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    followers?: NullableIntFieldUpdateOperationsInput | number | null
     url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20154,7 +20190,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
     username?: StringFieldUpdateOperationsInput | string
-    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    followers?: NullableIntFieldUpdateOperationsInput | number | null
     url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20165,7 +20201,7 @@ export namespace Prisma {
     userId: string
     platform: $Enums.SocialMediaPlatform
     username: string
-    followers?: string | null
+    followers?: number | null
     url?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20175,7 +20211,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
     username?: StringFieldUpdateOperationsInput | string
-    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    followers?: NullableIntFieldUpdateOperationsInput | number | null
     url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20186,7 +20222,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
     username?: StringFieldUpdateOperationsInput | string
-    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    followers?: NullableIntFieldUpdateOperationsInput | number | null
     url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21361,6 +21397,17 @@ export namespace Prisma {
     not?: NestedEnumSocialMediaPlatformFilter<$PrismaModel> | $Enums.SocialMediaPlatform
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -21381,6 +21428,10 @@ export namespace Prisma {
     url?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type SocialMediaAvgOrderByAggregateInput = {
+    followers?: SortOrder
   }
 
   export type SocialMediaMaxOrderByAggregateInput = {
@@ -21405,6 +21456,10 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type SocialMediaSumOrderByAggregateInput = {
+    followers?: SortOrder
+  }
+
   export type EnumSocialMediaPlatformWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.SocialMediaPlatform | EnumSocialMediaPlatformFieldRefInput<$PrismaModel>
     in?: $Enums.SocialMediaPlatform[] | ListEnumSocialMediaPlatformFieldRefInput<$PrismaModel>
@@ -21413,6 +21468,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumSocialMediaPlatformFilter<$PrismaModel>
     _max?: NestedEnumSocialMediaPlatformFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type DecimalFilter<$PrismaModel = never> = {
@@ -22474,6 +22545,14 @@ export namespace Prisma {
     set?: $Enums.SocialMediaPlatform
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type UserUpdateOneRequiredWithoutSocialMediasNestedInput = {
     create?: XOR<UserCreateWithoutSocialMediasInput, UserUncheckedCreateWithoutSocialMediasInput>
     connectOrCreate?: UserCreateOrConnectWithoutSocialMediasInput
@@ -23397,6 +23476,33 @@ export namespace Prisma {
     _max?: NestedEnumSocialMediaPlatformFilter<$PrismaModel>
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedDecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
@@ -23567,7 +23673,7 @@ export namespace Prisma {
     id?: string
     platform: $Enums.SocialMediaPlatform
     username: string
-    followers?: string | null
+    followers?: number | null
     url?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23577,7 +23683,7 @@ export namespace Prisma {
     id?: string
     platform: $Enums.SocialMediaPlatform
     username: string
-    followers?: string | null
+    followers?: number | null
     url?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23819,7 +23925,7 @@ export namespace Prisma {
     userId?: StringFilter<"SocialMedia"> | string
     platform?: EnumSocialMediaPlatformFilter<"SocialMedia"> | $Enums.SocialMediaPlatform
     username?: StringFilter<"SocialMedia"> | string
-    followers?: StringNullableFilter<"SocialMedia"> | string | null
+    followers?: IntNullableFilter<"SocialMedia"> | number | null
     url?: StringNullableFilter<"SocialMedia"> | string | null
     createdAt?: DateTimeFilter<"SocialMedia"> | Date | string
     updatedAt?: DateTimeFilter<"SocialMedia"> | Date | string
@@ -26043,7 +26149,7 @@ export namespace Prisma {
     id?: string
     platform: $Enums.SocialMediaPlatform
     username: string
-    followers?: string | null
+    followers?: number | null
     url?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26116,7 +26222,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
     username?: StringFieldUpdateOperationsInput | string
-    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    followers?: NullableIntFieldUpdateOperationsInput | number | null
     url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26126,7 +26232,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
     username?: StringFieldUpdateOperationsInput | string
-    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    followers?: NullableIntFieldUpdateOperationsInput | number | null
     url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26136,7 +26242,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialMediaPlatformFieldUpdateOperationsInput | $Enums.SocialMediaPlatform
     username?: StringFieldUpdateOperationsInput | string
-    followers?: NullableStringFieldUpdateOperationsInput | string | null
+    followers?: NullableIntFieldUpdateOperationsInput | number | null
     url?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

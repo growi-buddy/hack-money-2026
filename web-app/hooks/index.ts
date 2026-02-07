@@ -1,2 +1,2 @@
 export * from './useProfile';
-export * from './use-site';
+export * from './use-sites';

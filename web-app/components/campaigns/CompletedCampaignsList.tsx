@@ -120,7 +120,7 @@ export const CompletedCampaignsList = ({ userRole, onRateCampaign, deps, onReloa
       
       <ErrorCard error={error} />
       
-      {isLoading ? <LoadingCard userRole={userRole} /> : (
+      {(isLoading && !hasCampaigns) ? <LoadingCard userRole={userRole} /> : (
         <motion.div
           variants={staggerContainer}
           initial="hidden"
