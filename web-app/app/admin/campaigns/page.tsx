@@ -1,10 +1,14 @@
 'use client';
 
 import { CampaignStatusBadge } from '@/components/campaigns/CampaignStatusBadge';
+import { CampaignStatus } from '@/lib/db/enums';
 import { CampaignResponseDTO } from '@/types';
-import { useCallback, useEffect, useState } from 'react';
+import { Pencil, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type ApiMeta = { total: number; page: number; limit: number };
+
+const ALL_STATUSES = Object.values(CampaignStatus) as CampaignStatus[];
 
 export default function AdminCampaignsPage() {
   const [campaigns, setCampaigns] = useState<CampaignResponseDTO[]>([]);
@@ -12,6 +16,9 @@ export default function AdminCampaignsPage() {
   const [loading, setLoading] = useState(false);
   const [ownerWallet, setOwnerWallet] = useState('');
   const [filterInput, setFilterInput] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchCampaigns = useCallback(async (page: number, wallet: string) => {
     setLoading(true);
@@ -38,6 +45,39 @@ export default function AdminCampaignsPage() {
     fetchCampaigns(meta.page, ownerWallet);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setEditingId(null);
+      }
+    };
+    if (editingId) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [editingId]);
+
+  const handleStatusChange = async (campaignId: string, newStatus: CampaignStatus) => {
+    setUpdatingId(campaignId);
+    try {
+      const res = await fetch(`/api/campaigns/${campaignId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setCampaigns(prev =>
+          prev.map(c => c.id === campaignId ? { ...c, status: newStatus } : c),
+        );
+      }
+    } finally {
+      setUpdatingId(null);
+      setEditingId(null);
+    }
+  };
 
   const handleFilter = () => {
     setOwnerWallet(filterInput);
@@ -145,7 +185,42 @@ export default function AdminCampaignsPage() {
                       {c.title}
                     </td>
                     <td className="px-3 py-2">
-                      <CampaignStatusBadge status={c.status} />
+                      <div className="relative flex items-center gap-1">
+                        <CampaignStatusBadge status={c.status} />
+                        {editingId === c.id ? (
+                          <div ref={dropdownRef} className="absolute top-full left-0 z-50 mt-1 w-40 rounded-md border border-gray-700 bg-gray-900 py-1 shadow-lg">
+                            <div className="flex items-center justify-between px-3 py-1 border-b border-gray-700">
+                              <span className="text-xs text-gray-400">Change status</span>
+                              <button onClick={() => setEditingId(null)} className="text-gray-500 hover:text-gray-300">
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                            {ALL_STATUSES.map((status) => (
+                              <button
+                                key={status}
+                                disabled={status === c.status || updatingId === c.id}
+                                onClick={() => handleStatusChange(c.id, status)}
+                                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                <CampaignStatusBadge status={status} />
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setEditingId(c.id)}
+                            disabled={updatingId === c.id}
+                            className="rounded p-0.5 text-gray-500 hover:bg-gray-800 hover:text-gray-300 disabled:opacity-40"
+                            title="Edit status"
+                          >
+                            {updatingId === c.id ? (
+                              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-500 border-t-transparent" />
+                            ) : (
+                              <Pencil className="h-3 w-3" />
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap">{c.owner.name || '-'}</td>
                     <td className="px-3 py-2 font-mono text-xs max-w-[120px] truncate" title={c.owner.walletAddress}>
