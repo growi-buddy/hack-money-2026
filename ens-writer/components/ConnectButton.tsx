@@ -29,7 +29,14 @@ export function ConnectButton() {
   // Estado de error
   if (status === "error") {
     return (
-      <div className="px-4 py-2 bg-red-900/20 border border-red-500 rounded-lg text-red-300 text-sm">
+      <div 
+        className="px-4 py-2 rounded-full text-sm font-medium"
+        style={{
+          backgroundColor: "rgba(255, 99, 71, 0.1)",
+          border: "2px solid rgba(255, 99, 71, 0.3)",
+          color: "#DC3545"
+        }}
+      >
         Error: {error}
       </div>
     );
@@ -41,7 +48,12 @@ export function ConnectButton() {
       <button
         onClick={handleConnect}
         disabled={isConnecting || status === "idle"}
-        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors"
+        className="px-6 py-2 rounded-full font-bold text-sm lg:text-base transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+        style={{
+          backgroundColor: "#B0D74C",
+          color: "#2D3436",
+          boxShadow: "0 2px 10px rgba(176, 215, 76, 0.4)"
+        }}
       >
         {isConnecting ? "Connecting..." : "Connect Wallet"}
       </button>
@@ -50,16 +62,36 @@ export function ConnectButton() {
 
   // Conectado
   return (
-    <div className="flex items-center gap-3">
-      <div className="px-4 py-2 bg-slate-800 rounded-lg border border-slate-700">
+    <div className="flex items-center gap-2 lg:gap-3">
+      <div 
+        className="px-4 py-2 rounded-full"
+        style={{
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+          border: "1px solid rgba(176, 215, 76, 0.2)"
+        }}
+      >
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span className="font-mono text-sm">{formatAddress(address)}</span>
+          <div 
+            className="w-2 h-2 rounded-full" 
+            style={{ backgroundColor: "#B0D74C" }}
+          ></div>
+          <span 
+            className="font-mono text-xs lg:text-sm font-medium"
+            style={{ color: "#2D3436" }}
+          >
+            {formatAddress(address)}
+          </span>
         </div>
       </div>
       <button
         onClick={handleDisconnect}
-        className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition-colors"
+        className="px-4 py-2 rounded-full text-xs lg:text-sm font-bold transition-all hover:scale-105"
+        style={{
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          color: "#636E72",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.08)"
+        }}
       >
         Disconnect
       </button>

@@ -4,6 +4,7 @@ import { useWallet } from "@/contexts/WalletContext";
 import { ConnectButton } from "@/components/ConnectButton";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Campaign {
   code: string;
@@ -55,129 +56,192 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-12">
-          <div>
-            <h1 className="text-4xl font-bold mb-2 bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+    <div className="min-h-screen relative overflow-x-hidden" style={{ background: "linear-gradient(135deg, #FDFCF7 0%, #F8FAE5 50%, #E8F5E9 100%)" }}>
+      {/* Decorative background blobs */}
+      <div className="absolute top-20 right-0 w-[500px] h-[500px] rounded-full opacity-30 blur-3xl" style={{ background: "#B0D74C" }}></div>
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-20 blur-3xl" style={{ background: "#B0D74C" }}></div>
+
+      {/* Header */}
+      <header className="relative z-10 px-6 lg:px-12 py-3 flex justify-between items-center">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <div className="relative w-10 h-10">
+            <Image
+              src="/growi.png"
+              alt="Growi"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+          </div>
+          <span className="text-xl lg:text-2xl font-bold" style={{ color: "#2D3436" }}>Growi</span>
+        </Link>
+        <ConnectButton />
+      </header>
+
+      {/* Main Content */}
+      <main className="relative z-10 px-6 lg:px-12 py-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Title Section */}
+          <div className="mb-8">
+            <h1 className="text-4xl lg:text-5xl font-bold mb-3" style={{ color: "#2D3436" }}>
               My Campaigns
             </h1>
-            <p className="text-slate-400">
+            <p className="text-lg" style={{ color: "#636E72" }}>
               {address
                 ? "Campaigns where you are manager or beneficiary"
                 : "Connect your wallet to get started"}
             </p>
           </div>
-          <ConnectButton />
+
+          {/* Content */}
+          {!address ? (
+            // CTA: Connect wallet
+            <div className="rounded-3xl p-12 text-center"
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                boxShadow: "0 4px 30px rgba(0,0,0,0.1)"
+              }}>
+              <div className="max-w-md mx-auto">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center text-5xl"
+                  style={{ backgroundColor: "rgba(176, 215, 76, 0.15)" }}>
+                  🔐
+                </div>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: "#2D3436" }}>
+                  Connect Your Wallet
+                </h2>
+                <p className="mb-8" style={{ color: "#636E72" }}>
+                  Connect your wallet using WaaP to see campaigns where you are
+                  manager or have payments. All verification happens locally
+                  using on-chain ENS data.
+                </p>
+                <ConnectButton />
+              </div>
+            </div>
+          ) : loading ? (
+            // Loading
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-t-transparent"
+                style={{ borderColor: "#B0D74C", borderTopColor: "transparent" }}></div>
+              <p className="mt-4" style={{ color: "#636E72" }}>Loading campaigns...</p>
+            </div>
+          ) : error ? (
+            // Error
+            <div className="rounded-3xl p-6"
+              style={{
+                backgroundColor: "rgba(255, 99, 71, 0.1)",
+                border: "2px solid rgba(255, 99, 71, 0.3)"
+              }}>
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">❌</span>
+                <div>
+                  <h3 className="font-bold mb-1" style={{ color: "#2D3436" }}>Error</h3>
+                  <p className="text-sm" style={{ color: "#636E72" }}>{error}</p>
+                </div>
+              </div>
+            </div>
+          ) : campaigns.length === 0 ? (
+            // No campaigns
+            <div className="rounded-3xl p-12 text-center"
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                boxShadow: "0 4px 30px rgba(0,0,0,0.1)"
+              }}>
+              <div className="max-w-md mx-auto">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center text-5xl"
+                  style={{ backgroundColor: "rgba(176, 215, 76, 0.15)" }}>
+                  📭
+                </div>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: "#2D3436" }}>
+                  No Campaigns Yet
+                </h2>
+                <p className="mb-6" style={{ color: "#636E72" }}>
+                  You don&apos;t have any campaigns yet. Campaigns where you are manager or
+                  beneficiary will appear here.
+                </p>
+                <div className="text-sm px-4 py-2 rounded-xl font-mono inline-block"
+                  style={{
+                    backgroundColor: "rgba(176, 215, 76, 0.1)",
+                    color: "#5D7A1F"
+                  }}>
+                  Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Campaigns list
+            <div>
+              <div className="mb-6 px-4 py-2 rounded-full inline-block font-semibold text-sm"
+                style={{
+                  backgroundColor: "rgba(176, 215, 76, 0.15)",
+                  color: "#5D7A1F"
+                }}>
+                {campaigns.length} campaign{campaigns.length !== 1 ? "s" : ""} found
+              </div>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {campaigns.map((campaign) => (
+                  <Link
+                    key={campaign.code}
+                    href={`/campaigns/${campaign.code}`}
+                    className="block rounded-3xl p-6 transition-all duration-200 hover:scale-[1.03] hover:shadow-2xl"
+                    style={{
+                      backgroundColor: "rgba(255, 255, 255, 0.8)",
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.08)"
+                    }}
+                  >
+                    {/* Role & Status Badges */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span
+                        className="text-xs font-bold px-3 py-1 rounded-full"
+                        style={{
+                          backgroundColor: campaign.role === "manager" 
+                            ? "rgba(138, 43, 226, 0.15)" 
+                            : "rgba(176, 215, 76, 0.25)",
+                          color: campaign.role === "manager" 
+                            ? "#8A2BE2" 
+                            : "#5D7A1F"
+                        }}
+                      >
+                        {campaign.role === "manager" ? "Manager" : "Beneficiary"}
+                      </span>
+                      <span
+                        className="text-xs font-bold px-3 py-1 rounded-full"
+                        style={{
+                          backgroundColor: campaign.status === "FINALIZED"
+                            ? "rgba(76, 175, 80, 0.15)"
+                            : "rgba(255, 193, 7, 0.15)",
+                          color: campaign.status === "FINALIZED"
+                            ? "#4CAF50"
+                            : "#FFC107"
+                        }}
+                      >
+                        {campaign.status}
+                      </span>
+                    </div>
+
+                    {/* Code */}
+                    <h3 className="text-2xl font-bold mb-2 font-mono" style={{ color: "#2D3436" }}>
+                      {campaign.code}
+                    </h3>
+
+                    {/* FQDN */}
+                    <p className="text-sm font-mono mb-4 break-all" style={{ color: "#636E72" }}>
+                      {campaign.fqdn}
+                    </p>
+
+                    {/* Date */}
+                    <p className="text-xs mb-4" style={{ color: "#95A5A6" }}>
+                      Created {new Date(campaign.created_at).toLocaleDateString()}
+                    </p>
+
+                    {/* Arrow */}
+                    <div className="text-2xl" style={{ color: "#B0D74C" }}>→</div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Content */}
-        {!address ? (
-          // CTA: Connect wallet
-          <div className="bg-slate-800/50 backdrop-blur rounded-lg p-12 border border-slate-700 text-center">
-            <div className="max-w-md mx-auto">
-              <div className="text-6xl mb-6">🔐</div>
-              <h2 className="text-2xl font-bold mb-4">Connect Your Wallet</h2>
-              <p className="text-slate-400 mb-8">
-                Connect your wallet using WaaP to see campaigns where you are a
-                manager or have payouts. All verification happens locally using
-                on-chain ENS data.
-              </p>
-              <ConnectButton />
-            </div>
-          </div>
-        ) : loading ? (
-          // Loading
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
-            <p className="mt-4 text-slate-400">Loading campaigns...</p>
-          </div>
-        ) : error ? (
-          // Error
-          <div className="bg-red-900/20 border border-red-500 rounded-lg p-6">
-            <div className="flex items-start gap-3">
-              <span className="text-red-400 text-xl">❌</span>
-              <div>
-                <h3 className="font-semibold text-red-300 mb-1">Error</h3>
-                <p className="text-red-200 text-sm">{error}</p>
-              </div>
-            </div>
-          </div>
-        ) : campaigns.length === 0 ? (
-          // No campaigns
-          <div className="bg-slate-800/50 backdrop-blur rounded-lg p-12 border border-slate-700 text-center">
-            <div className="max-w-md mx-auto">
-              <div className="text-6xl mb-6">📭</div>
-              <h2 className="text-2xl font-bold mb-4">No Campaigns Yet</h2>
-              <p className="text-slate-400 mb-6">
-                You don&apos;t have any campaigns yet. Campaigns where you are a
-                manager or beneficiary will appear here.
-              </p>
-              <div className="text-sm text-slate-500 font-mono bg-slate-900 px-4 py-2 rounded">
-                Connected: {address}
-              </div>
-            </div>
-          </div>
-        ) : (
-          // Campaigns list
-          <div>
-            <div className="mb-4 text-sm text-slate-400">
-              Found {campaigns.length} campaign{campaigns.length !== 1 ? "s" : ""}
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {campaigns.map((campaign) => (
-                <Link
-                  key={campaign.code}
-                  href={`/campaigns/${campaign.code}`}
-                  className="block bg-slate-800/50 backdrop-blur rounded-lg p-6 border border-slate-700 hover:border-blue-500 transition-all duration-200 hover:scale-[1.02]"
-                >
-                  {/* Role Badge */}
-                  <div className="flex items-center justify-between mb-3">
-                    <span
-                      className={`text-xs font-semibold px-2 py-1 rounded ${
-                        campaign.role === "manager"
-                          ? "bg-purple-900/50 text-purple-300"
-                          : "bg-green-900/50 text-green-300"
-                      }`}
-                    >
-                      {campaign.role === "manager" ? "Manager" : "Beneficiary"}
-                    </span>
-                    <span
-                      className={`text-xs font-semibold px-2 py-1 rounded ${
-                        campaign.status === "FINALIZED"
-                          ? "bg-green-900/50 text-green-300"
-                          : "bg-yellow-900/50 text-yellow-300"
-                      }`}
-                    >
-                      {campaign.status}
-                    </span>
-                  </div>
-
-                  {/* Code */}
-                  <h3 className="text-xl font-bold mb-2 font-mono text-blue-400">
-                    {campaign.code}
-                  </h3>
-
-                  {/* FQDN */}
-                  <p className="text-sm text-slate-400 font-mono mb-4">
-                    {campaign.fqdn}
-                  </p>
-
-                  {/* Date */}
-                  <p className="text-xs text-slate-500">
-                    Created {new Date(campaign.created_at).toLocaleDateString()}
-                  </p>
-
-                  {/* Arrow */}
-                  <div className="mt-4 text-blue-400">→</div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-      </div>
+      </main>
     </div>
   );
 }
