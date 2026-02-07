@@ -106,11 +106,11 @@ export default function AdminCampaignsPage() {
   const formatCurrency = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 p-6">
+    <div className="min-h-screen bg-background text-foreground p-6">
       <div className="max-w-[1600px] mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Admin - All Campaigns</h1>
-          <p className="text-sm text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Admin - All Campaigns</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Showing all campaigns regardless of status or ownership ({meta.total} total)
           </p>
         </div>
@@ -123,18 +123,18 @@ export default function AdminCampaignsPage() {
             value={filterInput}
             onChange={(e) => setFilterInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleFilter()}
-            className="flex-1 max-w-lg rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="flex-1 max-w-lg rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-growi-lime focus:outline-none focus:ring-1 focus:ring-growi-lime"
           />
           <button
             onClick={handleFilter}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="rounded-lg bg-growi-lime px-4 py-2 text-sm font-medium text-foreground hover:bg-growi-lime/80"
           >
             Filter
           </button>
           {ownerWallet && (
             <button
               onClick={handleClear}
-              className="rounded-md border border-gray-700 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800"
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary"
             >
               Clear
             </button>
@@ -142,9 +142,9 @@ export default function AdminCampaignsPage() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto rounded-lg border border-gray-800">
+        <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-gray-900 text-gray-400 text-left">
+            <thead className="bg-secondary text-muted-foreground text-left">
               <tr>
                 <th className="px-3 py-3 font-medium">Title</th>
                 <th className="px-3 py-3 font-medium">Status</th>
@@ -165,22 +165,22 @@ export default function AdminCampaignsPage() {
                 <th className="px-3 py-3 font-medium">Created</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className="divide-y divide-border">
               {loading ? (
                 <tr>
-                  <td colSpan={17} className="px-3 py-8 text-center text-gray-500">
+                  <td colSpan={17} className="px-3 py-8 text-center text-muted-foreground">
                     Loading...
                   </td>
                 </tr>
               ) : campaigns.length === 0 ? (
                 <tr>
-                  <td colSpan={17} className="px-3 py-8 text-center text-gray-500">
+                  <td colSpan={17} className="px-3 py-8 text-center text-muted-foreground">
                     No campaigns found
                   </td>
                 </tr>
               ) : (
                 campaigns.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-900/50">
+                  <tr key={c.id} className="hover:bg-secondary/50 transition-colors">
                     <td className="px-3 py-2 font-medium max-w-[200px] truncate" title={c.title}>
                       {c.title}
                     </td>
@@ -188,10 +188,10 @@ export default function AdminCampaignsPage() {
                       <div className="relative flex items-center gap-1">
                         <CampaignStatusBadge status={c.status} />
                         {editingId === c.id ? (
-                          <div ref={dropdownRef} className="absolute top-full left-0 z-50 mt-1 w-40 rounded-md border border-gray-700 bg-gray-900 py-1 shadow-lg">
-                            <div className="flex items-center justify-between px-3 py-1 border-b border-gray-700">
-                              <span className="text-xs text-gray-400">Change status</span>
-                              <button onClick={() => setEditingId(null)} className="text-gray-500 hover:text-gray-300">
+                          <div ref={dropdownRef} className="absolute top-full left-0 z-50 mt-1 w-40 rounded-lg border border-border bg-popover py-1 shadow-lg">
+                            <div className="flex items-center justify-between px-3 py-1 border-b border-border">
+                              <span className="text-xs text-muted-foreground">Change status</span>
+                              <button onClick={() => setEditingId(null)} className="text-muted-foreground hover:text-foreground">
                                 <X className="h-3 w-3" />
                               </button>
                             </div>
@@ -200,7 +200,7 @@ export default function AdminCampaignsPage() {
                                 key={status}
                                 disabled={status === c.status || updatingId === c.id}
                                 onClick={() => handleStatusChange(c.id, status)}
-                                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed"
                               >
                                 <CampaignStatusBadge status={status} />
                               </button>
@@ -210,11 +210,11 @@ export default function AdminCampaignsPage() {
                           <button
                             onClick={() => setEditingId(c.id)}
                             disabled={updatingId === c.id}
-                            className="rounded p-0.5 text-gray-500 hover:bg-gray-800 hover:text-gray-300 disabled:opacity-40"
+                            className="rounded p-0.5 text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-40"
                             title="Edit status"
                           >
                             {updatingId === c.id ? (
-                              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-500 border-t-transparent" />
+                              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
                             ) : (
                               <Pencil className="h-3 w-3" />
                             )}
@@ -257,21 +257,21 @@ export default function AdminCampaignsPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-400">
+            <span className="text-muted-foreground">
               Page {meta.page} of {totalPages}
             </span>
             <div className="flex gap-2">
               <button
                 onClick={() => goToPage(meta.page - 1)}
                 disabled={meta.page <= 1}
-                className="rounded-md border border-gray-700 px-3 py-1 text-gray-300 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="rounded-lg border border-border px-3 py-1 text-muted-foreground hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button
                 onClick={() => goToPage(meta.page + 1)}
                 disabled={meta.page >= totalPages}
-                className="rounded-md border border-gray-700 px-3 py-1 text-gray-300 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="rounded-lg border border-border px-3 py-1 text-muted-foreground hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Next
               </button>
