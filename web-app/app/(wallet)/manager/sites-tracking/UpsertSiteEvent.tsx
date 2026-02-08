@@ -204,7 +204,7 @@ export const UpsertSiteEvent = ({
                       {formData.eventType === SiteEventType.LANDING_PAGE_VIEW || SiteEventType.PURCHASE_SUCCESS === formData.eventType
                         ? 'Contains urls ' : 'CSS Selectors'}
                       {(formData.eventType === SiteEventType.VIEW_ITEM || formData.eventType === SiteEventType.ADD_TO_CART || formData.eventType === SiteEventType.CHECKOUT) && (
-                        ' (clic on)'
+                        ' (click on)'
                       )}
                       <span className="text-destructive">*</span>
                     </label>
@@ -234,7 +234,7 @@ export const UpsertSiteEvent = ({
                               ? 'https://growi.app'
                               : formData.eventType === SiteEventType.PURCHASE_SUCCESS
                                 ? 'https://growi.app/thanks'
-                                : '.btn-primary, #add-to-cart'}
+                                : '.container > button:has-text("Submit"), #add-to-cart'}
                             className="w-full rounded border border-border bg-background px-2 py-1.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-growi-blue/50"
                           />
                           <div className="flex items-center gap-2">

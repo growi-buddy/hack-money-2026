@@ -3,6 +3,9 @@
 import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { LoadingCard } from '@/components/ui/loading-card';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useWallet } from '@/contexts/wallet-context';
 import { mapCampaignFormToAPI, validateCampaignForm } from '@/helpers/campaign-mapper';
 import { useSites } from '@/hooks';
@@ -83,6 +86,7 @@ export default function CreateCampaignPage() {
   const [ input, setInput ] = useState('');
   const [ lastUpdatedField, setLastUpdatedField ] = useState<string | null>(null);
   const [ showSuccess, setShowSuccess ] = useState(false);
+  const [ selectedSiteId, setSelectedSiteId ] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const { sites, hasSiteEvents, isLoading } = useSites();
@@ -584,11 +588,7 @@ export default function CreateCampaignPage() {
               </InfoCard>
               
               <InfoCard icon={<Zap className="h-4 w-4" />} title="Reward Events" color="amber">
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin text-growi-blue" />
-                  </div>
-                ) : !hasSiteEvents ? (
+                {isLoading ? <LoadingCard userRole="manager" /> : !hasSiteEvents ? (
                   <div className="text-center py-4">
                     <p className="text-sm text-muted-foreground mb-2">
                       You don&apos;t have any reward events configured
@@ -602,64 +602,86 @@ export default function CreateCampaignPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {sites.map((site) => (
-                      <div key={site.id} className="space-y-2">
-                        <div className="flex items-center gap-2 pb-1 border-b border-border/50">
-                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                            {site.name}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Select Site</Label>
+                      <RadioGroup
+                        value={selectedSiteId}
+                        onValueChange={(siteId) => {
+                          setSelectedSiteId(siteId);
+                          const site = sites.find(s => s.id === siteId);
+                          if (site) {
+                            setCampaignData((prev) => ({
+                              ...prev,
+                              selectedRewardEvents: site.events.map(event => ({
+                                rewardEventId: event.id!,
+                                amount: 0.01,
+                                volumeStep: 1,
+                              })),
+                            }));
+                          }
+                        }}
+                      >
+                        {sites.map((site) => (
+                          <div key={site.id} className="flex items-center space-x-2">
+                            <RadioGroupItem value={site.id} id={site.id} />
+                            <Label htmlFor={site.id} className="flex items-center gap-2 cursor-pointer">
+                              {site.name}
+                              <span className="text-xs text-muted-foreground">
+                                ({site.events.length} event{site.events.length !== 1 ? 's' : ''})
+                              </span>
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </div>
+                    
+                    {/* Show events from selected site */}
+                    {selectedSiteId && (() => {
+                      const selectedSite = sites.find(s => s.id === selectedSiteId);
+                      if (!selectedSite) return null;
+                      
+                      return (
+                        <div className="space-y-2 pt-4 border-t border-border">
+                          <h4 className="text-sm font-semibold text-foreground">
+                            Events for {selectedSite.name}
                           </h4>
-                          <span className="text-xs text-muted-foreground/60">
-                            ({site.events.length} event{site.events.length !== 1 ? 's' : ''})
-                          </span>
+                          {selectedSite.events.map((event) => {
+                            const selectedEvent = campaignData.selectedRewardEvents?.find(
+                              (e) => e.rewardEventId === event.id,
+                            );
+                            
+                            return (
+                              <RewardEventField
+                                key={event.id}
+                                label={event.name}
+                                eventType={SITE_EVENT_TYPE_LABELS[event.eventType]}
+                                enabled={true}
+                                amount={selectedEvent?.amount}
+                                volumeStep={selectedEvent?.volumeStep}
+                                onToggle={() => {
+                                }} // No toggle since all events are auto-selected
+                                onAmountChange={(amount) => {
+                                  setCampaignData((prev) => ({
+                                    ...prev,
+                                    selectedRewardEvents: (prev.selectedRewardEvents || []).map((e) =>
+                                      e.rewardEventId === event.id ? { ...e, amount } : e,
+                                    ),
+                                  }));
+                                }}
+                                onVolumeStepChange={(volumeStep) => {
+                                  setCampaignData((prev) => ({
+                                    ...prev,
+                                    selectedRewardEvents: (prev.selectedRewardEvents || []).map((e) =>
+                                      e.rewardEventId === event.id ? { ...e, volumeStep } : e,
+                                    ),
+                                  }));
+                                }}
+                              />
+                            );
+                          })}
                         </div>
-                        {site.events.map((event) => {
-                          const isSelected = campaignData.selectedRewardEvents?.some(
-                            (e) => e.rewardEventId === event.id,
-                          );
-                          const selectedEvent = campaignData.selectedRewardEvents?.find(
-                            (e) => e.rewardEventId === event.id,
-                          );
-                          
-                          return (
-                            <RewardEventField
-                              key={event.id}
-                              label={event.name}
-                              eventType={SITE_EVENT_TYPE_LABELS[event.eventType]}
-                              enabled={isSelected}
-                              amount={selectedEvent?.amount}
-                              onToggle={(enabled) => {
-                                setCampaignData((prev) => {
-                                  if (enabled) {
-                                    return {
-                                      ...prev,
-                                      selectedRewardEvents: [
-                                        ...(prev.selectedRewardEvents || []),
-                                        { rewardEventId: event.id!, amount: 0.01, volumeStep: 1 },
-                                      ],
-                                    };
-                                  } else {
-                                    return {
-                                      ...prev,
-                                      selectedRewardEvents: (prev.selectedRewardEvents || []).filter(
-                                        (e) => e.rewardEventId !== event.id,
-                                      ),
-                                    };
-                                  }
-                                });
-                              }}
-                              onAmountChange={(amount) => {
-                                setCampaignData((prev) => ({
-                                  ...prev,
-                                  selectedRewardEvents: (prev.selectedRewardEvents || []).map((e) =>
-                                    e.rewardEventId === event.id ? { ...e, amount } : e,
-                                  ),
-                                }));
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
-                    ))}
+                      );
+                    })()}
                   </div>
                 )}
               </InfoCard>
@@ -880,15 +902,18 @@ function RewardEventField({
                             eventType,
                             enabled,
                             amount,
-                            onToggle,
+                            volumeStep,
                             onAmountChange,
+                            onVolumeStepChange,
                           }: {
   label: string
   eventType: string
   enabled?: boolean
   amount?: number
+  volumeStep?: number
   onToggle?: (enabled: boolean) => void
   onAmountChange?: (amount: number) => void
+  onVolumeStepChange?: (volumeStep: number) => void
 }) {
   return (
     <div
@@ -897,12 +922,6 @@ function RewardEventField({
       }`}
     >
       <label className="flex flex-1 cursor-pointer items-center gap-2">
-        <input
-          type="checkbox"
-          checked={enabled || false}
-          onChange={(e) => onToggle?.(e.target.checked)}
-          className="h-4 w-4 rounded text-growi-blue focus:ring-2 focus:ring-growi-blue/50"
-        />
         <div className="flex flex-col">
           <span
             className={`text-sm ${enabled ? 'font-medium text-foreground' : 'text-muted-foreground'}`}
@@ -913,16 +932,35 @@ function RewardEventField({
         </div>
       </label>
       {enabled && (
-        <div className="flex items-center gap-1 rounded bg-secondary px-2 py-1">
-          <span className="text-xs text-muted-foreground">$</span>
-          <input
-            type="number"
-            step="0.001"
-            min="0.001"
-            value={amount || 0.01}
-            onChange={(e) => onAmountChange?.(parseFloat(e.target.value) || 0.01)}
-            className="w-16 bg-transparent text-sm text-foreground focus:outline-none"
-          />
+        <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1 rounded bg-secondary px-2 py-1">
+              <span className="text-xs text-muted-foreground">$</span>
+              <input
+                type="number"
+                step="0.001"
+                min="0.001"
+                value={amount || 0.01}
+                onChange={(e) => onAmountChange?.(parseFloat(e.target.value) || 0.01)}
+                className="w-16 bg-transparent text-sm text-foreground focus:outline-none"
+              />
+            </div>
+            <span className="text-[10px] text-muted-foreground/60 px-2">Amount</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-1 rounded bg-secondary px-2 py-1">
+              <span className="text-xs text-muted-foreground">×</span>
+              <input
+                type="number"
+                step="1"
+                min="1"
+                value={volumeStep || 1}
+                onChange={(e) => onVolumeStepChange?.(parseInt(e.target.value) || 1)}
+                className="w-12 bg-transparent text-sm text-foreground focus:outline-none"
+              />
+            </div>
+            <span className="text-[10px] text-muted-foreground/60 px-2">Volume</span>
+          </div>
         </div>
       )}
     </div>
