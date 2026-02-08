@@ -47,7 +47,8 @@ function CountUpNumber({ value, prefix = '' }: { value: number; prefix?: string 
   return <motion.span>{rounded}</motion.span>;
 }
 
-export default function ClientCampaignCompletePage() {
+export function CampaignCompleteCard() {
+  
   const [ showConfetti, setShowConfetti ] = useState(true);
   const [ influencerRatings, setInfluencerRatings ] = useState<Record<number, number>>({});
   const [ showRatingModal, setShowRatingModal ] = useState(false);

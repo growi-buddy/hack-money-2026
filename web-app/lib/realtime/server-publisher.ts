@@ -1,5 +1,5 @@
+import { SiteEventType } from '@/lib/db/enums';
 import * as Ably from 'ably';
-import { EventType } from '@/lib/db/prisma/generated';
 
 const getAblyClient = () => {
   if (!process.env.ABLY_API_KEY) {
@@ -12,7 +12,7 @@ export class ServerPublisher {
   static async publish<T = unknown>(
     channelName: string,
     event: string,
-    data: T
+    data: T,
   ): Promise<void> {
     try {
       const ably = getAblyClient();
@@ -24,31 +24,31 @@ export class ServerPublisher {
       throw error;
     }
   }
-
+  
   static async publishCampaignEvent(
     campaignId: string,
     event: string,
-    data: unknown
+    data: unknown,
   ): Promise<void> {
     await this.publish(`campaign:${campaignId}`, event, data);
   }
-
+  
   static async publishParticipationEvent(
     participationId: string,
     event: string,
-    data: unknown
+    data: unknown,
   ): Promise<void> {
     await this.publish(`participation:${participationId}`, event, data);
   }
-
+  
   static async publishAnalyticsEvent(
     campaignId: string,
-    eventType: EventType,
+    eventType: SiteEventType,
     data: {
       participationId: string;
       amount: number;
       metadata?: unknown;
-    }
+    },
   ): Promise<void> {
     await Promise.all([
       this.publishCampaignEvent(campaignId, 'analytics_event', {
@@ -63,18 +63,18 @@ export class ServerPublisher {
       }),
     ]);
   }
-
+  
   static async publishBalanceUpdate(
     campaignId: string,
     participationId: string,
-    balance: number
+    balance: number,
   ): Promise<void> {
     const data = {
       participationId,
       balance,
       timestamp: Date.now(),
     };
-
+    
     await Promise.all([
       this.publishCampaignEvent(campaignId, 'balance_updated', data),
       this.publishParticipationEvent(participationId, 'balance_updated', data),

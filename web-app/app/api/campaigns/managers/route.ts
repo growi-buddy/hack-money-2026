@@ -50,7 +50,7 @@ export async function GET(req: Request) {
       include: {
         campaignsCreated: {
           where: {
-            status: { not: CampaignStatus.DELETED },
+            deletedAt: null,
           },
           select: {
             id: true,

@@ -165,22 +165,33 @@ exports.Prisma.CampaignScalarFieldEnum = {
   yellowChannelId: 'yellowChannelId',
   status: 'status',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+};
+
+exports.Prisma.SiteScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  name: 'name',
+  url: 'url',
+  description: 'description',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.RewardEventScalarFieldEnum = {
+exports.Prisma.SiteEventScalarFieldEnum = {
   id: 'id',
-  ownerId: 'ownerId',
+  siteId: 'siteId',
   name: 'name',
   eventType: 'eventType',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.CampaignRewardEventScalarFieldEnum = {
+exports.Prisma.CampaignSiteEventScalarFieldEnum = {
   id: 'id',
   campaignId: 'campaignId',
-  rewardEventId: 'rewardEventId',
+  siteEventId: 'siteEventId',
   amount: 'amount',
   volumeStep: 'volumeStep',
   createdAt: 'createdAt',
@@ -196,19 +207,20 @@ exports.Prisma.ClientScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.TrackedEventScalarFieldEnum = {
+exports.Prisma.TrackedSiteEventScalarFieldEnum = {
   id: 'id',
-  campaignRewardEventId: 'campaignRewardEventId',
   clientId: 'clientId',
+  siteEventId: 'siteEventId',
+  participationId: 'participationId',
   data: 'data',
   timestamp: 'timestamp',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.SelectorScalarFieldEnum = {
+exports.Prisma.SiteEventSelectorScalarFieldEnum = {
   id: 'id',
-  rewardEventId: 'rewardEventId',
+  siteEventId: 'siteEventId',
   selector: 'selector',
   eventType: 'eventType',
   isActive: 'isActive',
@@ -235,7 +247,7 @@ exports.Prisma.TrackingLinkScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.AnalyticsEventScalarFieldEnum = {
+exports.Prisma.RewardScalarFieldEnum = {
   id: 'id',
   type: 'type',
   participationId: 'participationId',
@@ -307,14 +319,15 @@ exports.SocialMediaPlatform = exports.$Enums.SocialMediaPlatform = {
 
 exports.CampaignStatus = exports.$Enums.CampaignStatus = {
   DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
   ACTIVE: 'ACTIVE',
   PAUSED: 'PAUSED',
   DEPLETED: 'DEPLETED',
-  COMPLETED: 'COMPLETED',
-  DELETED: 'DELETED'
+  EXPIRED: 'EXPIRED',
+  COMPLETED: 'COMPLETED'
 };
 
-exports.EventType = exports.$Enums.EventType = {
+exports.SiteEventType = exports.$Enums.SiteEventType = {
   LANDING_PAGE_VIEW: 'LANDING_PAGE_VIEW',
   VIEW_ITEM: 'VIEW_ITEM',
   ADD_TO_CART: 'ADD_TO_CART',
@@ -332,14 +345,15 @@ exports.Prisma.ModelName = {
   User: 'User',
   SocialMedia: 'SocialMedia',
   Campaign: 'Campaign',
-  RewardEvent: 'RewardEvent',
-  CampaignRewardEvent: 'CampaignRewardEvent',
+  Site: 'Site',
+  SiteEvent: 'SiteEvent',
+  CampaignSiteEvent: 'CampaignSiteEvent',
   Client: 'Client',
-  TrackedEvent: 'TrackedEvent',
-  Selector: 'Selector',
+  TrackedSiteEvent: 'TrackedSiteEvent',
+  SiteEventSelector: 'SiteEventSelector',
   Participation: 'Participation',
   TrackingLink: 'TrackingLink',
-  AnalyticsEvent: 'AnalyticsEvent',
+  Reward: 'Reward',
   ChatRoom: 'ChatRoom',
   ChatMessage: 'ChatMessage'
 };

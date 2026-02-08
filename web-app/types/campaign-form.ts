@@ -10,9 +10,7 @@ export const CampaignFormDataSchema = z.object({
   endDate: z.string().optional(), // ISO date
   
   // Público objetivo
-  targetAudience: z.object({
-    demographics: z.array(z.string()).optional(), // ej: ['Gen Z', 'Millennials']
-  }).optional(),
+  demographics: z.array(z.string()).optional(), // ej: ['Gen Z', 'Millennials']
   
   // Geográfico
   geographic: z.object({

@@ -5,17 +5,14 @@ import { CampaignFormData } from '@/types/campaign-form';
  * Maps campaign form data to API input.
  * Requires rewardEventIds to be pre-created and passed in the formData.
  */
-export function mapCampaignFormToAPI(
-  formData: CampaignFormData,
-  walletAddress: string,
-): CreateCampaignInput {
-  const rewardEvents: CampaignRewardEventInput[] = [];
+export function mapCampaignFormToAPI(formData: CampaignFormData): CreateCampaignInput {
+  const siteEvents: CampaignRewardEventInput[] = [];
   
   // Map selected reward events from the form
   if (formData.selectedRewardEvents) {
     for (const selectedEvent of formData.selectedRewardEvents) {
-      rewardEvents.push({
-        rewardEventId: selectedEvent.rewardEventId,
+      siteEvents.push({
+        siteEventId: selectedEvent.rewardEventId,
         amount: selectedEvent.amount,
         volumeStep: selectedEvent.volumeStep || 1,
       });
@@ -23,18 +20,17 @@ export function mapCampaignFormToAPI(
   }
   
   return {
-    walletAddress,
     title: formData.name || 'Draft',
     description: formData.description,
     budgetTotal: formData.budget || 0,
     slots: formData.slots || 10,
     interests: formData.interests || [],
-    demographics: formData.targetAudience?.demographics || [],
+    demographics: formData.demographics || [],
     regions: formData.geographic?.regions || [],
     countries: formData.geographic?.countries || [],
-    startDate: formData.startDate ? new Date(formData.startDate).toISOString() : null,
-    endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
-    rewardEvents,
+    startDate: new Date(formData.startDate || 0).toISOString(),
+    endDate: new Date(formData.endDate || 0).toISOString(),
+    siteEvents,
   };
 }
 

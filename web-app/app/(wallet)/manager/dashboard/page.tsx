@@ -1,10 +1,9 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { ActiveCampaignsList } from '@/components/campaigns/ActiveCampaignsList';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { CreditCard, DollarSign, Eye, MoreVertical, ShoppingCart, Users } from 'lucide-react';
-import Link from 'next/link';
+import { CreditCard, DollarSign, Eye, ShoppingCart } from 'lucide-react';
 
 // Mock data for the dashboard
 const campaignData = {
@@ -21,54 +20,6 @@ const performanceMetrics = [
   { label: 'Add to Cart', icon: ShoppingCart, value: '24K', progress: 55, color: 'bg-growi-lime' },
   { label: 'Checkout', icon: CreditCard, value: '12K', progress: 35, color: 'bg-growi-blue' },
   { label: 'Purchase', icon: DollarSign, value: '8K', progress: 25, color: 'bg-growi-lime' },
-];
-
-// Weekly timeline data
-const timelineData = [
-  { day: 'Mon', value: 4800 },
-  { day: 'Tue', value: 5200 },
-  { day: 'Wed', value: 6800 },
-  { day: 'Thu', value: 7200 },
-  { day: 'Fri', value: 8500 },
-  { day: 'Sat', value: 6200 },
-  { day: 'Sun', value: 7800 },
-];
-
-// Funnel data
-const funnelData = [
-  { stage: 'Landing Page View', value: 45000, color: '#6B7280' },
-  { stage: 'View Item', value: 38000, color: '#9CA3AF' },
-  { stage: 'Add to Cart', value: 24000, color: '#D1D5DB' },
-  { stage: 'Checkout', value: 12000, color: '#6B7280' },
-  { stage: 'Purchase', value: 8000, color: '#1F2937' },
-];
-
-// Campaign cards data
-const campaigns = [
-  {
-    id: '1',
-    name: 'Nike Summer',
-    expiresIn: 3,
-    status: 'active',
-    lastUpdate: 'Mar 27 2026 6:00am',
-    influencers: 2,
-  },
-  {
-    id: '2',
-    name: 'Campaign 2',
-    expiresIn: 5,
-    status: 'active',
-    lastUpdate: 'Mar 27 2026 6:00am',
-    influencers: 2,
-  },
-  {
-    id: '3',
-    name: 'Campaign 3',
-    expiresIn: 5,
-    status: 'active',
-    lastUpdate: 'Mar 27 2026 6:00am',
-    influencers: 2,
-  },
 ];
 
 export default function ClientDashboardPage() {
@@ -176,69 +127,7 @@ export default function ClientDashboardPage() {
         </Card>
       </motion.div>
       
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-      >
-        <h2 className="mb-4 text-lg font-semibold text-foreground">My Campaigns</h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          {campaigns.map((campaign, index) => (
-            <motion.div
-              key={campaign.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 + index * 0.1 }}
-            >
-              <Link href={`/manager/campaign/${campaign.id}`}>
-                <Card className="cursor-pointer transition-colors hover:border-growi-blue/50">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
-                          <ShoppingCart className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-sm font-semibold text-foreground">
-                            {campaign.name}
-                          </CardTitle>
-                          <p className="text-xs text-muted-foreground">
-                            Expires in {campaign.expiresIn} days
-                          </p>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div
-                      className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
-                        index === 0
-                          ? 'bg-foreground text-background'
-                          : 'border border-border text-muted-foreground'
-                      }`}
-                    >
-                      Status: {campaign.status}
-                    </div>
-                    
-                    <div>
-                      <p className="text-xs text-muted-foreground">Last Update</p>
-                      <p className="text-xs text-muted-foreground">{campaign.lastUpdate}</p>
-                    </div>
-                    
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+      <ActiveCampaignsList userRole="manager" />
     </div>
   );
 }

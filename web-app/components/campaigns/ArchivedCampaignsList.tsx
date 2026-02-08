@@ -7,31 +7,59 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ErrorCard } from '@/components/ui/error-card';
 import { LoadingCard } from '@/components/ui/loading-card';
 import { useWallet } from '@/contexts/wallet-context';
-import { groupRewardEventsByType } from '@/helpers/campaigns';
+import { groupTrackedEventsByType } from '@/helpers/campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { CampaignStatus, EventType } from '@/lib/db/enums';
-import { ApiListResponse, CampaignResponse, UserRoleType } from '@/types';
+import { SiteEventType } from '@/lib/db/enums';
+import { ApiListResponse, CampaignResponseDTO, UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
 import { Archive, Flame, RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 interface ArchivedCampaignsListProps {
   userRole: UserRoleType;
-  onRestore?: (campaignId: string) => void;
   deps?: (number | Date | string)[],
+  onReload: () => void,
 }
 
-function getTotalPurchases(campaign: CampaignResponse): number {
-  const grouped = groupRewardEventsByType(campaign.rewardEvents);
-  const purchases = grouped.find(e => e.eventType === EventType.PURCHASE_SUCCESS);
+function getTotalPurchases(campaign: CampaignResponseDTO): number {
+  const grouped = groupTrackedEventsByType(campaign.sites);
+  const purchases = grouped.find(e => e.eventType === SiteEventType.PURCHASE_SUCCESS);
   return purchases?.trackedEventsCount ?? 0;
 }
 
-export const ArchivedCampaignsList = ({ userRole, onRestore, deps }: ArchivedCampaignsListProps) => {
+export const ArchivedCampaignsList = ({ userRole, deps, onReload }: ArchivedCampaignsListProps) => {
   const { address } = useWallet();
-  const [ campaigns, setCampaigns ] = useState<CampaignResponse[]>([]);
+  const [ campaigns, setCampaigns ] = useState<CampaignResponseDTO[]>([]);
   const [ isLoading, setIsLoading ] = useState(false);
   const [ error, setError ] = useState('');
+  const [ restoringId, setRestoringId ] = useState<string | null>(null);
+  
+  const handleRestoreCampaign = async (campaignId: string) => {
+    try {
+      setRestoringId(campaignId);
+      const response = await fetch(`/api/campaigns/${campaignId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'restore' }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to restore campaign');
+      }
+      
+      // Remove the restored campaign from the archived list
+      setCampaigns(prev => prev.filter(c => c.id !== campaignId));
+      
+      // Call onReload to refresh other campaign lists
+      onReload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to restore campaign');
+    } finally {
+      setRestoringId(null);
+    }
+  };
   
   const fetchCampaigns = useCallback(async () => {
     if (!address) {
@@ -43,13 +71,14 @@ export const ArchivedCampaignsList = ({ userRole, onRestore, deps }: ArchivedCam
       setIsLoading(true);
       setError('');
       
-      const response = await fetch(`/api/wallet/${address}/all-campaigns?status=${CampaignStatus.DELETED}`);
+      // Fetch expired and completed campaigns as archived
+      const response = await fetch(`/api/campaigns/all?walletAddress=${address}&isDeleted=true`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch campaigns');
       }
       
-      const result: ApiListResponse<CampaignResponse> = await response.json();
+      const result: ApiListResponse<CampaignResponseDTO> = await response.json();
       
       // Filter campaigns by userRole (manager or influencer)
       const filteredCampaigns = result.data.filter(
@@ -90,7 +119,7 @@ export const ArchivedCampaignsList = ({ userRole, onRestore, deps }: ArchivedCam
       
       <ErrorCard error={error} />
       
-      {isLoading ? <LoadingCard userRole={userRole} /> : (
+      {(isLoading && !hasCampaigns) ? <LoadingCard userRole={userRole} /> : (
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -138,15 +167,18 @@ export const ArchivedCampaignsList = ({ userRole, onRestore, deps }: ArchivedCam
                           </>
                         )}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 text-xs"
-                        onClick={() => onRestore?.(campaign.id)}
-                      >
-                        <RotateCcw className="mr-1 h-3 w-3" />
-                        Restore
-                      </Button>
+                      {isManager && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => handleRestoreCampaign(campaign.id)}
+                          disabled={restoringId === campaign.id}
+                        >
+                          <RotateCcw className="mr-1 h-3 w-3" />
+                          Restore
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

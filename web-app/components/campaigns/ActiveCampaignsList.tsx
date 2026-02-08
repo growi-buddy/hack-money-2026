@@ -7,10 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
 import { LoadingCard } from '@/components/ui/loading-card';
 import { useWallet } from '@/contexts/wallet-context';
-import { groupRewardEventsByType } from '@/helpers/campaigns';
+import { groupTrackedEventsByType } from '@/helpers/campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { CampaignStatus, EventType } from '@/lib/db/enums';
-import { ApiListResponse, CampaignResponse, UserRoleType } from '@/types';
+import { SITE_EVENT_TYPE_SHORT_LABELS } from '@/lib/constants';
+import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
+import { ApiListResponse, CampaignResponseDTO, UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
 import { Calendar, Flame, Sparkles, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
@@ -21,17 +22,15 @@ interface MyCampaignsListProps {
   deps?: (number | Date | string)[],
 }
 
-// Helper function to calculate campaign duration
-function getCampaignDuration(startDate: string, endDate: string): string {
+function getCampaignDuration(startDate: string | number, endDate: string | number): string {
   const start = new Date(startDate);
   const end = new Date(endDate);
-
-  // If dates are the same, it's ongoing
+  
   if (start.getTime() === end.getTime()) return 'Ongoing';
-
+  
   const diffTime = Math.abs(end.getTime() - start.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+  
   if (diffDays < 1) return 'Same day';
   if (diffDays < 7) return `${diffDays}d`;
   if (diffDays < 30) return `${Math.ceil(diffDays / 7)}w`;
@@ -39,26 +38,24 @@ function getCampaignDuration(startDate: string, endDate: string): string {
   return `${Math.ceil(diffDays / 365)}y`;
 }
 
-// Helper function to format date range
-function getDateRange(startDate: string, endDate: string): string {
+function getDateRange(startDate: string | number, endDate: string | number): string {
   const start = new Date(startDate);
   const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-  // If dates are the same, show as ongoing
+  
   if (start.getTime() === new Date(endDate).getTime()) {
     return `${startStr} - Ongoing`;
   }
-
+  
   const end = new Date(endDate);
   const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
+  
   return `${startStr} - ${endStr}`;
 }
 
 export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => {
   
   const { address } = useWallet();
-  const [ campaigns, setCampaigns ] = useState<CampaignResponse[]>([]);
+  const [ campaigns, setCampaigns ] = useState<CampaignResponseDTO[]>([]);
   const [ isLoading, setIsLoading ] = useState(false);
   const [ error, setError ] = useState('');
   
@@ -75,21 +72,26 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
         setIsLoading(true);
       }
       setError('');
-      
-      const response = await fetch(`/api/wallet/${address}/all-campaigns?status=${CampaignStatus.ACTIVE}`);
-      
+      let response;
+      if (userRole === 'influencer') {
+        response = await fetch(`/api/campaigns/all?walletAddress=${address}&status=${CampaignStatus.ACTIVE},${CampaignStatus.DEPLETED}`);
+      } else {
+        response = await fetch(`/api/campaigns/all?walletAddress=${address}&status=${CampaignStatus.ACTIVE},${CampaignStatus.PUBLISHED},${CampaignStatus.DEPLETED}`);
+      }
       if (!response.ok) {
-        throw new Error('Failed to fetch campaigns');
+        // 1. Intentamos obtener el mensaje de error del body
+        const errorData = await response.json().catch(() => ({}));
+        
+        // 2. Lanzamos el error usando el mensaje del backend o uno por defecto
+        throw new Error(errorData?.error?.message || 'Failed to fetch campaigns');
       }
       
-      const result: ApiListResponse<CampaignResponse> = await response.json();
+      const result: ApiListResponse<CampaignResponseDTO> = await response.json();
       
-      // Filter campaigns by userRole (manager or influencer)
       const filteredCampaigns = result.data.filter(
         campaign => campaign.userRole === userRole,
       );
       
-      // Sort by startDate (newest first)
       const sortedCampaigns = filteredCampaigns.sort((a, b) => {
         return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
       });
@@ -129,7 +131,6 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
         throw new Error('Failed to toggle hot status');
       }
       
-      // Update local state
       setCampaigns((prev) =>
         prev.map((campaign) =>
           campaign.id === campaignId
@@ -166,7 +167,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
       
       <ErrorCard error={error} />
       
-      {isLoading ? <LoadingCard userRole={userRole} /> : hasCampaigns ? (
+      {(isLoading && !hasCampaigns) ? <LoadingCard userRole={userRole} /> : hasCampaigns ? (
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -178,16 +179,22 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
               ? Math.round((campaign.budgetSpent / campaign.budgetTotal) * 100)
               : 0;
             
+            const slotsProgress = campaign.slots && campaign.slots > 0
+              ? Math.round((campaign.participants.length / campaign.slots) * 100)
+              : 0;
+            
             return (
               <motion.div key={campaign.id} variants={staggerItem}>
                 <Link href={`/${userRole}/campaigns/${campaign.id}`}>
                   <Card className={`cursor-pointer transition-colors ${primaryBorderHover}`}>
                     <CardHeader>
                       <div className="flex items-center justify-between gap-2">
-                        <CardTitle className="text-foreground">{campaign.title}</CardTitle>
+                        <div className="flex items-center gap-2">
+                          <CardTitle className="text-foreground">{campaign.title}</CardTitle>
+                        </div>
                         <div className="flex items-center gap-2">
                           <CampaignStatusBadge status={campaign.status} />
-                          {campaign.status === CampaignStatus.ACTIVE && userRole === 'manager' && (
+                          {campaign.status === CampaignStatus.PUBLISHED && userRole === 'manager' && (
                             <button
                               onClick={(e) => {
                                 e.preventDefault();
@@ -205,7 +212,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
                               <Flame className={`h-4 w-4 ${togglingHot === campaign.id ? 'animate-spin' : ''}`} />
                             </button>
                           )}
-                          {campaign.status === CampaignStatus.ACTIVE && userRole === 'influencer' && campaign.isHot && (
+                          {campaign.status === CampaignStatus.PUBLISHED && userRole === 'influencer' && campaign.isHot && (
                             <div
                               className="p-1.5 rounded-full bg-amber-500/20"
                               title="Hot Campaign"
@@ -229,18 +236,38 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
                         <span className="font-medium">{getCampaignDuration(campaign.startDate, campaign.endDate)}</span>
                       </div>
                       
-                      {/* Influencers Count */}
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <Users className="h-3.5 w-3.5" />
-                        <span>{campaign.participationsCount} influencer{campaign.participationsCount !== 1 ? 's' : ''}</span>
-                      </div>
+                      {/* Influencers Count / Slots */}
+                      {campaign.status === CampaignStatus.ACTIVE ? (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Users className="h-3.5 w-3.5" />
+                          <span>{campaign.participants.length} influencer{campaign.participants.length !== 1 ? 's' : ''}</span>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1.5">
+                              <Users className="h-3.5 w-3.5" />
+                              <span>Slots</span>
+                            </div>
+                            <span className="font-medium">{campaign.participants.length} / {campaign.slots || 0}</span>
+                          </div>
+                          <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+                            <motion.div
+                              className="h-full bg-growi-blue"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${slotsProgress}%` }}
+                              transition={{ duration: 1, delay: 0.2 }}
+                            />
+                          </div>
+                        </div>
+                      )}
                       
                       {/* Event Stats */}
                       <div className="grid grid-cols-4 gap-2 text-center">
                         {(() => {
-                          const grouped = groupRewardEventsByType(campaign.rewardEvents);
+                          const grouped = groupTrackedEventsByType(campaign.sites);
                           return grouped.slice(0, 4).map((event, index) => {
-                            const isLast = index === grouped.length - 1 || event.eventType === EventType.PURCHASE_SUCCESS;
+                            const isLast = index === grouped.length - 1 || event.eventType === SiteEventType.PURCHASE_SUCCESS;
                             const count = event.trackedEventsCount;
                             const displayCount = count >= 1000 ? `${(count / 1000).toFixed(count >= 10000 ? 0 : 1)}k` : count.toString();
                             return (
@@ -248,7 +275,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
                                 <p className={`text-lg font-bold ${isLast ? 'text-growi-money' : 'text-foreground'}`}>
                                   {displayCount}
                                 </p>
-                                <p className="text-xs text-muted-foreground truncate">{event.label}</p>
+                                <p className="text-xs text-muted-foreground truncate">{SITE_EVENT_TYPE_SHORT_LABELS[event.eventType]}</p>
                               </div>
                             );
                           });
@@ -326,22 +353,46 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
               >
                 <Sparkles className={`h-10 w-10 ${primaryColorClass}`} />
               </motion.div>
-              <h3 className="text-xl font-bold text-foreground">Your Campaigns Will Show Here</h3>
+              <h3 className="text-xl font-bold text-foreground">
+                {isManager ? 'No Active Campaigns Yet' : 'Your Campaigns Will Show Here'}
+              </h3>
               <p className="mt-3 max-w-md text-muted-foreground">
-                Once you join your first campaign, it will appear in this section.
-                Browse available campaigns and start earning by promoting brands you love.
+                {isManager
+                  ? 'Create your first campaign to start promoting your brand and connect with influencers.'
+                  : 'Once you join your first campaign, it will appear in this section. Browse available campaigns and start earning by promoting brands you love.'
+                }
               </p>
-              <Link href="/influencer/discover" className="mt-6">
+              {isManager ? (
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  className="mt-6"
                 >
-                  <Button size="lg" className={`${primaryBg} text-white ${primaryBgHover}`}>
-                    <Sparkles className="mr-2 h-5 w-5" />
-                    Browse Campaigns
-                  </Button>
+                  <Link href="/manager/campaigns/create" className="mt-6">
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button size="lg" className={`${primaryBg} text-white ${primaryBgHover}`}>
+                        <Sparkles className="mr-2 h-5 w-5" />
+                        Create Campaign
+                      </Button>
+                    </motion.div>
+                  </Link>
                 </motion.div>
-              </Link>
+              ) : (
+                <Link href="/influencer/search" className="mt-6">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button size="lg" className={`${primaryBg} text-white ${primaryBgHover}`}>
+                      <Sparkles className="mr-2 h-5 w-5" />
+                      Browse Campaigns
+                    </Button>
+                  </motion.div>
+                </Link>
+              )}
             </CardContent>
           </Card>
         </motion.div>

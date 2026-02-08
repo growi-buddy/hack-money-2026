@@ -1,56 +1,34 @@
-import { safeRoute } from '@/helpers';
+import { safeRouteWithWalletAddress } from '@/helpers';
 import { prisma } from '@/lib/db';
 import { CampaignStatus } from '@/lib/db/enums';
-import { Campaign } from '@/lib/db/prisma/generated';
-import { getOrCreateUserByWallet } from '@/lib/services/user.service';
-import { ApiDataResponse, ApiListResponse, CreateCampaignDTO } from '@/types';
-
-export async function GET(req: Request) {
-  return safeRoute(async () => {
-    const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') ?? '1');
-    const limit = parseInt(searchParams.get('limit') ?? '10');
-    const skip = (page - 1) * limit;
-    
-    const [ campaigns, total ] = await Promise.all([
-      prisma.campaign.findMany({
-        skip,
-        take: limit,
-        include: { _count: { select: { participations: true } } },
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.campaign.count(),
-    ]);
-    
-    const response: ApiListResponse<Campaign> = {
-      success: true,
-      data: campaigns,
-      meta: { total, page, limit },
-    };
-    return { response };
-  });
-}
+import { ApiDataResponse, CreateCampaignDTO } from '@/types';
 
 export async function POST(req: Request) {
-  return safeRoute(async () => {
+  return safeRouteWithWalletAddress(req, async (user) => {
     const body = await req.json();
+    
     const validatedData = CreateCampaignDTO.parse(body);
     
-    const campaign = await prisma.$transaction(async (tx) => {
-      const user = await getOrCreateUserByWallet(validatedData.walletAddress, tx);
+    await prisma.$transaction(async (tx) => {
       
-      // Verify all reward events exist and belong to the user
-      if (validatedData.rewardEvents.length > 0) {
-        const rewardEventIds = validatedData.rewardEvents.map(re => re.rewardEventId);
-        const existingRewardEvents = await tx.rewardEvent.findMany({
+      if (validatedData.siteEvents.length > 0) {
+        const siteEventIds = validatedData.siteEvents.map(se => se.siteEventId);
+        const existingSiteEvents = await tx.siteEvent.findMany({
           where: {
-            id: { in: rewardEventIds },
-            ownerId: user.id,
+            id: { in: siteEventIds },
+          },
+          include: {
+            site: true,
           },
         });
         
-        if (existingRewardEvents.length !== rewardEventIds.length) {
-          throw new Error('One or more reward events not found or do not belong to the user');
+        if (existingSiteEvents.length !== siteEventIds.length) {
+          throw new Error('One or more site events not found');
+        }
+        
+        const invalidSites = existingSiteEvents.filter(se => se.site.ownerId !== user.id);
+        if (invalidSites.length > 0) {
+          throw new Error('One or more site events do not belong to the user');
         }
       }
       
@@ -69,29 +47,20 @@ export async function POST(req: Request) {
           countries: validatedData.countries ?? [],
           startDate: validatedData.startDate ? new Date(validatedData.startDate) : null,
           endDate: validatedData.endDate ? new Date(validatedData.endDate) : null,
-          rewardEvents: {
-            create: validatedData.rewardEvents.map(event => ({
-              rewardEventId: event.rewardEventId,
+          siteEvents: {
+            create: validatedData.siteEvents.map(event => ({
+              siteEventId: event.siteEventId,
               amount: event.amount,
               volumeStep: event.volumeStep ?? 1,
             })),
           },
         },
-        include: {
-          rewardEvents: {
-            include: {
-              rewardEvent: {
-                include: { selectors: true },
-              },
-            },
-          },
-        },
       });
     });
     
-    const response: ApiDataResponse<Campaign> = {
+    const response: ApiDataResponse<true> = {
       success: true,
-      data: campaign,
+      data: true,
     };
     return { response, status: 201 };
   });

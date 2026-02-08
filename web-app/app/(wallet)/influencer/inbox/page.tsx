@@ -141,7 +141,7 @@ function ChatMessages({ currentUserId }: { currentUserId: string }) {
   if (loadingHistory) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-growi-blue" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -307,7 +307,7 @@ export default function InfluencerInboxPage() {
   if (loading) {
     return (
       <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }

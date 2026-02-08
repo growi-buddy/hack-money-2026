@@ -9,7 +9,8 @@ export async function OPTIONS() {
 }
 
 const TrackEventSchema = z.object({
-  campaignRewardEventId: z.string().min(1, 'Campaign reward event ID is required'),
+  campaignSiteEventId: z.string().min(1, 'Campaign site event ID is required'),
+  participationId: z.string().min(1, 'Participation ID is required'),
   sessionId: z.string().min(1, 'Session ID is required'),
   userAgent: z.string().optional(),
   ipAddress: z.string().optional(),
@@ -23,32 +24,64 @@ export async function POST(req: Request) {
     const body = await req.json();
     const payload = TrackEventSchema.parse(body);
 
-    // Verify the CampaignRewardEvent exists
-    const campaignRewardEvent = await prisma.campaignRewardEvent.findUnique({
-      where: { id: payload.campaignRewardEventId },
+    // Verify the CampaignSiteEvent exists
+    const campaignSiteEvent = await prisma.campaignSiteEvent.findUnique({
+      where: { id: payload.campaignSiteEventId },
       include: {
         campaign: true,
-        rewardEvent: true,
+        siteEvent: {
+          include: {
+            site: true,
+          },
+        },
       },
     });
 
-    if (!campaignRewardEvent) {
+    if (!campaignSiteEvent) {
       return corsJsonResponse(
         {
           success: false,
-          error: { code: 'NOT_FOUND', message: 'Campaign reward event not found' },
+          error: { code: 'NOT_FOUND', message: 'Campaign site event not found' },
         },
-        404
+        404,
       );
     }
 
-    // Find or create Client by sessionId
+    // Verify the participation exists
+    const participation = await prisma.participation.findUnique({
+      where: { id: payload.participationId },
+      include: {
+        campaign: true,
+        influencer: true,
+      },
+    });
+
+    if (!participation) {
+      return corsJsonResponse(
+        {
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Participation not found' },
+        },
+        404,
+      );
+    }
+
+    // Verify participation belongs to the campaign
+    if (participation.campaignId !== campaignSiteEvent.campaignId) {
+      return corsJsonResponse(
+        {
+          success: false,
+          error: { code: 'INVALID_REQUEST', message: 'Participation does not belong to this campaign' },
+        },
+        400,
+      );
+    }
+
     let client = await prisma.client.findUnique({
       where: { sessionId: payload.sessionId },
     });
 
     if (!client) {
-      // Create new client with sessionId
       client = await prisma.client.create({
         data: {
           sessionId: payload.sessionId,
@@ -58,10 +91,10 @@ export async function POST(req: Request) {
       });
     }
 
-    // Create the tracked event
-    const trackedEvent = await prisma.trackedEvent.create({
+    const trackedEvent = await prisma.trackedSiteEvent.create({
       data: {
-        campaignRewardEventId: payload.campaignRewardEventId,
+        siteEventId: campaignSiteEvent.siteEventId,
+        participationId: payload.participationId,
         clientId: client.id,
         data: payload.data ? JSON.parse(JSON.stringify(payload.data)) : undefined,
         timestamp: payload.timestamp ? new Date(payload.timestamp) : new Date(),
@@ -71,16 +104,18 @@ export async function POST(req: Request) {
     // Publish to Ably for real-time updates
     try {
       await ServerPublisher.publishCampaignEvent(
-        campaignRewardEvent.campaignId,
+        campaignSiteEvent.campaignId,
         'tracked_event',
         {
           id: trackedEvent.id,
-          eventType: campaignRewardEvent.rewardEvent.eventType,
-          eventName: campaignRewardEvent.rewardEvent.name,
-          amount: Number(campaignRewardEvent.amount),
+          eventType: campaignSiteEvent.siteEvent.eventType,
+          eventName: campaignSiteEvent.siteEvent.name,
+          amount: Number(campaignSiteEvent.amount),
           timestamp: trackedEvent.timestamp.toISOString(),
           data: trackedEvent.data,
-        }
+          participationId: participation.id,
+          influencerWallet: participation.influencer.walletAddress,
+        },
       );
     } catch (ablyError) {
       // Log but don't fail the request if Ably publish fails
@@ -94,7 +129,7 @@ export async function POST(req: Request) {
           event: trackedEvent,
         },
       },
-      201
+      201,
     );
   } catch (error) {
     console.error('[Event API] Error:', error);
@@ -105,7 +140,7 @@ export async function POST(req: Request) {
           success: false,
           error: { code: 'VALIDATION_ERROR', message: error.errors[0].message },
         },
-        400
+        400,
       );
     }
 
@@ -114,7 +149,7 @@ export async function POST(req: Request) {
         success: false,
         error: { code: 'SERVER_ERROR', message: 'Internal server error' },
       },
-      500
+      500,
     );
   }
 }

@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { useProfile } from '@/hooks';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { INTEREST_OPTIONS, AUDIENCE_DEMOGRAPHIC_OPTIONS } from '@/lib/constants/tags';
+import { AUDIENCE_DEMOGRAPHIC_OPTIONS, INTEREST_OPTIONS } from '@/lib/constants';
 import { InfluencerVerificationStatus, SocialMediaPlatform } from '@/lib/db/enums';
 import { SocialMedia } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -222,7 +222,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
