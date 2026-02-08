@@ -238,8 +238,8 @@ export default function EditCampaignPage() {
         </div>
       </div>
       
-      {saveError && <ErrorCard error={saveError} />}
-      {error && <ErrorCard error={error} />}
+      <ErrorCard error={saveError} />
+      <ErrorCard error={error} />
       
       {/* Hot Campaign Toggle */}
       <Card>

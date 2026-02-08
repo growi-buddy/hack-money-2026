@@ -1,5 +1,6 @@
 'use client';
 
+import { InfluencerVerificationStatus } from '@/lib/db/enums';
 import { UserResponseDTO } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -9,6 +10,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserResponseDTO[]>([]);
   const [meta, setMeta] = useState<ApiMeta>({ total: 0, page: 1, limit: 50 });
   const [loading, setLoading] = useState(false);
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   const fetchUsers = useCallback(async (page: number) => {
     setLoading(true);
@@ -36,6 +38,59 @@ export default function AdminUsersPage() {
 
   const goToPage = (page: number) => {
     fetchUsers(page);
+  };
+
+  const updateVerificationStatus = async (userId: string, status: InfluencerVerificationStatus) => {
+    setUpdatingUserId(userId);
+    try {
+      const res = await fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ influencerVerification: status }),
+      });
+
+      if (res.ok) {
+        // Update local state
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.id === userId ? { ...user, influencerVerification: status } : user,
+          ),
+        );
+      } else {
+        alert('Failed to update verification status');
+      }
+    } catch (error) {
+      console.error('Error updating verification status:', error);
+      alert('Error updating verification status');
+    } finally {
+      setUpdatingUserId(null);
+    }
+  };
+
+  const getVerificationBadge = (status: InfluencerVerificationStatus) => {
+    switch (status) {
+      case InfluencerVerificationStatus.VERIFIED:
+        return 'bg-growi-success/20 text-growi-success';
+      case InfluencerVerificationStatus.PENDING:
+        return 'bg-yellow-500/20 text-yellow-600';
+      case InfluencerVerificationStatus.REJECTED:
+        return 'bg-red-500/20 text-red-600';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const getVerificationLabel = (status: InfluencerVerificationStatus) => {
+    switch (status) {
+      case InfluencerVerificationStatus.VERIFIED:
+        return 'Verified';
+      case InfluencerVerificationStatus.PENDING:
+        return 'Pending';
+      case InfluencerVerificationStatus.REJECTED:
+        return 'Rejected';
+      default:
+        return 'None';
+    }
   };
 
   return (
@@ -97,16 +152,32 @@ export default function AdminUsersPage() {
                     <td className="px-3 py-2 max-w-[150px] truncate" title={u.affinities.join(', ')}>
                       {u.affinities.length > 0 ? u.affinities.join(', ') : '-'}
                     </td>
-                    <td className="px-3 py-2 text-center">
-                      {u.influencerVerification ? (
-                        <span className="inline-block rounded-full bg-growi-success/20 px-2 py-0.5 text-xs font-medium text-growi-success">
-                          Verified
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${getVerificationBadge(
+                            u.influencerVerification,
+                          )}`}
+                        >
+                          {getVerificationLabel(u.influencerVerification)}
                         </span>
-                      ) : (
-                        <span className="inline-block rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                          No
-                        </span>
-                      )}
+                        <select
+                          value={u.influencerVerification}
+                          onChange={(e) =>
+                            updateVerificationStatus(
+                              u.id,
+                              e.target.value as InfluencerVerificationStatus,
+                            )
+                          }
+                          disabled={updatingUserId === u.id}
+                          className="rounded border border-border bg-background px-2 py-1 text-xs text-foreground hover:border-growi-blue/50 focus:border-growi-blue focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <option value={InfluencerVerificationStatus.NONE}>None</option>
+                          <option value={InfluencerVerificationStatus.PENDING}>Pending</option>
+                          <option value={InfluencerVerificationStatus.VERIFIED}>Verified</option>
+                          <option value={InfluencerVerificationStatus.REJECTED}>Rejected</option>
+                        </select>
+                      </div>
                     </td>
                     <td className="px-3 py-2">
                       {u.socialMedias.length > 0 ? (

@@ -192,8 +192,9 @@ model Participation {
   campaignId   String
   campaign     Campaign @relation(fields: [campaignId], references: [id])
 
+  status         ParticipationStatus
   links          TrackingLink[]
-  currentBalance Decimal        @default(0)
+  currentBalance Decimal             @default(0)
 
   rewards           Reward[]
   trackedSiteEvents TrackedSiteEvent[]
@@ -307,5 +308,12 @@ enum InfluencerVerificationStatus {
   NONE
   PENDING
   VERIFIED
+  REJECTED
+}
+
+enum ParticipationStatus {
+  APPLY_PENDING
+  INVITATION_SENT
+  ACCEPTED
   REJECTED
 }

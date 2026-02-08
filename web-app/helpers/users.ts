@@ -14,7 +14,8 @@ export const toUserResponseDTO = (user: any): UserResponseDTO => {
     avatar: user?.avatar || '',
     interests: user?.interests || [],
     affinities: user?.affinities || [],
-    influencerVerification: user?.influencerVerification === InfluencerVerificationStatus.VERIFIED,
+    isOnline: false,
+    influencerVerification: user?.influencerVerification || InfluencerVerificationStatus.VERIFIED,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     socialMedias: (Array.isArray(user?.socialMedias) ? user?.socialMedias : []).map((sm: any) => ({
       platform: sm?.platform || '',

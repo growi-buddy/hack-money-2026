@@ -6,15 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
 import { LoadingCard } from '@/components/ui/loading-card';
-import { useWallet } from '@/contexts/wallet-context';
 import { groupTrackedEventsByType } from '@/helpers/campaigns';
+import { useCampaigns } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
-import { ApiListResponse, CampaignResponseDTO, UserRoleType } from '@/types';
+import { CampaignResponseDTO, UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
 import { Archive, CheckCircle2, Flame, Star } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface CompletedCampaignsListProps {
   userRole: UserRoleType;
@@ -37,11 +37,9 @@ function calculateROI(campaign: CampaignResponseDTO): number {
 }
 
 export const CompletedCampaignsList = ({ userRole, onRateCampaign, deps, onReload }: CompletedCampaignsListProps) => {
-  const { address } = useWallet();
-  const [ campaigns, setCampaigns ] = useState<CampaignResponseDTO[]>([]);
-  const [ isLoading, setIsLoading ] = useState(false);
-  const [ error, setError ] = useState('');
+  
   const [ archivingId, setArchivingId ] = useState<string | null>(null);
+  const [ error, setError ] = useState('');
   
   const handleArchiveCampaign = async (campaignId: string) => {
     try {
@@ -61,41 +59,11 @@ export const CompletedCampaignsList = ({ userRole, onRateCampaign, deps, onReloa
     }
   };
   
-  const fetchCampaigns = useCallback(async () => {
-    if (!address) {
-      setCampaigns([]);
-      return;
-    }
-    
-    try {
-      setIsLoading(true);
-      setError('');
-      
-      const response = await fetch(`/api/campaigns/all?walletAddress=${address}&status=${CampaignStatus.COMPLETED},${CampaignStatus.EXPIRED}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch campaigns');
-      }
-      
-      const result: ApiListResponse<CampaignResponseDTO> = await response.json();
-      
-      // Filter campaigns by userRole (manager or influencer)
-      const filteredCampaigns = result.data.filter(
-        campaign => campaign.userRole === userRole,
-      );
-      
-      setCampaigns(filteredCampaigns);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [ address, userRole ]);
-  
-  const depsString = JSON.stringify(deps);
-  useEffect(() => {
-    void fetchCampaigns();
-  }, [ fetchCampaigns, depsString ]);
+  const {
+    campaigns,
+    isLoading,
+    error: campaignError,
+  } = useCampaigns([ CampaignStatus.COMPLETED, CampaignStatus.EXPIRED ], userRole, false, deps);
   
   const hasCampaigns = campaigns.length > 0;
   
@@ -118,7 +86,7 @@ export const CompletedCampaignsList = ({ userRole, onRateCampaign, deps, onReloa
         </Badge>
       </div>
       
-      <ErrorCard error={error} />
+      <ErrorCard error={error || campaignError} />
       
       {(isLoading && !hasCampaigns) ? <LoadingCard userRole={userRole} /> : (
         <motion.div

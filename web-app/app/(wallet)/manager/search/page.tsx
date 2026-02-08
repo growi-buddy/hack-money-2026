@@ -6,98 +6,48 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { staggerContainer, staggerItem } from '@/lib/animations';
+import { useCampaigns } from '@/hooks/use-campaigns';
+import { useUsers } from '@/hooks/use-users';
+import { staggerContainer } from '@/lib/animations';
+import { CampaignStatus } from '@/lib/db/enums';
+import { UserResponseDTO } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Search, Send, Star, Users } from 'lucide-react';
+import { Check, Facebook, Instagram, Linkedin, Music2, Search, Send, Twitter, Users, Youtube } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
-const influencers = [
-  {
-    id: '1',
-    name: 'Alex Chen',
-    avatar: '/growi-mascot.png',
-    followers: '125K',
-    engagement: '4.2%',
-    status: 'online',
-    rating: 4.8,
-    reviewCount: 24,
-    audienceSegments: [ 'Gen Z', 'Millennials', 'Urban' ],
-    affinities: [ 'Fashion', 'Streetwear', 'Sneakers' ],
-    interests: [ 'Sports', 'Music', 'Gaming' ],
-    bio: 'Fashion & lifestyle creator focused on streetwear and sneaker culture.',
-  },
-  {
-    id: '2',
-    name: 'Sarah Kim',
-    avatar: '/growi-mascot.png',
-    followers: '89K',
-    engagement: '5.8%',
-    status: 'online',
-    rating: 4.9,
-    reviewCount: 18,
-    audienceSegments: [ 'Millennials', 'Women 25-34', 'Suburban' ],
-    affinities: [ 'Beauty', 'Wellness', 'Fitness' ],
-    interests: [ 'Yoga', 'Skincare', 'Travel' ],
-    bio: 'Wellness advocate sharing healthy lifestyle tips and beauty secrets.',
-  },
-  {
-    id: '3',
-    name: 'Mike Ross',
-    avatar: '/growi-mascot.png',
-    followers: '256K',
-    engagement: '3.9%',
-    status: 'away',
-    rating: 4.5,
-    reviewCount: 31,
-    audienceSegments: [ 'Gen Z', 'Men 18-24', 'Global' ],
-    affinities: [ 'Tech', 'Gaming', 'Electronics' ],
-    interests: [ 'Esports', 'Gadgets', 'Software' ],
-    bio: 'Tech reviewer and gaming enthusiast with a passion for the latest gadgets.',
-  },
-  {
-    id: '4',
-    name: 'Emma Wilson',
-    avatar: '/growi-mascot.png',
-    followers: '178K',
-    engagement: '6.1%',
-    status: 'online',
-    rating: 4.7,
-    reviewCount: 22,
-    audienceSegments: [ 'Women 18-34', 'Urban', 'High Income' ],
-    affinities: [ 'Luxury', 'Fashion', 'Travel' ],
-    interests: [ 'Designer Brands', 'Fine Dining', 'Art' ],
-    bio: 'Luxury lifestyle content creator showcasing high-end fashion and travel.',
-  },
-  {
-    id: '5',
-    name: 'Jordan Lee',
-    avatar: '/growi-mascot.png',
-    followers: '92K',
-    engagement: '7.2%',
-    status: 'online',
-    rating: 5.0,
-    reviewCount: 15,
-    audienceSegments: [ 'Gen Z', 'Athletes', 'Students' ],
-    affinities: [ 'Sports', 'Fitness', 'Nutrition' ],
-    interests: [ 'Basketball', 'Training', 'Supplements' ],
-    bio: 'Fitness coach and athlete sharing workout routines and nutrition tips.',
-  },
-  {
-    id: '6',
-    name: 'Lisa Park',
-    avatar: '/growi-mascot.png',
-    followers: '145K',
-    engagement: '5.4%',
-    status: 'away',
-    rating: 4.6,
-    reviewCount: 27,
-    audienceSegments: [ 'Millennials', 'Parents', 'Suburban' ],
-    affinities: [ 'Home', 'Family', 'Cooking' ],
-    interests: [ 'Recipes', 'Home Decor', 'Parenting' ],
-    bio: 'Family lifestyle blogger sharing recipes, home tips, and parenting advice.',
-  },
-];
+// Helper function to get social media icon
+const getSocialIcon = (platform: string) => {
+  const normalizedPlatform = platform.toLowerCase();
+  switch (normalizedPlatform) {
+    case 'instagram':
+      return <Instagram className="h-4 w-4" />;
+    case 'twitter':
+    case 'x':
+      return <Twitter className="h-4 w-4" />;
+    case 'youtube':
+      return <Youtube className="h-4 w-4" />;
+    case 'tiktok':
+      return <Music2 className="h-4 w-4" />;
+    case 'facebook':
+      return <Facebook className="h-4 w-4" />;
+    case 'linkedin':
+      return <Linkedin className="h-4 w-4" />;
+    default:
+      return <Users className="h-4 w-4" />;
+  }
+};
+
+// Helper function to format followers count
+const formatFollowers = (count: number): string => {
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M`;
+  }
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}K`;
+  }
+  return count.toString();
+};
 
 const mockCampaigns = [
   { id: '1', title: 'Nike Summer Collection', status: 'active' },
@@ -106,32 +56,66 @@ const mockCampaigns = [
 ];
 
 export default function InfluencersPage() {
+  
   const [ searchQuery, setSearchQuery ] = useState('');
-  const [ selectedInfluencer, setSelectedInfluencer ] = useState<typeof influencers[0] | null>(null);
+  const [ selectedInfluencer, setSelectedInfluencer ] = useState<UserResponseDTO | null>(null);
   const [ showInviteModal, setShowInviteModal ] = useState(false);
   const [ selectedCampaign, setSelectedCampaign ] = useState('');
   const [ inviteSent, setInviteSent ] = useState(false);
-  
-  const filteredInfluencers = influencers.filter(inf =>
+  const [ isSending, setIsSending ] = useState(false);
+  const [ inviteError, setInviteError ] = useState<string | null>(null);
+
+  const { users } = useUsers('influencer');
+  const { campaigns } = useCampaigns([ CampaignStatus.PUBLISHED ], 'manager', false);
+
+  const filteredInfluencers = users.filter(inf =>
     inf.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     inf.affinities.some(a => a.toLowerCase().includes(searchQuery.toLowerCase())) ||
     inf.interests.some(i => i.toLowerCase().includes(searchQuery.toLowerCase())),
   );
-  
-  const handleInvite = (influencer: typeof influencers[0]) => {
+
+  const handleInvite = (influencer: UserResponseDTO) => {
     setSelectedInfluencer(influencer);
     setShowInviteModal(true);
     setInviteSent(false);
     setSelectedCampaign('');
+    setInviteError(null);
   };
-  
-  const sendInvite = () => {
-    setInviteSent(true);
-    setTimeout(() => {
-      setShowInviteModal(false);
-      setInviteSent(false);
-    }, 1500);
+
+  const sendInvite = async () => {
+    if (!selectedInfluencer || !selectedCampaign) return;
+
+    setIsSending(true);
+    setInviteError(null);
+
+    try {
+      const response = await fetch(
+        `/api/campaigns/${selectedCampaign}/invite?walletAddress=${selectedInfluencer.walletAddress}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.error?.message || 'Failed to send invite');
+      }
+
+      setInviteSent(true);
+      setTimeout(() => {
+        setShowInviteModal(false);
+        setInviteSent(false);
+        setSelectedCampaign('');
+      }, 1500);
+    } catch (error) {
+      setInviteError(error instanceof Error ? error.message : 'Failed to send invite');
+    } finally {
+      setIsSending(false);
+    }
   };
+
+  console.log({ users, filteredInfluencers });
   
   return (
     <div className="space-y-6">
@@ -142,7 +126,6 @@ export default function InfluencersPage() {
         </p>
       </div>
       
-      {/* Search */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -158,7 +141,6 @@ export default function InfluencersPage() {
         />
       </motion.div>
       
-      {/* Stats */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -170,11 +152,10 @@ export default function InfluencersPage() {
           {filteredInfluencers.length} influencers
         </Badge>
         <Badge variant="secondary" className="gap-1 bg-growi-success/10 text-growi-success">
-          {influencers.filter(i => i.status === 'online').length} online
+          {users.filter(i => i.isOnline).length} online
         </Badge>
       </motion.div>
       
-      {/* Influencer Grid */}
       <motion.div
         variants={staggerContainer}
         initial="hidden"
@@ -182,88 +163,121 @@ export default function InfluencersPage() {
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
       >
         {filteredInfluencers.map((influencer) => (
-          <motion.div key={influencer.id} variants={staggerItem}>
+          <motion.div key={influencer.id}>
             <Card className="h-full transition-all hover:border-growi-blue/50 hover:shadow-md">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-4">
                 <div className="flex items-start gap-3">
-                  <div className="relative">
+                  <div className="relative flex-shrink-0">
                     <Image
                       src={influencer.avatar || '/placeholder.svg'}
                       alt={influencer.name}
-                      width={56}
-                      height={56}
-                      className="rounded-full"
+                      width={60}
+                      height={60}
+                      className="rounded-full ring-2 ring-border"
                     />
-                    <span
-                      className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-card ${
-                        influencer.status === 'online' ? 'bg-growi-success' : 'bg-growi-yellow'
-                      }`}
-                    />
+                    {influencer.influencerVerification && (
+                      <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-growi-success ring-2 ring-card">
+                        <Check className="h-3.5 w-3.5 text-white" />
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base text-foreground">{influencer.name}</CardTitle>
-                    <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>{influencer.followers} followers</span>
-                      <span>|</span>
-                      <span>{influencer.engagement} eng.</span>
-                    </div>
-                    <div className="mt-1 flex items-center gap-1">
-                      {[ ...Array(5) ].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-3 w-3 ${i < Math.floor(influencer.rating) ? 'fill-growi-yellow text-growi-yellow' : 'text-muted-foreground/30'}`}
-                        />
-                      ))}
-                      <span className="ml-1 text-xs text-muted-foreground">
-                        {influencer.rating} ({influencer.reviewCount})
-                      </span>
-                    </div>
+                    <CardTitle className="text-base text-foreground truncate">
+                      {influencer.name}
+                    </CardTitle>
+                    <p className="mt-0.5 text-xs text-muted-foreground truncate">
+                      {influencer.location || 'Location not specified'}
+                    </p>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground line-clamp-2">{influencer.bio}</p>
+              
+              <CardContent className="space-y-4">
+                {/* Bio */}
+                {influencer.bio && (
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {influencer.bio}
+                  </p>
+                )}
                 
-                {/* Audience Segments */}
-                <div>
-                  <p className="mb-1.5 text-xs font-medium text-muted-foreground">Audience</p>
-                  <div className="flex flex-wrap gap-1">
-                    {influencer.audienceSegments.map((segment) => (
-                      <Badge key={segment} variant="outline" className="text-xs">
-                        {segment}
-                      </Badge>
-                    ))}
+                {/* Social Media Stats */}
+                {influencer.socialMedias && influencer.socialMedias.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Social Media
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {influencer.socialMedias.map((social, index) => (
+                        <a
+                          key={index}
+                          href={social.url || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 rounded-lg border border-border bg-secondary/40 px-3 py-1.5 text-xs font-medium transition-all hover:border-growi-blue/50 hover:bg-growi-blue/5 hover:shadow-sm"
+                        >
+                          <span className="text-muted-foreground">
+                            {getSocialIcon(social.platform)}
+                          </span>
+                          <span className="text-foreground">
+                            {formatFollowers(social.followers)}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* Affinities */}
-                <div>
-                  <p className="mb-1.5 text-xs font-medium text-muted-foreground">Affinities</p>
-                  <div className="flex flex-wrap gap-1">
-                    {influencer.affinities.map((affinity) => (
-                      <Badge key={affinity} className="bg-growi-blue/10 text-growi-blue text-xs hover:bg-growi-blue/20">
-                        {affinity}
-                      </Badge>
-                    ))}
+                {influencer.affinities && influencer.affinities.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Affinities
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {influencer.affinities.slice(0, 3).map((affinity) => (
+                        <Badge
+                          key={affinity}
+                          className="bg-growi-blue/10 text-growi-blue border-growi-blue/20 text-xs hover:bg-growi-blue/20"
+                        >
+                          {affinity}
+                        </Badge>
+                      ))}
+                      {influencer.affinities.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{influencer.affinities.length - 3}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* Interests */}
-                <div>
-                  <p className="mb-1.5 text-xs font-medium text-muted-foreground">Interests</p>
-                  <div className="flex flex-wrap gap-1">
-                    {influencer.interests.map((interest) => (
-                      <Badge key={interest} className="bg-growi-lime/10 text-growi-lime text-xs hover:bg-growi-lime/20">
-                        {interest}
-                      </Badge>
-                    ))}
+                {influencer.interests && influencer.interests.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Interests
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {influencer.interests.slice(0, 3).map((interest) => (
+                        <Badge
+                          key={interest}
+                          className="bg-growi-lime/10 text-growi-lime border-growi-lime/20 text-xs hover:bg-growi-lime/20"
+                        >
+                          {interest}
+                        </Badge>
+                      ))}
+                      {influencer.interests.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{influencer.interests.length - 3}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
                 
-                {/* Invite Button */}
                 <Button
                   onClick={() => handleInvite(influencer)}
-                  className="mt-2 w-full bg-growi-blue text-white hover:bg-growi-blue/90"
+                  className="w-full bg-growi-blue text-white hover:bg-growi-blue/90 shadow-sm"
                 >
                   <Send className="mr-2 h-4 w-4" />
                   Invite to Campaign
@@ -274,7 +288,6 @@ export default function InfluencersPage() {
         ))}
       </motion.div>
       
-      {/* Invite Modal */}
       <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
         <DialogContent>
           <DialogHeader>
@@ -321,7 +334,7 @@ export default function InfluencersPage() {
                     />
                     <div>
                       <p className="font-medium text-foreground">{selectedInfluencer.name}</p>
-                      <p className="text-sm text-muted-foreground">{selectedInfluencer.followers} followers</p>
+                      {/*<p className="text-sm text-muted-foreground">{selectedInfluencer.followers} followers</p>*/}
                     </div>
                   </div>
                 )}
@@ -333,7 +346,7 @@ export default function InfluencersPage() {
                       <SelectValue placeholder="Choose a campaign..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockCampaigns.filter(c => c.status === 'active').map((campaign) => (
+                      {campaigns.map((campaign) => (
                         <SelectItem key={campaign.id} value={campaign.id}>
                           {campaign.title}
                         </SelectItem>
@@ -342,21 +355,37 @@ export default function InfluencersPage() {
                   </Select>
                 </div>
                 
+                {inviteError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                    {inviteError}
+                  </div>
+                )}
+
                 <div className="flex gap-2 pt-2">
                   <Button
                     variant="outline"
                     className="flex-1 bg-transparent"
                     onClick={() => setShowInviteModal(false)}
+                    disabled={isSending}
                   >
                     Cancel
                   </Button>
                   <Button
                     className="flex-1 bg-growi-blue text-white hover:bg-growi-blue/90"
-                    disabled={!selectedCampaign}
+                    disabled={!selectedCampaign || isSending}
                     onClick={sendInvite}
                   >
-                    <Send className="mr-2 h-4 w-4" />
-                    Send Invite
+                    {isSending ? (
+                      <>
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-4 w-4" />
+                        Send Invite
+                      </>
+                    )}
                   </Button>
                 </div>
               </motion.div>

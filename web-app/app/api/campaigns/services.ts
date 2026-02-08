@@ -167,13 +167,25 @@ export const getCampaignResponseDTO = async (
         },
       },
       participations: {
-        include: {
+        select: {
+          status: true,
           influencer: {
             select: {
               id: true,
               name: true,
               walletAddress: true,
               avatar: true,
+            },
+          },
+          trackedSiteEvents: {
+            select: {
+              siteEventId: true,
+              createdAt: true,
+              siteEvent: {
+                select: {
+                  eventType: true,
+                },
+              },
             },
           },
         },
@@ -249,13 +261,35 @@ export const getCampaignResponseDTO = async (
     })),
   }));
   
-  // Map participants
-  const participants = campaign.participations.map((p) => ({
-    id: p.influencer.id,
-    name: p.influencer.name ?? '',
-    walletAddress: p.influencer.walletAddress,
-    avatar: p.influencer.avatar ?? '',
-  }));
+  const participants = campaign.participations.map((p) => {
+    const summaryTrackedSiteEvents: Record<SiteEventType, { total: number; lastUpdated: number }> = {} as any;
+    
+    p.trackedSiteEvents.forEach(te => {
+      const eventType = te.siteEvent.eventType;
+      
+      if (!summaryTrackedSiteEvents[eventType]) {
+        summaryTrackedSiteEvents[eventType] = {
+          total: 0,
+          lastUpdated: 0,
+        };
+      }
+      
+      summaryTrackedSiteEvents[eventType].total += 1;
+      const createdAtTime = new Date(te.createdAt).getTime();
+      if (createdAtTime > summaryTrackedSiteEvents[eventType].lastUpdated) {
+        summaryTrackedSiteEvents[eventType].lastUpdated = createdAtTime;
+      }
+    });
+    
+    return {
+      id: p.influencer.id,
+      name: p.influencer.name ?? '',
+      walletAddress: p.influencer.walletAddress,
+      avatar: p.influencer.avatar ?? '',
+      status: p.status,
+      summaryTrackedSiteEvents,
+    };
+  });
   
   const startDate = new Date(campaign.startDate || 0).getTime();
   const endDate = new Date(campaign.endDate || 0).getTime();

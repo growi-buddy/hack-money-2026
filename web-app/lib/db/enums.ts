@@ -48,3 +48,12 @@ export const InfluencerVerificationStatus = {
 } as const;
 
 export type InfluencerVerificationStatus = (typeof InfluencerVerificationStatus)[keyof typeof InfluencerVerificationStatus];
+
+export const ParticipationStatus = {
+  APPLY_PENDING: 'APPLY_PENDING',
+  INVITATION_SENT: 'INVITATION_SENT',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type ParticipationStatus = (typeof ParticipationStatus)[keyof typeof ParticipationStatus];

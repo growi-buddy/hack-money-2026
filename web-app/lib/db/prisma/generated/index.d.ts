@@ -141,6 +141,16 @@ export const InfluencerVerificationStatus: {
 
 export type InfluencerVerificationStatus = (typeof InfluencerVerificationStatus)[keyof typeof InfluencerVerificationStatus]
 
+
+export const ParticipationStatus: {
+  APPLY_PENDING: 'APPLY_PENDING',
+  INVITATION_SENT: 'INVITATION_SENT',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED'
+};
+
+export type ParticipationStatus = (typeof ParticipationStatus)[keyof typeof ParticipationStatus]
+
 }
 
 export type SiteEventType = $Enums.SiteEventType
@@ -162,6 +172,10 @@ export const CampaignStatus: typeof $Enums.CampaignStatus
 export type InfluencerVerificationStatus = $Enums.InfluencerVerificationStatus
 
 export const InfluencerVerificationStatus: typeof $Enums.InfluencerVerificationStatus
+
+export type ParticipationStatus = $Enums.ParticipationStatus
+
+export const ParticipationStatus: typeof $Enums.ParticipationStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -12925,6 +12939,7 @@ export namespace Prisma {
     id: string | null
     influencerId: string | null
     campaignId: string | null
+    status: $Enums.ParticipationStatus | null
     currentBalance: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -12934,6 +12949,7 @@ export namespace Prisma {
     id: string | null
     influencerId: string | null
     campaignId: string | null
+    status: $Enums.ParticipationStatus | null
     currentBalance: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -12943,6 +12959,7 @@ export namespace Prisma {
     id: number
     influencerId: number
     campaignId: number
+    status: number
     currentBalance: number
     createdAt: number
     updatedAt: number
@@ -12962,6 +12979,7 @@ export namespace Prisma {
     id?: true
     influencerId?: true
     campaignId?: true
+    status?: true
     currentBalance?: true
     createdAt?: true
     updatedAt?: true
@@ -12971,6 +12989,7 @@ export namespace Prisma {
     id?: true
     influencerId?: true
     campaignId?: true
+    status?: true
     currentBalance?: true
     createdAt?: true
     updatedAt?: true
@@ -12980,6 +12999,7 @@ export namespace Prisma {
     id?: true
     influencerId?: true
     campaignId?: true
+    status?: true
     currentBalance?: true
     createdAt?: true
     updatedAt?: true
@@ -13076,6 +13096,7 @@ export namespace Prisma {
     id: string
     influencerId: string
     campaignId: string
+    status: $Enums.ParticipationStatus
     currentBalance: Decimal
     createdAt: Date
     updatedAt: Date
@@ -13104,6 +13125,7 @@ export namespace Prisma {
     id?: boolean
     influencerId?: boolean
     campaignId?: boolean
+    status?: boolean
     currentBalance?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -13119,6 +13141,7 @@ export namespace Prisma {
     id?: boolean
     influencerId?: boolean
     campaignId?: boolean
+    status?: boolean
     currentBalance?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -13130,6 +13153,7 @@ export namespace Prisma {
     id?: boolean
     influencerId?: boolean
     campaignId?: boolean
+    status?: boolean
     currentBalance?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -13141,12 +13165,13 @@ export namespace Prisma {
     id?: boolean
     influencerId?: boolean
     campaignId?: boolean
+    status?: boolean
     currentBalance?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ParticipationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "influencerId" | "campaignId" | "currentBalance" | "createdAt" | "updatedAt", ExtArgs["result"]["participation"]>
+  export type ParticipationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "influencerId" | "campaignId" | "status" | "currentBalance" | "createdAt" | "updatedAt", ExtArgs["result"]["participation"]>
   export type ParticipationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     influencer?: boolean | UserDefaultArgs<ExtArgs>
     campaign?: boolean | CampaignDefaultArgs<ExtArgs>
@@ -13177,6 +13202,7 @@ export namespace Prisma {
       id: string
       influencerId: string
       campaignId: string
+      status: $Enums.ParticipationStatus
       currentBalance: Prisma.Decimal
       createdAt: Date
       updatedAt: Date
@@ -13611,6 +13637,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Participation", 'String'>
     readonly influencerId: FieldRef<"Participation", 'String'>
     readonly campaignId: FieldRef<"Participation", 'String'>
+    readonly status: FieldRef<"Participation", 'ParticipationStatus'>
     readonly currentBalance: FieldRef<"Participation", 'Decimal'>
     readonly createdAt: FieldRef<"Participation", 'DateTime'>
     readonly updatedAt: FieldRef<"Participation", 'DateTime'>
@@ -18665,6 +18692,7 @@ export namespace Prisma {
     id: 'id',
     influencerId: 'influencerId',
     campaignId: 'campaignId',
+    status: 'status',
     currentBalance: 'currentBalance',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -18915,6 +18943,20 @@ export namespace Prisma {
    * Reference to a field of type 'SelectorEventType[]'
    */
   export type ListEnumSelectorEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SelectorEventType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ParticipationStatus'
+   */
+  export type EnumParticipationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ParticipationStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ParticipationStatus[]'
+   */
+  export type ListEnumParticipationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ParticipationStatus[]'>
     
 
 
@@ -19672,6 +19714,7 @@ export namespace Prisma {
     id?: StringFilter<"Participation"> | string
     influencerId?: StringFilter<"Participation"> | string
     campaignId?: StringFilter<"Participation"> | string
+    status?: EnumParticipationStatusFilter<"Participation"> | $Enums.ParticipationStatus
     currentBalance?: DecimalFilter<"Participation"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"Participation"> | Date | string
     updatedAt?: DateTimeFilter<"Participation"> | Date | string
@@ -19686,6 +19729,7 @@ export namespace Prisma {
     id?: SortOrder
     influencerId?: SortOrder
     campaignId?: SortOrder
+    status?: SortOrder
     currentBalance?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -19704,6 +19748,7 @@ export namespace Prisma {
     NOT?: ParticipationWhereInput | ParticipationWhereInput[]
     influencerId?: StringFilter<"Participation"> | string
     campaignId?: StringFilter<"Participation"> | string
+    status?: EnumParticipationStatusFilter<"Participation"> | $Enums.ParticipationStatus
     currentBalance?: DecimalFilter<"Participation"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"Participation"> | Date | string
     updatedAt?: DateTimeFilter<"Participation"> | Date | string
@@ -19718,6 +19763,7 @@ export namespace Prisma {
     id?: SortOrder
     influencerId?: SortOrder
     campaignId?: SortOrder
+    status?: SortOrder
     currentBalance?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -19735,6 +19781,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Participation"> | string
     influencerId?: StringWithAggregatesFilter<"Participation"> | string
     campaignId?: StringWithAggregatesFilter<"Participation"> | string
+    status?: EnumParticipationStatusWithAggregatesFilter<"Participation"> | $Enums.ParticipationStatus
     currentBalance?: DecimalWithAggregatesFilter<"Participation"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeWithAggregatesFilter<"Participation"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Participation"> | Date | string
@@ -20816,6 +20863,7 @@ export namespace Prisma {
 
   export type ParticipationCreateInput = {
     id?: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20830,6 +20878,7 @@ export namespace Prisma {
     id?: string
     influencerId: string
     campaignId: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20840,6 +20889,7 @@ export namespace Prisma {
 
   export type ParticipationUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20854,6 +20904,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     influencerId?: StringFieldUpdateOperationsInput | string
     campaignId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20866,6 +20917,7 @@ export namespace Prisma {
     id?: string
     influencerId: string
     campaignId: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20873,6 +20925,7 @@ export namespace Prisma {
 
   export type ParticipationUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20882,6 +20935,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     influencerId?: StringFieldUpdateOperationsInput | string
     campaignId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22011,6 +22065,13 @@ export namespace Prisma {
     _max?: NestedEnumSelectorEventTypeFilter<$PrismaModel>
   }
 
+  export type EnumParticipationStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ParticipationStatus | EnumParticipationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ParticipationStatus[] | ListEnumParticipationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ParticipationStatus[] | ListEnumParticipationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumParticipationStatusFilter<$PrismaModel> | $Enums.ParticipationStatus
+  }
+
   export type TrackingLinkListRelationFilter = {
     every?: TrackingLinkWhereInput
     some?: TrackingLinkWhereInput
@@ -22040,6 +22101,7 @@ export namespace Prisma {
     id?: SortOrder
     influencerId?: SortOrder
     campaignId?: SortOrder
+    status?: SortOrder
     currentBalance?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -22053,6 +22115,7 @@ export namespace Prisma {
     id?: SortOrder
     influencerId?: SortOrder
     campaignId?: SortOrder
+    status?: SortOrder
     currentBalance?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -22062,6 +22125,7 @@ export namespace Prisma {
     id?: SortOrder
     influencerId?: SortOrder
     campaignId?: SortOrder
+    status?: SortOrder
     currentBalance?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -22069,6 +22133,16 @@ export namespace Prisma {
 
   export type ParticipationSumOrderByAggregateInput = {
     currentBalance?: SortOrder
+  }
+
+  export type EnumParticipationStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ParticipationStatus | EnumParticipationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ParticipationStatus[] | ListEnumParticipationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ParticipationStatus[] | ListEnumParticipationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumParticipationStatusWithAggregatesFilter<$PrismaModel> | $Enums.ParticipationStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumParticipationStatusFilter<$PrismaModel>
+    _max?: NestedEnumParticipationStatusFilter<$PrismaModel>
   }
 
   export type TrackingLinkCountOrderByAggregateInput = {
@@ -23107,6 +23181,10 @@ export namespace Prisma {
     connect?: TrackedSiteEventWhereUniqueInput | TrackedSiteEventWhereUniqueInput[]
   }
 
+  export type EnumParticipationStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ParticipationStatus
+  }
+
   export type UserUpdateOneRequiredWithoutParticipationsNestedInput = {
     create?: XOR<UserCreateWithoutParticipationsInput, UserUncheckedCreateWithoutParticipationsInput>
     connectOrCreate?: UserCreateOrConnectWithoutParticipationsInput
@@ -23669,6 +23747,23 @@ export namespace Prisma {
     _max?: NestedEnumSelectorEventTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumParticipationStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ParticipationStatus | EnumParticipationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ParticipationStatus[] | ListEnumParticipationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ParticipationStatus[] | ListEnumParticipationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumParticipationStatusFilter<$PrismaModel> | $Enums.ParticipationStatus
+  }
+
+  export type NestedEnumParticipationStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ParticipationStatus | EnumParticipationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ParticipationStatus[] | ListEnumParticipationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ParticipationStatus[] | ListEnumParticipationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumParticipationStatusWithAggregatesFilter<$PrismaModel> | $Enums.ParticipationStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumParticipationStatusFilter<$PrismaModel>
+    _max?: NestedEnumParticipationStatusFilter<$PrismaModel>
+  }
+
   export type SocialMediaCreateWithoutUserInput = {
     id?: string
     platform: $Enums.SocialMediaPlatform
@@ -23787,6 +23882,7 @@ export namespace Prisma {
 
   export type ParticipationCreateWithoutInfluencerInput = {
     id?: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23799,6 +23895,7 @@ export namespace Prisma {
   export type ParticipationUncheckedCreateWithoutInfluencerInput = {
     id?: string
     campaignId: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -24024,6 +24121,7 @@ export namespace Prisma {
     id?: StringFilter<"Participation"> | string
     influencerId?: StringFilter<"Participation"> | string
     campaignId?: StringFilter<"Participation"> | string
+    status?: EnumParticipationStatusFilter<"Participation"> | $Enums.ParticipationStatus
     currentBalance?: DecimalFilter<"Participation"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"Participation"> | Date | string
     updatedAt?: DateTimeFilter<"Participation"> | Date | string
@@ -24285,6 +24383,7 @@ export namespace Prisma {
 
   export type ParticipationCreateWithoutCampaignInput = {
     id?: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -24297,6 +24396,7 @@ export namespace Prisma {
   export type ParticipationUncheckedCreateWithoutCampaignInput = {
     id?: string
     influencerId: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25062,6 +25162,7 @@ export namespace Prisma {
 
   export type ParticipationCreateWithoutTrackedSiteEventsInput = {
     id?: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25075,6 +25176,7 @@ export namespace Prisma {
     id?: string
     influencerId: string
     campaignId: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25162,6 +25264,7 @@ export namespace Prisma {
 
   export type ParticipationUpdateWithoutTrackedSiteEventsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25175,6 +25278,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     influencerId?: StringFieldUpdateOperationsInput | string
     campaignId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25619,6 +25723,7 @@ export namespace Prisma {
 
   export type ParticipationCreateWithoutLinksInput = {
     id?: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25632,6 +25737,7 @@ export namespace Prisma {
     id?: string
     influencerId: string
     campaignId: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25657,6 +25763,7 @@ export namespace Prisma {
 
   export type ParticipationUpdateWithoutLinksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25670,6 +25777,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     influencerId?: StringFieldUpdateOperationsInput | string
     campaignId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25679,6 +25787,7 @@ export namespace Prisma {
 
   export type ParticipationCreateWithoutRewardsInput = {
     id?: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25692,6 +25801,7 @@ export namespace Prisma {
     id?: string
     influencerId: string
     campaignId: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25717,6 +25827,7 @@ export namespace Prisma {
 
   export type ParticipationUpdateWithoutRewardsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25730,6 +25841,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     influencerId?: StringFieldUpdateOperationsInput | string
     campaignId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26188,6 +26300,7 @@ export namespace Prisma {
   export type ParticipationCreateManyInfluencerInput = {
     id?: string
     campaignId: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26346,6 +26459,7 @@ export namespace Prisma {
 
   export type ParticipationUpdateWithoutInfluencerInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26358,6 +26472,7 @@ export namespace Prisma {
   export type ParticipationUncheckedUpdateWithoutInfluencerInput = {
     id?: StringFieldUpdateOperationsInput | string
     campaignId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26369,6 +26484,7 @@ export namespace Prisma {
   export type ParticipationUncheckedUpdateManyWithoutInfluencerInput = {
     id?: StringFieldUpdateOperationsInput | string
     campaignId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26465,6 +26581,7 @@ export namespace Prisma {
   export type ParticipationCreateManyCampaignInput = {
     id?: string
     influencerId: string
+    status: $Enums.ParticipationStatus
     currentBalance?: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26499,6 +26616,7 @@ export namespace Prisma {
 
   export type ParticipationUpdateWithoutCampaignInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26511,6 +26629,7 @@ export namespace Prisma {
   export type ParticipationUncheckedUpdateWithoutCampaignInput = {
     id?: StringFieldUpdateOperationsInput | string
     influencerId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26522,6 +26641,7 @@ export namespace Prisma {
   export type ParticipationUncheckedUpdateManyWithoutCampaignInput = {
     id?: StringFieldUpdateOperationsInput | string
     influencerId?: StringFieldUpdateOperationsInput | string
+    status?: EnumParticipationStatusFieldUpdateOperationsInput | $Enums.ParticipationStatus
     currentBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
