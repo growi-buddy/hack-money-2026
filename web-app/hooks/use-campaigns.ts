@@ -103,8 +103,11 @@ export function useCampaign(campaignId: string, deps?: (number | Date | string)[
     void fetchCampaigns();
   }, [ fetchCampaigns, depsString ]);
   
+  const participant = campaign?.participants.find(({ walletAddress }) => walletAddress === address);
+  
   return {
     campaign,
+    participant,
     setCampaign,
     isLoading,
     isRevalidating,

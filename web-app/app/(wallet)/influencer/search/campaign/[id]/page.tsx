@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
 import { useWallet } from '@/contexts/wallet-context';
+import { useCampaign } from '@/hooks/use-campaigns';
 import { PARTICIPATION_STATUS } from '@/lib/constants';
 import { ParticipationStatus, SiteEventType } from '@/lib/db/enums';
-import { CampaignResponseDTO } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const EVENT_TYPE_ICONS: Record<SiteEventType, typeof Eye> = {
   [SiteEventType.LANDING_PAGE_VIEW]: Eye,
@@ -50,36 +50,10 @@ export default function CampaignDetailsPage() {
   const campaignId = params.id as string;
   const { address } = useWallet();
   
-  const [ campaign, setCampaign ] = useState<CampaignResponseDTO | null>(null);
-  const [ loading, setLoading ] = useState(true);
-  const [ error, setError ] = useState<string>('');
   const [ showSuccess, setShowSuccess ] = useState(false);
   const [ isApplying, setIsApplying ] = useState(false);
-  
-  useEffect(() => {
-    const fetchCampaign = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          setCampaign(data.data);
-        } else {
-          setError(data.error?.message || 'Failed to load campaign');
-        }
-      } catch (err) {
-        console.error('Error fetching campaign:', err);
-        setError('Failed to load campaign');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    if (campaignId) {
-      void fetchCampaign();
-    }
-  }, [ campaignId, address ]);
+  const [ error, setError ] = useState('');
+  const { campaign, isLoading, error: campaignError, participant } = useCampaign(campaignId);
   
   const handleApply = async () => {
     setIsApplying(true);
@@ -110,28 +84,13 @@ export default function CampaignDetailsPage() {
     }
   };
   
-  if (loading) {
+  if (isLoading || !campaign) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
-  
-  if (!campaign) {
-    return (
-      <div className="mx-auto max-w-3xl text-center py-20">
-        <ErrorCard error={error} />
-        <Button onClick={() => router.back()} variant="outline" className="mt-4">
-          Go Back
-        </Button>
-      </div>
-    );
-  }
-  
-  if (!campaign) return null;
-  
-  const participant = campaign.participants.find(({ walletAddress }) => walletAddress === address);
   
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -159,6 +118,7 @@ export default function CampaignDetailsPage() {
       </motion.div>
       
       <ErrorCard error={error} />
+      <ErrorCard error={campaignError} />
       
       {/* Campaign Header Card */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>

@@ -4,15 +4,16 @@ import { CampaignInfoCard } from '@/app/(wallet)/manager/campaigns/[id]/Campaign
 import { CampaignLiveEventsCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignLiveEventsCard';
 import { CampaignStatusBadge } from '@/components/campaigns/CampaignStatusBadge';
 import { BackButton } from '@/components/ui/back-button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
 import { useCampaign } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
-import { animate, AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
-import { CreditCard, DollarSign, Eye, Flame, Loader2, Package, ShoppingCart, Zap } from 'lucide-react';
+import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
+import { CreditCard, DollarSign, Eye, Flame, Loader2, Package, QrCode, ShoppingCart, Zap } from 'lucide-react';
+import Link from 'next/link';
 import { use, useEffect, useState } from 'react';
 
 interface CampaignDetail {
@@ -224,12 +225,9 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
     );
   }
   
-  const hasTags = campaign.interests.length > 0 || campaign.demographics.length > 0 ||
-    campaign.regions.length > 0 || campaign.countries.length > 0;
-  
   return (
     <div className="space-y-6">
-      <BackButton href="/influencer/campaigns" label="ack to Campaigns" />
+      <BackButton href="/influencer/campaigns" label="Back to Campaigns" />
       
       <ErrorCard error={error} />
       
@@ -249,6 +247,12 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <Button asChild size="sm" variant="outline">
+              <Link href={`/influencer/campaigns/${campaign?.id}/qr`}>
+                <QrCode className="h-4 w-4 mr-2" />
+                QR Code
+              </Link>
+            </Button>
             <CampaignStatusBadge status={campaign.status} />
             {campaign.isHot && (
               <div className="p-1.5 rounded-full bg-amber-500/20" title="Hot Campaign">
@@ -545,71 +549,6 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
       {/*</Card>*/}
       
       {campaign.status === CampaignStatus.ACTIVE && <CampaignLiveEventsCard campaign={campaign} />}
-      
-      {/* Live Transmissions */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-foreground">
-              <motion.div
-                animate={{
-                  scale: [ 1, 1.2, 1 ],
-                  opacity: [ 1, 0.7, 1 ],
-                }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                }}
-                className="h-2 w-2 rounded-full bg-red-500"
-              />
-              Live Transmissions
-            </CardTitle>
-            <Badge variant="outline" className="text-growi-success">
-              Real-time
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="max-h-96 space-y-2 overflow-auto">
-            <AnimatePresence initial={false}>
-              {transactions.map((tx, index) => (
-                <motion.div
-                  key={tx.id}
-                  initial={{ opacity: 0, x: 50, scale: 0.8 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  className={`flex items-center justify-between rounded-lg border border-border p-3 ${
-                    index === 0 ? 'border-growi-money/50 bg-growi-money/10' : 'bg-secondary/30'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-full bg-secondary ${getTypeColor(tx.type)}`}>
-                      {getTypeIcon(tx.type)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{tx.user}</p>
-                      <p className="text-xs capitalize text-muted-foreground">{tx.type}</p>
-                    </div>
-                  </div>
-                  <motion.div
-                    initial={index === 0 ? { scale: 1.5 } : {}}
-                    animate={{ scale: 1 }}
-                    className="text-right"
-                  >
-                    <p className={`font-semibold ${index === 0 ? 'text-growi-money' : 'text-foreground'}`}>
-                      +${tx.amount.toFixed(2)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {tx.timestamp.toLocaleTimeString()}
-                    </p>
-                  </motion.div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
