@@ -21,7 +21,7 @@ const formatDate = (dateStr: string | number | null) => {
 
 export const CampaignInfoCard = ({ campaign, withoutTitle }: {
   campaign: CampaignResponseDTO,
-  withoutTitle: boolean
+  withoutTitle?: boolean
 }) => {
   return (
     <Card>
