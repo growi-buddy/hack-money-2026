@@ -339,7 +339,8 @@ exports.SiteEventType = exports.$Enums.SiteEventType = {
 exports.SelectorEventType = exports.$Enums.SelectorEventType = {
   ONCLICK: 'ONCLICK',
   HOVER: 'HOVER',
-  DOUBLE_CLICK: 'DOUBLE_CLICK'
+  DOUBLE_CLICK: 'DOUBLE_CLICK',
+  VISIT: 'VISIT'
 };
 
 exports.ParticipationStatus = exports.$Enums.ParticipationStatus = {

@@ -18,12 +18,32 @@ const TrackEventSchema = z.object({
   timestamp: z.string().datetime().optional(),
 });
 
+// Extract IP address from request headers
+function getClientIp(req: Request): string | undefined {
+  const forwarded = req.headers.get('x-forwarded-for');
+  const realIp = req.headers.get('x-real-ip');
+  
+  if (forwarded) {
+    // x-forwarded-for can contain multiple IPs, get the first one
+    return forwarded.split(',')[0].trim();
+  }
+  
+  if (realIp) {
+    return realIp;
+  }
+  
+  return undefined;
+}
+
 // POST /api/client/event - Track an event (public, CORS enabled)
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const payload = TrackEventSchema.parse(body);
-
+    
+    // Extract IP from request headers (override if provided in payload)
+    const clientIp = payload.ipAddress || getClientIp(req);
+    
     // Verify the CampaignSiteEvent exists
     const campaignSiteEvent = await prisma.campaignSiteEvent.findUnique({
       where: { id: payload.campaignSiteEventId },
@@ -36,7 +56,7 @@ export async function POST(req: Request) {
         },
       },
     });
-
+    
     if (!campaignSiteEvent) {
       return corsJsonResponse(
         {
@@ -46,7 +66,7 @@ export async function POST(req: Request) {
         404,
       );
     }
-
+    
     // Verify the participation exists
     const participation = await prisma.participation.findUnique({
       where: { id: payload.participationId },
@@ -55,7 +75,7 @@ export async function POST(req: Request) {
         influencer: true,
       },
     });
-
+    
     if (!participation) {
       return corsJsonResponse(
         {
@@ -65,7 +85,7 @@ export async function POST(req: Request) {
         404,
       );
     }
-
+    
     // Verify participation belongs to the campaign
     if (participation.campaignId !== campaignSiteEvent.campaignId) {
       return corsJsonResponse(
@@ -76,21 +96,21 @@ export async function POST(req: Request) {
         400,
       );
     }
-
+    
     let client = await prisma.client.findUnique({
       where: { sessionId: payload.sessionId },
     });
-
+    
     if (!client) {
       client = await prisma.client.create({
         data: {
           sessionId: payload.sessionId,
           userAgent: payload.userAgent,
-          ipAddress: payload.ipAddress,
+          ipAddress: clientIp,
         },
       });
     }
-
+    
     const trackedEvent = await prisma.trackedSiteEvent.create({
       data: {
         siteEventId: campaignSiteEvent.siteEventId,
@@ -100,7 +120,7 @@ export async function POST(req: Request) {
         timestamp: payload.timestamp ? new Date(payload.timestamp) : new Date(),
       },
     });
-
+    
     // Publish to Ably for real-time updates
     try {
       await ServerPublisher.publishCampaignEvent(
@@ -110,7 +130,7 @@ export async function POST(req: Request) {
           id: trackedEvent.id,
           eventType: campaignSiteEvent.siteEvent.eventType,
           eventName: campaignSiteEvent.siteEvent.name,
-          amount: Number(campaignSiteEvent.amount),
+          amount: Number(campaignSiteEvent.amount) / Number(campaignSiteEvent.volumeStep),
           timestamp: trackedEvent.timestamp.toISOString(),
           data: trackedEvent.data,
           participationId: participation.id,
@@ -121,7 +141,7 @@ export async function POST(req: Request) {
       // Log but don't fail the request if Ably publish fails
       console.error('[Event API] Failed to publish to Ably:', ablyError);
     }
-
+    
     return corsJsonResponse(
       {
         success: true,
@@ -133,7 +153,7 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error('[Event API] Error:', error);
-
+    
     if (error instanceof z.ZodError) {
       return corsJsonResponse(
         {
@@ -143,7 +163,7 @@ export async function POST(req: Request) {
         400,
       );
     }
-
+    
     return corsJsonResponse(
       {
         success: false,

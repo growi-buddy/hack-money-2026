@@ -78,6 +78,7 @@ function groupTrackedEventsBySite(
       volumeStep: info.volumeStep,
       trackedEventsCount: info.count,
     })),
+    siteEvents: [],
   }));
 }
 
@@ -139,7 +140,7 @@ export async function GET(req: Request) {
         select: {
           status: true,
           influencer: {
-            select: { id: true, name: true, walletAddress: true, avatar: true },
+            select: { id: true, name: true, walletAddress: true, avatar: true, influencerVerification: true },
           },
           trackedSiteEvents: {
             select: {
@@ -280,26 +281,24 @@ export async function GET(req: Request) {
         endDate: campaign.endDate?.getTime() ?? campaign.createdAt.getTime(),
         sites,
         participants: campaign.participations.map(p => {
-          // Group tracked events by event type
-          const summaryTrackedSiteEvents: Record<SiteEventType, { total: number; lastUpdated: number }> = {} as any;
-
+          const summaryTrackedSiteEvents: Record<SiteEventType, { total: number; lastUpdated: number }> = {
+            [SiteEventType.LANDING_PAGE_VIEW]: { total: 0, lastUpdated: 0 },
+            [SiteEventType.VIEW_ITEM]: { total: 0, lastUpdated: 0 },
+            [SiteEventType.ADD_TO_CART]: { total: 0, lastUpdated: 0 },
+            [SiteEventType.CHECKOUT]: { total: 0, lastUpdated: 0 },
+            [SiteEventType.PURCHASE_SUCCESS]: { total: 0, lastUpdated: 0 },
+          };
+          
           p.trackedSiteEvents.forEach(te => {
             const eventType = te.siteEvent.eventType;
-
-            if (!summaryTrackedSiteEvents[eventType]) {
-              summaryTrackedSiteEvents[eventType] = {
-                total: 0,
-                lastUpdated: 0,
-              };
-            }
-
+            
             summaryTrackedSiteEvents[eventType].total += 1;
             const createdAtTime = new Date(te.createdAt).getTime();
             if (createdAtTime > summaryTrackedSiteEvents[eventType].lastUpdated) {
               summaryTrackedSiteEvents[eventType].lastUpdated = createdAtTime;
             }
           });
-
+          
           return {
             id: p.influencer.id,
             name: p.influencer.name || '',
@@ -307,6 +306,7 @@ export async function GET(req: Request) {
             avatar: p.influencer.avatar || '',
             status: p.status,
             summaryTrackedSiteEvents,
+            influencerVerification: p.influencer.influencerVerification,
           };
         }),
         createdAt: campaign.createdAt.getTime(),

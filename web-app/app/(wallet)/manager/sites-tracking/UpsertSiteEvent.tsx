@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWallet } from '@/contexts/wallet-context';
-import { SELECTOR_SITE_EVENT_TYPE_LABELS, SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
+import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { SelectorEventType, SiteEventType } from '@/lib/db/enums';
 import { SelectorDTO, SiteResponseDTO, UpsertSiteEventInput } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -179,7 +179,14 @@ export const UpsertSiteEvent = ({
                   <select
                     value={formData.eventType}
                     onChange={(e) =>
-                      setFormData(prev => ({ ...prev, eventType: e.target.value as SiteEventType }))
+                      setFormData(prev => ({
+                        ...prev,
+                        eventType: e.target.value as SiteEventType,
+                        selectors: formData.selectors.map((sel) => ({
+                          ...sel,
+                          eventType: (e.target.value === SiteEventType.LANDING_PAGE_VIEW || e.target.value === SiteEventType.PURCHASE_SUCCESS) ? SelectorEventType.VISIT : SelectorEventType.ONCLICK,
+                        })),
+                      }))
                     }
                     className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-growi-blue/50"
                   >
@@ -194,7 +201,12 @@ export const UpsertSiteEvent = ({
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-sm font-medium text-foreground">
-                      CSS Selectors <span className="text-destructive">*</span>
+                      {formData.eventType === SiteEventType.LANDING_PAGE_VIEW || SiteEventType.PURCHASE_SUCCESS === formData.eventType
+                        ? 'Contains urls ' : 'CSS Selectors'}
+                      {(formData.eventType === SiteEventType.VIEW_ITEM || formData.eventType === SiteEventType.ADD_TO_CART || formData.eventType === SiteEventType.CHECKOUT) && (
+                        ' (click on)'
+                      )}
+                      <span className="text-destructive">*</span>
                     </label>
                     <Button
                       type="button"
@@ -218,32 +230,36 @@ export const UpsertSiteEvent = ({
                             type="text"
                             value={sel.selector}
                             onChange={(e) => updateSelector(index, 'selector', e.target.value)}
-                            placeholder=".btn-primary, #add-to-cart"
+                            placeholder={formData.eventType === SiteEventType.LANDING_PAGE_VIEW
+                              ? 'https://growi.app'
+                              : formData.eventType === SiteEventType.PURCHASE_SUCCESS
+                                ? 'https://growi.app/thanks'
+                                : '.container > button:has-text("Submit"), #add-to-cart'}
                             className="w-full rounded border border-border bg-background px-2 py-1.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-growi-blue/50"
                           />
                           <div className="flex items-center gap-2">
-                            <select
-                              value={sel.eventType}
-                              onChange={(e) =>
-                                updateSelector(index, 'eventType', e.target.value as SelectorEventType)
-                              }
-                              className="flex-1 rounded border border-border bg-background px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-growi-blue/50"
-                            >
-                              {Object.entries(SELECTOR_SITE_EVENT_TYPE_LABELS).map(([ value, label ]) => (
-                                <option key={value} value={value}>
-                                  {label}
-                                </option>
-                              ))}
-                            </select>
-                            <label className="flex items-center gap-1.5 text-sm">
-                              <input
-                                type="checkbox"
-                                checked={sel.isActive ?? true}
-                                onChange={(e) => updateSelector(index, 'isActive', e.target.checked)}
-                                className="h-4 w-4 rounded text-growi-blue"
-                              />
-                              <span className="text-muted-foreground">Active</span>
-                            </label>
+                            {/*<select*/}
+                            {/*  value={sel.eventType}*/}
+                            {/*  onChange={(e) =>*/}
+                            {/*    updateSelector(index, 'eventType', e.target.value as SelectorEventType)*/}
+                            {/*  }*/}
+                            {/*  className="flex-1 rounded border border-border bg-background px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-growi-blue/50"*/}
+                            {/*>*/}
+                            {/*  {Object.entries(SELECTOR_SITE_EVENT_TYPE_LABELS).map(([ value, label ]) => (*/}
+                            {/*    <option key={value} value={value}>*/}
+                            {/*      {label}*/}
+                            {/*    </option>*/}
+                            {/*  ))}*/}
+                            {/*</select>*/}
+                            {/*<label className="flex items-center gap-1.5 text-sm">*/}
+                            {/*  <input*/}
+                            {/*    type="checkbox"*/}
+                            {/*    checked={sel.isActive ?? true}*/}
+                            {/*    onChange={(e) => updateSelector(index, 'isActive', e.target.checked)}*/}
+                            {/*    className="h-4 w-4 rounded text-growi-blue"*/}
+                            {/*  />*/}
+                            {/*  <span className="text-muted-foreground">Active</span>*/}
+                            {/*</label>*/}
                           </div>
                         </div>
                         <Button

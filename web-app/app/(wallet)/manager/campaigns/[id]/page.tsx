@@ -1,16 +1,18 @@
 'use client';
 
 import { CampaignCompleteCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignCompleteCard';
+import { CampaignInfluencersCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignInfluencersCard';
 import { CampaignInfoCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignInfoCard';
 import { CampaignLiveEventsCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignLiveEventsCard';
 import { CampaignMetricsCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignMetricsCard';
 import { CampaignStatusBadge } from '@/components/campaigns/CampaignStatusBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ErrorCard } from '@/components/ui/error-card';
 import { useWallet } from '@/contexts/wallet-context';
 import { CampaignStatus } from '@/lib/db/enums';
+import { sendFunds } from '@/lib/web3';
 import { CampaignResponseDTO } from '@/types';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, Edit, Loader2, Rocket } from 'lucide-react';
@@ -30,26 +32,26 @@ export default function CampaignDashboardPage() {
   const [ showPublishModal, setShowPublishModal ] = useState(false);
   const [ isPublishing, setIsPublishing ] = useState(false);
   
-  useEffect(() => {
-    const fetchCampaign = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`);
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.error?.message || 'Failed to fetch campaign');
-        }
-        
-        setCampaign(data.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
+  const fetchCampaign = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Failed to fetch campaign');
       }
-    };
-    
+      
+      setCampaign(data.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
     if (campaignId) {
       void fetchCampaign();
     }
@@ -58,20 +60,32 @@ export default function CampaignDashboardPage() {
   const handlePublishCampaign = async () => {
     try {
       setIsPublishing(true);
-      const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: CampaignStatus.PUBLISHED }),
-      });
       
-      const data = await response.json();
+      const {
+        success,
+        error,
+        txHash,
+      } = await sendFunds('0x75a26Ca9e3Ef85d8e118Ec2b260c143f8738BA19', '0.001');
       
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'Failed to publish campaign');
+      if (success) {
+        console.log('Transacción exitosa en Base Sepolia:', txHash);
+        const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: CampaignStatus.PUBLISHED }),
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error?.message || 'Failed to publish campaign');
+        }
+        
+        setCampaign(prev => prev ? { ...prev, status: CampaignStatus.PUBLISHED } : null);
+      } else {
+        console.error('Error:', error);
+        setError(error);
       }
-      
-      // Update local state
-      setCampaign(prev => prev ? { ...prev, status: CampaignStatus.PUBLISHED } : null);
       setShowPublishModal(false);
     } catch (err) {
       console.error('Failed to publish campaign:', err);
@@ -81,27 +95,11 @@ export default function CampaignDashboardPage() {
     }
   };
   
-  // Loading state
-  if (loading) {
+  if (loading || !campaign) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    );
-  }
-  
-  if (error || !campaign) {
-    return (
-      <Card className="border-destructive/50">
-        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-destructive">{error || 'Campaign not found'}</p>
-          <Link href="/client">
-            <Button variant="outline" className="mt-4">
-              Back to Dashboard
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
     );
   }
   
@@ -163,6 +161,8 @@ export default function CampaignDashboardPage() {
         </div>
       </motion.div>
       
+      <ErrorCard error={error} />
+      
       {campaign.status !== CampaignStatus.COMPLETED && <CampaignInfoCard campaign={campaign} />}
       
       {campaign.status === CampaignStatus.COMPLETED && <CampaignCompleteCard />}
@@ -170,6 +170,10 @@ export default function CampaignDashboardPage() {
       
       {(campaign.status !== CampaignStatus.DRAFT && campaign.status !== CampaignStatus.PUBLISHED) && (
         <CampaignMetricsCard campaign={campaign} />
+      )}
+      
+      {(campaign.status === CampaignStatus.PUBLISHED || campaign.status === CampaignStatus.ACTIVE) && (
+        <CampaignInfluencersCard campaign={campaign} onUpdate={fetchCampaign} />
       )}
       
       {campaign.status === CampaignStatus.ACTIVE && <CampaignLiveEventsCard campaign={campaign} />}
@@ -210,14 +214,13 @@ export default function CampaignDashboardPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 mt-0.5 text-orange-500 flex-shrink-0" />
-                      <span>Influencers can start joining and participating</span>
+                      <span>Influencers will be able to apply</span>
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
             
-            {/* Campaign Info */}
             <div className="rounded-lg border border-border bg-secondary/30 p-4">
               <h4 className="font-medium text-foreground mb-2">{campaign.title}</h4>
               <div className="grid grid-cols-2 gap-2 text-sm">
@@ -232,7 +235,6 @@ export default function CampaignDashboardPage() {
               </div>
             </div>
             
-            {/* Action Buttons */}
             <div className="flex gap-2">
               <Button
                 variant="outline"

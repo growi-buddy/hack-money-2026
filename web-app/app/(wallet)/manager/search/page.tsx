@@ -6,13 +6,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { WalletDisplayName } from '@/components/ui/WalletDisplayName';
 import { useCampaigns } from '@/hooks/use-campaigns';
 import { useUsers } from '@/hooks/use-users';
 import { staggerContainer } from '@/lib/animations';
-import { CampaignStatus } from '@/lib/db/enums';
+import { CampaignStatus, InfluencerVerificationStatus } from '@/lib/db/enums';
 import { UserResponseDTO } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Facebook, Instagram, Linkedin, Music2, Search, Send, Twitter, Users, Youtube } from 'lucide-react';
+import {
+  Check,
+  Clock,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Music2,
+  Search,
+  Send,
+  Twitter,
+  Users,
+  X,
+  Youtube,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -49,11 +64,32 @@ const formatFollowers = (count: number): string => {
   return count.toString();
 };
 
-const mockCampaigns = [
-  { id: '1', title: 'Nike Summer Collection', status: 'active' },
-  { id: '2', title: 'Adidas Winter Drop', status: 'active' },
-  { id: '3', title: 'New Balance Pro', status: 'draft' },
-];
+// Helper function to get verification badge info
+const getVerificationBadge = (status: InfluencerVerificationStatus) => {
+  switch (status) {
+    case InfluencerVerificationStatus.VERIFIED:
+      return {
+        icon: <Check className="h-3.5 w-3.5 text-white" />,
+        bgColor: 'bg-growi-success',
+        label: 'Verified',
+      };
+    case InfluencerVerificationStatus.PENDING:
+      return {
+        icon: <Clock className="h-3.5 w-3.5 text-white" />,
+        bgColor: 'bg-growi-yellow',
+        label: 'Pending Verification',
+      };
+    case InfluencerVerificationStatus.REJECTED:
+      return {
+        icon: <X className="h-3.5 w-3.5 text-white" />,
+        bgColor: 'bg-destructive',
+        label: 'Verification Rejected',
+      };
+    case InfluencerVerificationStatus.NONE:
+    default:
+      return null;
+  }
+};
 
 export default function InfluencersPage() {
   
@@ -64,16 +100,16 @@ export default function InfluencersPage() {
   const [ inviteSent, setInviteSent ] = useState(false);
   const [ isSending, setIsSending ] = useState(false);
   const [ inviteError, setInviteError ] = useState<string | null>(null);
-
+  
   const { users } = useUsers('influencer');
   const { campaigns } = useCampaigns([ CampaignStatus.PUBLISHED ], 'manager', false);
-
+  
   const filteredInfluencers = users.filter(inf =>
     inf.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     inf.affinities.some(a => a.toLowerCase().includes(searchQuery.toLowerCase())) ||
     inf.interests.some(i => i.toLowerCase().includes(searchQuery.toLowerCase())),
   );
-
+  
   const handleInvite = (influencer: UserResponseDTO) => {
     setSelectedInfluencer(influencer);
     setShowInviteModal(true);
@@ -81,13 +117,13 @@ export default function InfluencersPage() {
     setSelectedCampaign('');
     setInviteError(null);
   };
-
+  
   const sendInvite = async () => {
     if (!selectedInfluencer || !selectedCampaign) return;
-
+    
     setIsSending(true);
     setInviteError(null);
-
+    
     try {
       const response = await fetch(
         `/api/campaigns/${selectedCampaign}/invite?walletAddress=${selectedInfluencer.walletAddress}`,
@@ -96,12 +132,12 @@ export default function InfluencersPage() {
           headers: { 'Content-Type': 'application/json' },
         },
       );
-
+      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData?.error?.message || 'Failed to send invite');
       }
-
+      
       setInviteSent(true);
       setTimeout(() => {
         setShowInviteModal(false);
@@ -114,8 +150,6 @@ export default function InfluencersPage() {
       setIsSending(false);
     }
   };
-
-  console.log({ users, filteredInfluencers });
   
   return (
     <div className="space-y-6">
@@ -164,7 +198,7 @@ export default function InfluencersPage() {
       >
         {filteredInfluencers.map((influencer) => (
           <motion.div key={influencer.id}>
-            <Card className="h-full transition-all hover:border-growi-blue/50 hover:shadow-md">
+            <Card className="h-full transition-all hover:border-growi-blue/50 hover:shadow-md flex flex-col">
               <CardHeader className="pb-4">
                 <div className="flex items-start gap-3">
                   <div className="relative flex-shrink-0">
@@ -175,16 +209,33 @@ export default function InfluencersPage() {
                       height={60}
                       className="rounded-full ring-2 ring-border"
                     />
-                    {influencer.influencerVerification && (
-                      <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-growi-success ring-2 ring-card">
-                        <Check className="h-3.5 w-3.5 text-white" />
-                      </div>
-                    )}
+                    {(() => {
+                      const badge = getVerificationBadge(influencer.influencerVerification);
+                      if (!badge) return null;
+                      
+                      return (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className={`absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full ${badge.bgColor} ring-2 ring-card cursor-help`}>
+                                {badge.icon}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{badge.label}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      );
+                    })()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <CardTitle className="text-base text-foreground truncate">
-                      {influencer.name}
+                      {influencer.name}&nbsp;
                     </CardTitle>
+                    <p className="text-xs text-muted-foreground">
+                      <WalletDisplayName address={influencer.walletAddress} />
+                    </p>
                     <p className="mt-0.5 text-xs text-muted-foreground truncate">
                       {influencer.location || 'Location not specified'}
                     </p>
@@ -192,7 +243,7 @@ export default function InfluencersPage() {
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-4">
+              <CardContent className="flex flex-col flex-1 space-y-4">
                 {/* Bio */}
                 {influencer.bio && (
                   <p className="text-sm text-muted-foreground line-clamp-2">
@@ -277,7 +328,7 @@ export default function InfluencersPage() {
                 
                 <Button
                   onClick={() => handleInvite(influencer)}
-                  className="w-full bg-growi-blue text-white hover:bg-growi-blue/90 shadow-sm"
+                  className="w-full bg-growi-blue text-white hover:bg-growi-blue/90 shadow-sm mt-auto"
                 >
                   <Send className="mr-2 h-4 w-4" />
                   Invite to Campaign
@@ -360,7 +411,7 @@ export default function InfluencersPage() {
                     {inviteError}
                   </div>
                 )}
-
+                
                 <div className="flex gap-2 pt-2">
                   <Button
                     variant="outline"

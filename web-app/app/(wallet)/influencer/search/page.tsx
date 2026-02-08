@@ -1,13 +1,19 @@
 'use client';
 
+import { CampaignSlots } from '@/components/campaigns/CampaignSlots';
 import { CampaignStatusBadge } from '@/components/campaigns/CampaignStatusBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { CountryTag } from '@/components/ui/country-tag';
 import { Input } from '@/components/ui/input';
+import { InterestTag } from '@/components/ui/interest-tag';
 import { LoadingCard } from '@/components/ui/loading-card';
+import { ParticipationStatusBadge } from '@/components/ui/participation-status-badge';
+import { RegionTag } from '@/components/ui/region-tag';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TargetAudienceTag } from '@/components/ui/target-audience-tag';
 import { useWallet } from '@/contexts/wallet-context';
 import { useUsers } from '@/hooks/use-users';
 import { staggerContainer, staggerItem } from '@/lib/animations';
@@ -527,9 +533,6 @@ const formatDate = (startDate?: string | number, endDate?: string | number) => {
 function CampaignCard({ campaign }: { campaign: CampaignResponseDTO }) {
   
   const { address } = useWallet();
-  const slotsProgress = campaign.slots && campaign.slots > 0
-    ? Math.round((campaign.participants.length / campaign.slots) * 100)
-    : 0;
   
   const participation = campaign.participants.find(({ walletAddress }) => walletAddress === address);
   
@@ -550,11 +553,7 @@ function CampaignCard({ campaign }: { campaign: CampaignResponseDTO }) {
             />
             <div className="absolute left-2 top-2 flex gap-2">
               <CampaignStatusBadge status={campaign.status} />
-              {participation ? (
-                <Badge className="bg-growi-success text-white hover:bg-growi-success/90">
-                  {participation.status}
-                </Badge>
-              ) : (
+              {participation ? <ParticipationStatusBadge status={participation.status} /> : (
                 <Badge className="bg-growi-blue/90 text-white hover:bg-growi-blue">
                   Available
                 </Badge>
@@ -591,11 +590,9 @@ function CampaignCard({ campaign }: { campaign: CampaignResponseDTO }) {
             {campaign.interests.length > 0 && (
               <div className="mt-2">
                 <p className="text-xs font-medium text-muted-foreground mb-1">Interests</p>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1 text-xs">
                   {campaign.interests.slice(0, 3).map((interest) => (
-                    <Badge key={interest} variant="secondary" className="text-xs">
-                      {interest}
-                    </Badge>
+                    <InterestTag key={interest} label={interest} />
                   ))}
                   {campaign.interests.length > 3 && (
                     <Badge variant="secondary" className="text-xs">
@@ -612,9 +609,7 @@ function CampaignCard({ campaign }: { campaign: CampaignResponseDTO }) {
                 <p className="text-xs font-medium text-muted-foreground mb-1">Target Audience</p>
                 <div className="flex flex-wrap gap-1">
                   {campaign.demographics.slice(0, 2).map((demo) => (
-                    <Badge key={demo} className="text-xs bg-purple-500/20 text-purple-500 border-purple-500/50">
-                      {demo}
-                    </Badge>
+                    <TargetAudienceTag key={demo} label={demo} />
                   ))}
                   {campaign.demographics.length > 2 && (
                     <Badge className="text-xs bg-purple-500/20 text-purple-500 border-purple-500/50">
@@ -631,14 +626,10 @@ function CampaignCard({ campaign }: { campaign: CampaignResponseDTO }) {
                 <p className="text-xs font-medium text-muted-foreground mb-1">Geographic</p>
                 <div className="flex flex-wrap gap-1">
                   {campaign.regions.slice(0, 2).map((region) => (
-                    <Badge key={region} className="text-xs bg-blue-500/20 text-blue-500 border-blue-500/50">
-                      {region}
-                    </Badge>
+                    <RegionTag key={region} label={region} />
                   ))}
                   {campaign.countries.slice(0, 2).map((country) => (
-                    <Badge key={country} className="text-xs bg-blue-500/20 text-blue-500 border-blue-500/50">
-                      {country}
-                    </Badge>
+                    <CountryTag key={country} label={country} />
                   ))}
                   {(campaign.regions.length + campaign.countries.length > 4) && (
                     <Badge className="text-xs bg-blue-500/20 text-blue-500 border-blue-500/50">
@@ -655,20 +646,7 @@ function CampaignCard({ campaign }: { campaign: CampaignResponseDTO }) {
                 <p className="text-xs text-muted-foreground">${campaign.budgetTotal.toLocaleString()}</p>
               </div>
               <div>
-                <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                  <span>
-                    Slots filled ({campaign.participants.length}/{campaign.slots})
-                  </span>
-                  <span>{slotsProgress}%</span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-secondary">
-                  <motion.div
-                    className="h-full bg-growi-blue"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${slotsProgress}%` }}
-                    transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.3 }}
-                  />
-                </div>
+                <CampaignSlots campaign={campaign} />
               </div>
             </div>
           </CardContent>

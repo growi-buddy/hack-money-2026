@@ -28,10 +28,8 @@ export const useSites = () => {
         if (response.ok) {
           setSites(data?.data || []);
           const totalSiteEvents = data?.data?.reduce((sum, site) => sum + (site?.events?.length || 0), 0);
-          setHasSiteEvents(totalSiteEvents >= 0);
-          setIsLoading(true);
-        } else {
-          setHasSiteEvents(false);
+          setHasSiteEvents(totalSiteEvents > 0);
+          setIsLoading(false);
         }
       } catch {
         setHasSiteEvents(false);

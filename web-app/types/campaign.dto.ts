@@ -1,4 +1,4 @@
-import { CampaignStatus, ParticipationStatus, SelectorEventType, SiteEventType } from '@/lib/db/enums';
+import { CampaignStatus, InfluencerVerificationStatus, ParticipationStatus, SelectorEventType, SiteEventType } from '@/lib/db/enums';
 import { CampaignUserRole } from '@/types/user';
 import { BasicUserResponseDTO } from '@/types/user.dto';
 import { z } from 'zod';
@@ -34,9 +34,7 @@ export const RewardEventSchema = z.object({
 
 export type RewardEventInput = z.infer<typeof RewardEventSchema>;
 
-// Schema for linking RewardEvent to Campaign with amount and volumeStep
 export const CampaignRewardEventSchema = z.object({
-  id: z.string().cuid().optional(),
   siteEventId: z.string().cuid('Invalid site event ID'),
   amount: z.number().positive('Amount must be greater than 0'),
   volumeStep: z.number().int().positive().optional().default(1),
@@ -68,7 +66,6 @@ export const CreateLinkDTO = z.object({
 
 export const UpdateCampaignDTO = CreateCampaignDTO.partial().extend({
   status: z.nativeEnum(CampaignStatus).optional(),
-  isHot: z.boolean().optional(),
 });
 
 export type UpdateCampaignInput = z.infer<typeof UpdateCampaignDTO>;
@@ -105,12 +102,19 @@ export interface SiteWithEventsResponseDTO {
   name: string,
   url: string,
   description: string,
+  siteEvents: {
+    id: string,
+    siteEventType: SiteEventType,
+    amount: number,
+    volumeStep: number,
+  }[],
   trackedSiteEventsGroupedByType: TrackedSiteEventSummaryResponseDTO[],
 }
 
 export interface CampaignParticipantResponseDTO extends BasicUserResponseDTO {
   status: ParticipationStatus,
   summaryTrackedSiteEvents: Record<SiteEventType, { total: number, lastUpdated: number }>,
+  influencerVerification: InfluencerVerificationStatus,
 }
 
 export interface CampaignResponseDTO {

@@ -1,16 +1,15 @@
 'use client';
 
+import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useCampaign } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Check, Copy, ExternalLink, QrCode } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-
-const trackingLink = 'growi.ws/sku/8x4k2m';
+import { Check, Copy, ExternalLink, Loader2, QrCode } from 'lucide-react';
+import { use, useEffect, useState } from 'react';
 
 const instructions = [
   'Share this link in your content bio or description',
@@ -19,7 +18,11 @@ const instructions = [
   'Monitor your earnings in real-time on the active campaign page',
 ];
 
-export default function QRGeneratorPage() {
+export default function QRGeneratorPage({ params }: { params: Promise<{ id: string }> }) {
+  
+  const { id } = use(params);
+  const { campaign, participant, isLoading } = useCampaign(id);
+  
   const [ copied, setCopied ] = useState(false);
   const [ activeTab, setActiveTab ] = useState('qr');
   const [ qrDrawn, setQrDrawn ] = useState(false);
@@ -30,14 +33,29 @@ export default function QRGeneratorPage() {
     return () => clearTimeout(timer);
   }, []);
   
+  if (isLoading || !campaign) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+  
+  const baseUrl = campaign?.sites?.[0]?.url;
+  
+  const utmId = `${campaign?.id},${participant?.id}`;
+  
+  const trackingLink = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}utm_id=${encodeURIComponent(utmId)}`;
+  
   const copyLink = () => {
-    navigator.clipboard.writeText(`https://${trackingLink}`);
+    navigator.clipboard.writeText(trackingLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
   
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      <BackButton href={`/influencer/campaigns/${campaign?.id}`} />
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -126,7 +144,7 @@ export default function QRGeneratorPage() {
                 >
                   <div className="flex gap-2">
                     <Input
-                      value={`https://${trackingLink}`}
+                      value={trackingLink}
                       readOnly
                       className="flex-1 bg-secondary font-mono text-sm"
                     />
@@ -168,7 +186,7 @@ export default function QRGeneratorPage() {
                     </motion.div>
                   </div>
                   <Button variant="ghost" className="w-full text-muted-foreground" asChild>
-                    <a href={`https://${trackingLink}`} target="_blank" rel="noopener noreferrer">
+                    <a href={trackingLink} target="_blank" rel="noopener noreferrer">
                       <ExternalLink className="mr-2 h-4 w-4" />
                       Open in new tab
                     </a>
@@ -215,31 +233,6 @@ export default function QRGeneratorPage() {
             </motion.ol>
           </CardContent>
         </Card>
-      </motion.div>
-      
-      {/* Action Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <Link href="/influencer/campaign/1/active">
-          <motion.div
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-          >
-            <Button className="relative w-full overflow-hidden bg-growi-blue text-white hover:bg-growi-blue/90">
-              <motion.div
-                className="absolute inset-0 bg-growi-lime/30"
-                initial={{ x: '-100%' }}
-                whileHover={{ x: '100%' }}
-                transition={{ duration: 0.5 }}
-              />
-              Go to Active Campaign
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </motion.div>
-        </Link>
       </motion.div>
     </div>
   );

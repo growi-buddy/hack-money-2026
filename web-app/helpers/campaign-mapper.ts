@@ -35,45 +35,45 @@ export function mapCampaignFormToAPI(formData: CampaignFormData): CreateCampaign
 }
 
 /**
- * Valida que los datos del formulario sean suficientes para crear una campaña
+ * Validates that the form data is sufficient to create a campaign
  */
 export function validateCampaignForm(formData: CampaignFormData): {
   valid: boolean;
   errors: string[];
 } {
   const errors: string[] = [];
-  
+
   if (!formData.name || formData.name.trim() === '') {
-    errors.push('El nombre de la campaña es requerido');
+    errors.push('Campaign name is required');
   }
-  
+
   if (!formData.budget || formData.budget <= 0) {
-    errors.push('El presupuesto debe ser mayor a 0');
+    errors.push('Budget must be greater than 0');
   }
-  
+
   if (!formData.description || formData.description.trim() === '') {
-    errors.push('La descripción es requerida');
+    errors.push('Description is required');
   }
-  
-  // Validar que al menos un reward event esté seleccionado con amount > 0
+
+  // Validate that at least one reward event is selected with amount > 0
   const hasRewardEvents = formData.selectedRewardEvents &&
     formData.selectedRewardEvents.length > 0 &&
     formData.selectedRewardEvents.some(e => e.amount > 0);
-  
+
   if (!hasRewardEvents) {
-    errors.push('Debes seleccionar al menos un evento de recompensa con un monto mayor a 0');
+    errors.push('You must select at least one reward event with an amount greater than 0');
   }
-  
-  // Validar fechas
+
+  // Validate dates
   if (formData.startDate && formData.endDate) {
     const start = new Date(formData.startDate);
     const end = new Date(formData.endDate);
-    
+
     if (end <= start) {
-      errors.push('La fecha de fin debe ser posterior a la fecha de inicio');
+      errors.push('End date must be after start date');
     }
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
@@ -81,7 +81,7 @@ export function validateCampaignForm(formData: CampaignFormData): {
 }
 
 /**
- * Calcula estadísticas útiles de la campaña
+ * Calculates useful campaign statistics
  */
 export function calculateCampaignStats(formData: CampaignFormData) {
   const selectedEvents = formData.selectedRewardEvents || [];

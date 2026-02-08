@@ -312,7 +312,6 @@ export default function InfluencerInboxPage() {
     );
   }
   
-  console.log({ chatRooms, selectedRoom });
   const roomId = `${selectedRoom?.campaign?.id}_${selectedRoom?.campaign?.ownerId}_${selectedRoom?.otherUser?.id}`;
   
   return (

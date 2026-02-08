@@ -4,11 +4,13 @@ import { CampaignStatusBadge } from '@/components/campaigns/CampaignStatusBadge'
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
+import { InterestTag } from '@/components/ui/interest-tag';
 import { LoadingCard } from '@/components/ui/loading-card';
+import { TargetAudienceTag } from '@/components/ui/target-audience-tag';
 import { groupTrackedEventsByType } from '@/helpers/campaigns';
 import { useCampaigns } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { SITE_EVENT_TYPE_SHORT_LABELS } from '@/lib/constants';
+import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignStatus } from '@/lib/db/enums';
 import { UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
@@ -122,7 +124,6 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
                         <div className="flex items-center gap-1">
                           <Users className="h-3.5 w-3.5" />
                           <span>Slots:</span>
-                          aaaa
                           <span className="font-medium text-foreground">{campaign.slots}</span>
                         </div>
                         
@@ -133,13 +134,13 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-4 gap-2 text-center">
+                      <div className="grid grid-cols-5 gap-2 text-center">
                         {(() => {
                           const grouped = groupTrackedEventsByType(campaign.sites);
-                          return grouped.slice(0, 4).map((event, index) => {
+                          return grouped.map((event, index) => {
                             return (
                               <div key={event.eventType}>
-                                <p className="text-xs text-muted-foreground truncate">{SITE_EVENT_TYPE_SHORT_LABELS[event.eventType]}</p>
+                                <p className="text-xs text-muted-foreground truncate">{SITE_EVENT_TYPE_LABELS[event.eventType]}</p>
                               </div>
                             );
                           });
@@ -149,22 +150,13 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
                       {(campaign.interests.length > 0 || campaign.demographics.length > 0) && (
                         <div className="flex flex-wrap gap-1.5 pt-1">
                           {campaign.interests.slice(0, 2).map((interest) => (
-                            <Badge
+                            <InterestTag
                               key={interest}
-                              variant="secondary"
-                              className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
-                            >
-                              {interest}
-                            </Badge>
+                              label={interest}
+                            />
                           ))}
                           {campaign.demographics.slice(0, 2).map((demo) => (
-                            <Badge
-                              key={demo}
-                              variant="secondary"
-                              className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
-                            >
-                              {demo}
-                            </Badge>
+                            <TargetAudienceTag key={demo} label={demo} />
                           ))}
                           {(campaign.interests.length + campaign.demographics.length) > 4 && (
                             <Badge

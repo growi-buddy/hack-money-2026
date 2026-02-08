@@ -168,6 +168,7 @@ export const getCampaignResponseDTO = async (
       },
       participations: {
         select: {
+          id: true,
           status: true,
           influencer: {
             select: {
@@ -175,6 +176,7 @@ export const getCampaignResponseDTO = async (
               name: true,
               walletAddress: true,
               avatar: true,
+              influencerVerification: true,
             },
           },
           trackedSiteEvents: {
@@ -213,6 +215,7 @@ export const getCampaignResponseDTO = async (
     url: string;
     description: string;
     events: Map<SiteEventType, { amount: number; volumeStep: number; count: number }>;
+    siteEvents: Array<{ id: string; siteEventType: SiteEventType, amount: number; volumeStep: number }>;
   }>();
   
   // Group site events by site and calculate budget spent
@@ -231,10 +234,20 @@ export const getCampaignResponseDTO = async (
         url: site.url,
         description: site.description,
         events: new Map(),
+        siteEvents: [],
       });
     }
     
     const siteData = siteMap.get(site.id)!;
+    
+    // Add individual site event
+    siteData.siteEvents.push({
+      id: cse.siteEvent.id,
+      siteEventType: cse.siteEvent.eventType,
+      amount,
+      volumeStep: cse.volumeStep,
+    });
+    
     if (!siteData.events.has(eventType)) {
       siteData.events.set(eventType, {
         amount,
@@ -253,6 +266,7 @@ export const getCampaignResponseDTO = async (
     name: site.name,
     url: site.url,
     description: site.description,
+    siteEvents: site.siteEvents,
     trackedSiteEventsGroupedByType: Array.from(site.events.entries()).map(([ eventType, data ]) => ({
       siteEventType: eventType,
       amount: data.amount,
@@ -262,7 +276,13 @@ export const getCampaignResponseDTO = async (
   }));
   
   const participants = campaign.participations.map((p) => {
-    const summaryTrackedSiteEvents: Record<SiteEventType, { total: number; lastUpdated: number }> = {} as any;
+    const summaryTrackedSiteEvents: Record<SiteEventType, { total: number; lastUpdated: number }> = {
+      [SiteEventType.LANDING_PAGE_VIEW]: { total: 0, lastUpdated: 0 },
+      [SiteEventType.VIEW_ITEM]: { total: 0, lastUpdated: 0 },
+      [SiteEventType.ADD_TO_CART]: { total: 0, lastUpdated: 0 },
+      [SiteEventType.CHECKOUT]: { total: 0, lastUpdated: 0 },
+      [SiteEventType.PURCHASE_SUCCESS]: { total: 0, lastUpdated: 0 },
+    };
     
     p.trackedSiteEvents.forEach(te => {
       const eventType = te.siteEvent.eventType;
@@ -282,12 +302,14 @@ export const getCampaignResponseDTO = async (
     });
     
     return {
-      id: p.influencer.id,
+      id: p.id,
+      userId: p.influencer.id,
       name: p.influencer.name ?? '',
       walletAddress: p.influencer.walletAddress,
       avatar: p.influencer.avatar ?? '',
       status: p.status,
       summaryTrackedSiteEvents,
+      influencerVerification: p.influencer.influencerVerification,
     };
   });
   

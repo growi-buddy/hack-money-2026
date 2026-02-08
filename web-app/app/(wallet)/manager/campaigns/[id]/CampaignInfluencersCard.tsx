@@ -3,13 +3,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { WalletDisplayName } from '@/components/ui/WalletDisplayName';
+import { useWallet } from '@/contexts/wallet-context';
 import { staggerContainer, staggerItem } from '@/lib/animations';
+import { PARTICIPATION_STATUS, SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
+import { ParticipationStatus, SiteEventType } from '@/lib/db/enums';
 import { CampaignResponseDTO } from '@/types';
 import { motion } from 'framer-motion';
-import { MessageSquare, Sparkles, Star, Users } from 'lucide-react';
+import { Check, Clock, MessageSquare, Sparkles, Star, Users, X } from 'lucide-react';
 import { useState } from 'react';
 
-export const CampaignInfluencersCard = ({ campaign }: { campaign: CampaignResponseDTO }) => {
+export const CampaignInfluencersCard = ({ campaign, onUpdate }: {
+  campaign: CampaignResponseDTO;
+  onUpdate?: () => void
+}) => {
+  const { address } = useWallet();
   
   const [ showRatingModal, setShowRatingModal ] = useState(false);
   const [ selectedInfluencer, setSelectedInfluencer ] = useState<CampaignResponseDTO['participants'][number] | null>(null);
@@ -17,6 +25,7 @@ export const CampaignInfluencersCard = ({ campaign }: { campaign: CampaignRespon
   const [ hoverRating, setHoverRating ] = useState(0);
   const [ review, setReview ] = useState('');
   const [ ratingSubmitted, setRatingSubmitted ] = useState(false);
+  const [ processingParticipationId, setProcessingParticipationId ] = useState<string | null>(null);
   
   const handleSubmitRating = () => {
     setRatingSubmitted(true);
@@ -34,6 +43,48 @@ export const CampaignInfluencersCard = ({ campaign }: { campaign: CampaignRespon
     setReview('');
     setRatingSubmitted(false);
   };
+  
+  const handleAcceptParticipant = async (participationId: string) => {
+    setProcessingParticipationId(participationId);
+    try {
+      const response = await fetch(`/api/campaigns/${campaign.id}/accept?participationId=${participationId}&walletAddress=${address}`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        onUpdate?.();
+      } else {
+        console.error('Failed to accept participant:', data.error);
+      }
+    } catch (error) {
+      console.error('Error accepting participant:', error);
+    } finally {
+      setProcessingParticipationId(null);
+    }
+  };
+  
+  const handleRejectParticipant = async (participationId: string) => {
+    setProcessingParticipationId(participationId);
+    try {
+      const response = await fetch(`/api/campaigns/${campaign.id}/reject?participationId=${participationId}&walletAddress=${address}`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        onUpdate?.();
+      } else {
+        console.error('Failed to reject participant:', data.error);
+      }
+    } catch (error) {
+      console.error('Error rejecting participant:', error);
+    } finally {
+      setProcessingParticipationId(null);
+    }
+  };
+  
+  const isOwner = address && campaign.owner.walletAddress === address;
   
   return (
     <>
@@ -58,11 +109,10 @@ export const CampaignInfluencersCard = ({ campaign }: { campaign: CampaignRespon
               variants={staggerContainer}
               initial="hidden"
               animate="visible"
-              className="grid gap-4 md:grid-cols-2"
+              className="space-y-4"
             >
               {campaign.participants.map((participation) => {
-                // const isTopPerformer = participation.totalEvents > 100;
-                const displayName = participation.name || `${participation.walletAddress.slice(0, 6)}...${participation.walletAddress.slice(-4)}`;
+                const displayName = participation.name || participation.walletAddress;
                 
                 return (
                   <motion.div
@@ -75,50 +125,97 @@ export const CampaignInfluencersCard = ({ campaign }: { campaign: CampaignRespon
                       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-growi-blue/20 text-growi-blue font-semibold">
                         {displayName.charAt(0).toUpperCase()}
                       </div>
-                      {/*{isTopPerformer && (*/}
-                      {/*  <motion.div*/}
-                      {/*    animate={{*/}
-                      {/*      scale: [ 1, 1.1, 1 ],*/}
-                      {/*      rotate: [ 0, 5, -5, 0 ],*/}
-                      {/*    }}*/}
-                      {/*    transition={{*/}
-                      {/*      duration: 2,*/}
-                      {/*      repeat: Infinity,*/}
-                      {/*      ease: 'easeInOut',*/}
-                      {/*    }}*/}
-                      {/*    className="absolute -right-1 -top-1"*/}
-                      {/*  >*/}
-                      {/*    <Badge className="bg-orange-500 px-1 py-0 text-[10px] text-white hover:bg-orange-600">*/}
-                      {/*      TOP*/}
-                      {/*    </Badge>*/}
-                      {/*  </motion.div>*/}
-                      {/*)}*/}
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-foreground">{displayName}</h4>
-                        {/*{participation.totalEvents > 0 && (*/}
-                        {/*  <Badge className="bg-growi-blue/20 text-growi-blue text-xs">*/}
-                        {/*    {participation.totalEvents} events*/}
-                        {/*  </Badge>*/}
-                        {/*)}*/}
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          {participation.name && (
+                            <h4 className="font-medium text-foreground">{participation.name}</h4>
+                          )}
+                          <p className="text-xs text-muted-foreground">
+                            <WalletDisplayName address={participation.walletAddress} />
+                          </p>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${
+                            participation.status === ParticipationStatus.ACCEPTED
+                              ? 'border-growi-success/50 text-growi-success bg-growi-success/10'
+                              : participation.status === ParticipationStatus.APPLY_PENDING
+                                ? 'border-growi-yellow/50 text-growi-yellow bg-growi-yellow/10'
+                                : participation.status === ParticipationStatus.INVITATION_SENT
+                                  ? 'border-growi-blue/50 text-growi-blue bg-growi-blue/10'
+                                  : 'border-destructive/50 text-destructive bg-destructive/10'
+                          }`}
+                        >
+                          {PARTICIPATION_STATUS[participation.status]}
+                        </Badge>
                       </div>
-                      {/*<p className="text-sm text-growi-money">*/}
-                      {/*  Balance: ${participation.currentBalance.toLocaleString()}*/}
-                      {/*</p>*/}
-                      {/*{participation.events.length > 0 && (*/}
-                      {/*  <div className="mt-2 flex flex-wrap gap-1">*/}
-                      {/*    {participation.events.slice(0, 3).map((event) => (*/}
-                      {/*      <Badge*/}
-                      {/*        key={event.type}*/}
-                      {/*        variant="outline"*/}
-                      {/*        className="text-[10px] px-1.5 py-0"*/}
-                      {/*      >*/}
-                      {/*        {SITE_EVENT_TYPE_LABELS[event.type].split(' ')[0]}: {event.count}*/}
-                      {/*      </Badge>*/}
-                      {/*    ))}*/}
-                      {/*  </div>*/}
-                      {/*)}*/}
+                      {Object.keys(participation.summaryTrackedSiteEvents).length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(participation.summaryTrackedSiteEvents).map(([ eventType, data ]) => {
+                            const lastUpdatedDate = data.lastUpdated > 0 ? new Date(data.lastUpdated) : null;
+                            const isRecent = data.lastUpdated > 0 && Date.now() - data.lastUpdated < 3600000;
+                            
+                            return (
+                              <div
+                                key={eventType}
+                                className="flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-2"
+                              >
+                                <div>
+                                  <p className="text-xs font-medium text-foreground">
+                                    {SITE_EVENT_TYPE_LABELS[eventType as SiteEventType]}
+                                  </p>
+                                  <div className="flex items-center gap-1 mt-0.5">
+                                    <Clock className="h-2.5 w-2.5 text-muted-foreground" />
+                                    <p className="text-[10px] text-muted-foreground">
+                                      {lastUpdatedDate
+                                        ? `${lastUpdatedDate.toLocaleDateString()} ${lastUpdatedDate.toLocaleTimeString([], {
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                        })}`
+                                        : '-'
+                                      }
+                                    </p>
+                                  </div>
+                                </div>
+                                <Badge
+                                  className={`text-xs ${isRecent ? 'bg-growi-success/20 text-growi-success' : 'bg-growi-blue/20 text-growi-blue'}`}
+                                >
+                                  {data.total}
+                                </Badge>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">No events tracked yet</p>
+                      )}
+                      
+                      {isOwner && participation.status === ParticipationStatus.APPLY_PENDING && (
+                        <div className="flex gap-2 mt-3">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleAcceptParticipant(participation.id)}
+                            disabled={processingParticipationId === participation.id}
+                            className="flex-1 border-growi-success/50 text-growi-success hover:bg-growi-success/10"
+                          >
+                            <Check className="h-3.5 w-3.5 mr-1" />
+                            Accept
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleRejectParticipant(participation.id)}
+                            disabled={processingParticipationId === participation.id}
+                            className="flex-1 border-destructive/50 text-destructive hover:bg-destructive/10"
+                          >
+                            <X className="h-3.5 w-3.5 mr-1" />
+                            Reject
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 );

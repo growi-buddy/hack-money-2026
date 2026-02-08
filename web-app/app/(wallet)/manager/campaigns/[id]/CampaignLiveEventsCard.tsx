@@ -25,6 +25,7 @@ export const CampaignLiveEventsCard = ({ campaign }: { campaign: CampaignRespons
   const connectionState = useRealtimeStore((state) => state.connectionState);
   
   const handleTrackedEvent = useCallback((event: LiveTrackedEvent) => {
+    console.log({ event });
     setLiveEvents((prev) => [ event, ...prev ].slice(0, 20)); // Keep last 20 events
   }, []);
   
@@ -81,7 +82,7 @@ export const CampaignLiveEventsCard = ({ campaign }: { campaign: CampaignRespons
             </div>
           ) : (
             <AnimatePresence mode="popLayout">
-              {liveEvents.map((event) => (
+              {liveEvents.map((event, index) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, x: -20, scale: 0.95 }}
@@ -118,11 +119,18 @@ export const CampaignLiveEventsCard = ({ campaign }: { campaign: CampaignRespons
                       {new Date(event.timestamp).toLocaleTimeString()}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-growi-money text-sm">
-                      +${event.amount.toFixed(3)}
+                  <motion.div
+                    initial={index === 0 ? { scale: 1.5 } : {}}
+                    animate={{ scale: 1 }}
+                    className="text-right"
+                  >
+                    <p className={`font-semibold ${index === 0 ? 'text-growi-money' : 'text-foreground'}`}>
+                      +${event.amount.toFixed(4)}
                     </p>
-                  </div>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(event.timestamp).toLocaleTimeString()}
+                    </p>
+                  </motion.div>
                 </motion.div>
               ))}
             </AnimatePresence>
