@@ -1,4 +1,10 @@
-import { CampaignStatus, InfluencerVerificationStatus, ParticipationStatus, SelectorEventType, SiteEventType } from '@/lib/db/enums';
+import {
+  CampaignStatus,
+  InfluencerVerificationStatus,
+  ParticipationStatus,
+  SelectorEventType,
+  SiteEventType,
+} from '@/lib/db/enums';
 import { CampaignUserRole } from '@/types/user';
 import { BasicUserResponseDTO } from '@/types/user.dto';
 import { z } from 'zod';
@@ -113,7 +119,12 @@ export interface SiteWithEventsResponseDTO {
 
 export interface CampaignParticipantResponseDTO extends BasicUserResponseDTO {
   status: ParticipationStatus,
-  summaryTrackedSiteEvents: Record<SiteEventType, { total: number, lastUpdated: number }>,
+  summaryTrackedSiteEvents: Record<SiteEventType, {
+    total: number,
+    lastUpdated: number,
+    amount: number,
+    volumeStep: number,
+  }>,
   influencerVerification: InfluencerVerificationStatus,
 }
 

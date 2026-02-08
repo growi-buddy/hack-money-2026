@@ -41,13 +41,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return { response, status: 400 };
     }
     
-    if (campaign.ownerId === user.id) {
-      const response: ApiErrorResponse = {
-        success: false,
-        error: { code: 'OWNER_CANNOT_PARTICIPATE', message: 'Campaign owner cannot participate in their own campaign' },
-      };
-      return { response, status: 400 };
-    }
+    // if (campaign.ownerId === user.id) { // Mock, Only for testing purposes
+    //   const response: ApiErrorResponse = {
+    //     success: false,
+    //     error: { code: 'OWNER_CANNOT_PARTICIPATE', message: 'Campaign owner cannot participate in their own campaign' },
+    //   };
+    //   return { response, status: 400 };
+    // }
     
     const existingParticipation = await prisma.participation.findUnique({
       where: {

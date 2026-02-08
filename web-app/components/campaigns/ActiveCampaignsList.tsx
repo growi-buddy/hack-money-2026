@@ -78,7 +78,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
           success,
           error,
           txHash,
-        } = await sendFunds('0x75a26Ca9e3Ef85d8e118Ec2b260c143f8738BA19', '0.01');
+        } = await sendFunds('0x75a26Ca9e3Ef85d8e118Ec2b260c143f8738BA19', '0.0001');
         
         if (success) {
           console.log('Transacción exitosa en Base Sepolia:', txHash);

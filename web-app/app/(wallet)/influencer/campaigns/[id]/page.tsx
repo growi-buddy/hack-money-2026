@@ -7,14 +7,17 @@ import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
+import { useWallet } from '@/contexts/wallet-context';
 import { useCampaign } from '@/hooks/use-campaigns';
+import { useRealtimeSubscription } from '@/hooks/use-realtime-subscription';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
+import { CampaignResponseDTO } from '@/types';
 import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
 import { CreditCard, DollarSign, Eye, Flame, Loader2, Package, QrCode, ShoppingCart, Zap } from 'lucide-react';
 import Link from 'next/link';
-import { use, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 
 interface CampaignDetail {
   id: string;
@@ -48,67 +51,6 @@ interface CampaignDetail {
   updatedAt: string;
 }
 
-// Mock data for charts (will be replaced with real tracking data)
-const timelineData = [
-  { date: 'Feb 10', landingViews: 500, viewItems: 280, addToCart: 32, checkout: 12, purchases: 3, earnings: 15.50 },
-  { date: 'Feb 11', landingViews: 1200, viewItems: 650, addToCart: 78, checkout: 29, purchases: 8, earnings: 42.30 },
-  { date: 'Feb 12', landingViews: 1800, viewItems: 980, addToCart: 110, checkout: 42, purchases: 12, earnings: 58.20 },
-  { date: 'Feb 13', landingViews: 2500, viewItems: 1350, addToCart: 160, checkout: 58, purchases: 18, earnings: 78.90 },
-  {
-    date: 'Feb 14',
-    landingViews: 3500,
-    viewItems: 1890,
-    addToCart: 220,
-    checkout: 81,
-    purchases: 25,
-    earnings: 105.40,
-  },
-  {
-    date: 'Feb 15',
-    landingViews: 4800,
-    viewItems: 2600,
-    addToCart: 310,
-    checkout: 110,
-    purchases: 35,
-    earnings: 145.60,
-  },
-  {
-    date: 'Feb 16',
-    landingViews: 6200,
-    viewItems: 3350,
-    addToCart: 400,
-    checkout: 145,
-    purchases: 48,
-    earnings: 185.70,
-  },
-];
-
-const funnelData = [
-  { name: 'Landing Views', value: 12500, color: '#4A90E2' },
-  { name: 'View Items', value: 6750, color: '#60a5fa' },
-  { name: 'Add to Cart', value: 850, color: '#FFB347' },
-  { name: 'Checkout', value: 210, color: '#9ACD32' },
-  { name: 'Purchase', value: 98, color: '#34d399' },
-];
-
-interface Transaction {
-  id: string;
-  type: 'view' | 'cart' | 'checkout';
-  user: string;
-  amount: number;
-  timestamp: Date;
-}
-
-const initialTransactions: Transaction[] = [
-  { id: '1', type: 'checkout', user: 'ALICE VERTE', amount: 12.50, timestamp: new Date() },
-  { id: '2', type: 'view', user: 'BOB SMITH', amount: 0.01, timestamp: new Date(Date.now() - 5000) },
-  { id: '3', type: 'cart', user: 'CHARLIE BROWN', amount: 0.05, timestamp: new Date(Date.now() - 12000) },
-  { id: '4', type: 'view', user: 'DIANA ROSS', amount: 0.01, timestamp: new Date(Date.now() - 20000) },
-  { id: '5', type: 'checkout', user: 'EVE WILSON', amount: 10.00, timestamp: new Date(Date.now() - 35000) },
-];
-
-const mockNames = [ 'ALEX JONES', 'MAYA PATEL', 'LUCAS CHEN', 'SOFIA GARCIA', 'NOAH WILLIAMS', 'EMMA JOHNSON' ];
-
 function CountUpMoney({ value }: { value: number }) {
   const count = useMotionValue(0);
   const rounded = useTransform(count, (latest) => {
@@ -127,95 +69,24 @@ function CountUpMoney({ value }: { value: number }) {
   return <motion.span>{rounded}</motion.span>;
 }
 
-function formatDate(dateStr: string | number | null): string {
-  if (!dateStr) return 'Not set';
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-function getCampaignDuration(startDate: string | number | null, endDate: string | number | null): string {
-  if (!startDate || !endDate) return 'Ongoing';
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  if (start.getTime() === end.getTime()) return 'Ongoing';
-  const diffDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  if (diffDays < 7) return `${diffDays} days`;
-  if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks`;
-  if (diffDays < 365) return `${Math.ceil(diffDays / 30)} months`;
-  return `${Math.ceil(diffDays / 365)} years`;
-}
-
 export default function InfluencerCampaignDetailPage({ params }: { params: Promise<{ id: string }> }) {
   
-  const [ earnings, setEarnings ] = useState(245.67);
-  const [ transactions, setTransactions ] = useState<Transaction[]>(initialTransactions);
-  const [ metrics, setMetrics ] = useState({
-    landingViews: { count: 12500, earned: 87.50 },
-    viewItems: { count: 6750, earned: 33.75 },
-    addToCart: { count: 850, earned: 42.50 },
-    checkout: { count: 210, earned: 21.00 },
-    purchases: { count: 98, earned: 98.17 },
-  });
-  
   const { id } = use(params);
-  const { campaign, error, isLoading } = useCampaign(id);
+  const { address } = useWallet();
+  const { campaign: campaignFetch, error, isLoading } = useCampaign(id);
+  const [ campaignSocket, setCampaignSocket ] = useState<CampaignResponseDTO | null>();
   
-  // Simulate real-time transactions
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const types: ('view' | 'cart' | 'checkout')[] = [ 'view', 'view', 'view', 'cart', 'checkout' ];
-      const type = types[Math.floor(Math.random() * types.length)];
-      const amounts = { view: 0.007, cart: 0.05, checkout: Math.random() * 15 + 5 };
-      const amount = type === 'checkout' ? Number(amounts[type].toFixed(2)) : amounts[type];
-      
-      const newTransaction: Transaction = {
-        id: Date.now().toString(),
-        type,
-        user: mockNames[Math.floor(Math.random() * mockNames.length)],
-        amount,
-        timestamp: new Date(),
-      };
-      
-      setTransactions(prev => [ newTransaction, ...prev.slice(0, 9) ]);
-      setEarnings(prev => Number((prev + amount).toFixed(2)));
-      
-      const metricKey = type === 'view' ? 'landingViews' : type === 'cart' ? 'addToCart' : 'purchases';
-      setMetrics(prev => ({
-        ...prev,
-        [metricKey]: {
-          count: prev[metricKey].count + 1,
-          earned: Number((prev[metricKey].earned + amount).toFixed(2)),
-        },
-      }));
-    }, 3000);
-    
-    return () => clearInterval(interval);
+  const campaign = campaignSocket || campaignFetch;
+  const handleCampaignChanges = useCallback((campaignData: CampaignResponseDTO) => {
+    console.log('[GROWI] Campaign changes received:', campaignData);
+    setCampaignSocket(campaignData);
   }, []);
-  
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'view':
-        return <Eye className="h-4 w-4" />;
-      case 'cart':
-        return <ShoppingCart className="h-4 w-4" />;
-      case 'checkout':
-        return <DollarSign className="h-4 w-4" />;
-      default:
-        return null;
-    }
-  };
-  
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'view':
-        return 'text-growi-blue';
-      case 'cart':
-        return 'text-growi-yellow';
-      case 'checkout':
-        return 'text-growi-success';
-      default:
-        return 'text-muted-foreground';
-    }
-  };
+  useRealtimeSubscription<CampaignResponseDTO>(
+    `campaign:${campaign?.id}`,
+    'campaign_changes',
+    handleCampaignChanges,
+    { enabled: !!campaign?.id, autoConnect: true },
+  );
   
   if (isLoading || !campaign) {
     return (
@@ -225,13 +96,48 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
     );
   }
   
+  const participant = campaign?.participants.find(({ walletAddress }) => walletAddress === address);
+  
+  const landing = participant?.summaryTrackedSiteEvents[SiteEventType.LANDING_PAGE_VIEW] || {
+    total: 0,
+    amount: 0,
+    volumeStep: 1,
+  };
+  const view = participant?.summaryTrackedSiteEvents[SiteEventType.VIEW_ITEM] || {
+    total: 0,
+    amount: 0,
+    volumeStep: 1,
+  };
+  const addCart = participant?.summaryTrackedSiteEvents[SiteEventType.ADD_TO_CART] || {
+    total: 0,
+    amount: 0,
+    volumeStep: 1,
+  };
+  const checkout = participant?.summaryTrackedSiteEvents[SiteEventType.CHECKOUT] || {
+    total: 0,
+    amount: 0,
+    volumeStep: 1,
+  };
+  const purchase = participant?.summaryTrackedSiteEvents[SiteEventType.PURCHASE_SUCCESS] || {
+    total: 0,
+    amount: 0,
+    volumeStep: 1,
+  };
+  
+  const landingEarn = (landing.total * (landing.amount / landing.volumeStep));
+  const viewEarn = (view.total * (view.amount / view.volumeStep));
+  const addCartEarn = (addCart.total * (addCart.amount / addCart.volumeStep));
+  const checkoutEarn = (checkout.total * (checkout.amount / checkout.volumeStep));
+  const purchaseEarn = (purchase.total * (purchase.amount / purchase.volumeStep));
+  
+  const earnings = landingEarn + viewEarn + addCartEarn + checkoutEarn + purchaseEarn;
+  
   return (
     <div className="space-y-6">
       <BackButton href="/influencer/campaigns" label="Back to Campaigns" />
       
       <ErrorCard error={error} />
       
-      {/* Campaign Title */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -315,10 +221,10 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                   <Eye className="h-4 w-4 text-growi-blue" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold text-foreground">{metrics.landingViews.count.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-foreground">{landing.total}</p>
                   <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.LANDING_PAGE_VIEW]}</p>
                 </div>
-                <p className="text-sm font-semibold text-growi-money">${metrics.landingViews.earned.toFixed(2)}</p>
+                <p className="text-sm font-semibold text-growi-money">${landingEarn.toFixed(2)}</p>
               </div>
             </CardContent>
           </Card>
@@ -332,10 +238,10 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                   <Package className="h-4 w-4 text-blue-400" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold text-foreground">{metrics.viewItems.count.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-foreground">{participant?.summaryTrackedSiteEvents[SiteEventType.VIEW_ITEM]?.total || 0}</p>
                   <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.VIEW_ITEM]}</p>
                 </div>
-                <p className="text-sm font-semibold text-growi-money">${metrics.viewItems.earned.toFixed(2)}</p>
+                <p className="text-sm font-semibold text-growi-money">${viewEarn.toFixed(2)}</p>
               </div>
             </CardContent>
           </Card>
@@ -349,10 +255,10 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                   <ShoppingCart className="h-4 w-4 text-growi-yellow" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold text-foreground">{metrics.addToCart.count.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-foreground">{participant?.summaryTrackedSiteEvents[SiteEventType.ADD_TO_CART]?.total || 0}</p>
                   <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.ADD_TO_CART]}</p>
                 </div>
-                <p className="text-sm font-semibold text-growi-money">${metrics.addToCart.earned.toFixed(2)}</p>
+                <p className="text-sm font-semibold text-growi-money">${addCartEarn.toFixed(2)}</p>
               </div>
             </CardContent>
           </Card>
@@ -366,10 +272,10 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                   <CreditCard className="h-4 w-4 text-growi-lime" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold text-foreground">{metrics.checkout.count.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-foreground">{participant?.summaryTrackedSiteEvents[SiteEventType.CHECKOUT]?.total || 0}</p>
                   <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.CHECKOUT]}</p>
                 </div>
-                <p className="text-sm font-semibold text-growi-money">${metrics.checkout.earned.toFixed(2)}</p>
+                <p className="text-sm font-semibold text-growi-money">${checkoutEarn.toFixed(2)}</p>
               </div>
             </CardContent>
           </Card>
@@ -383,10 +289,10 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                   <DollarSign className="h-4 w-4 text-growi-success" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold text-foreground">{metrics.purchases.count.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-foreground">{participant?.summaryTrackedSiteEvents[SiteEventType.PURCHASE_SUCCESS]?.total || 0}</p>
                   <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.PURCHASE_SUCCESS]}</p>
                 </div>
-                <p className="text-sm font-semibold text-growi-money">${metrics.purchases.earned.toFixed(2)}</p>
+                <p className="text-sm font-semibold text-growi-money">${purchaseEarn.toFixed(2)}</p>
               </div>
             </CardContent>
           </Card>

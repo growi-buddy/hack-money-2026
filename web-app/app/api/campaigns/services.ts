@@ -275,25 +275,46 @@ export const getCampaignResponseDTO = async (
     })),
   }));
   
+  // Create a map of siteEventId to {amount, volumeStep} for quick lookup
+  const siteEventConfigMap = new Map<string, { amount: number; volumeStep: number }>();
+  campaign.siteEvents.forEach((cse) => {
+    siteEventConfigMap.set(cse.siteEvent.id, {
+      amount: Number(cse.amount),
+      volumeStep: cse.volumeStep,
+    });
+  });
+
   const participants = campaign.participations.map((p) => {
-    const summaryTrackedSiteEvents: Record<SiteEventType, { total: number; lastUpdated: number }> = {
-      [SiteEventType.LANDING_PAGE_VIEW]: { total: 0, lastUpdated: 0 },
-      [SiteEventType.VIEW_ITEM]: { total: 0, lastUpdated: 0 },
-      [SiteEventType.ADD_TO_CART]: { total: 0, lastUpdated: 0 },
-      [SiteEventType.CHECKOUT]: { total: 0, lastUpdated: 0 },
-      [SiteEventType.PURCHASE_SUCCESS]: { total: 0, lastUpdated: 0 },
+    const summaryTrackedSiteEvents: Record<SiteEventType, {
+      total: number; lastUpdated: number, amount: number,
+      volumeStep: number,
+    }> = {
+      [SiteEventType.LANDING_PAGE_VIEW]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
+      [SiteEventType.VIEW_ITEM]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
+      [SiteEventType.ADD_TO_CART]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
+      [SiteEventType.CHECKOUT]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
+      [SiteEventType.PURCHASE_SUCCESS]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
     };
-    
+
     p.trackedSiteEvents.forEach(te => {
       const eventType = te.siteEvent.eventType;
-      
+      const config = siteEventConfigMap.get(te.siteEventId);
+
       if (!summaryTrackedSiteEvents[eventType]) {
         summaryTrackedSiteEvents[eventType] = {
           total: 0,
           lastUpdated: 0,
+          amount: config?.amount || 0,
+          volumeStep: config?.volumeStep || 1,
         };
       }
-      
+
+      // Set amount and volumeStep from the campaign configuration
+      if (config && summaryTrackedSiteEvents[eventType].amount === 0) {
+        summaryTrackedSiteEvents[eventType].amount = config.amount;
+        summaryTrackedSiteEvents[eventType].volumeStep = config.volumeStep;
+      }
+
       summaryTrackedSiteEvents[eventType].total += 1;
       const createdAtTime = new Date(te.createdAt).getTime();
       if (createdAtTime > summaryTrackedSiteEvents[eventType].lastUpdated) {

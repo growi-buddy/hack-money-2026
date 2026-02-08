@@ -67,7 +67,7 @@ function groupTrackedEventsBySite(
     siteData.eventsByType.get(eventType)!.count += count;
   });
   
-  return Array.from(siteMap.entries()).map(([ _, data ]) => ({
+  return Array.from(siteMap.entries()).map(([, data]) => ({
     id: data.site.id,
     name: data.site.name,
     url: data.site.url,
@@ -280,35 +280,53 @@ export async function GET(req: Request) {
         startDate: campaign.startDate?.getTime() ?? campaign.createdAt.getTime(),
         endDate: campaign.endDate?.getTime() ?? campaign.createdAt.getTime(),
         sites,
-        participants: campaign.participations.map(p => {
-          const summaryTrackedSiteEvents: Record<SiteEventType, { total: number; lastUpdated: number }> = {
-            [SiteEventType.LANDING_PAGE_VIEW]: { total: 0, lastUpdated: 0 },
-            [SiteEventType.VIEW_ITEM]: { total: 0, lastUpdated: 0 },
-            [SiteEventType.ADD_TO_CART]: { total: 0, lastUpdated: 0 },
-            [SiteEventType.CHECKOUT]: { total: 0, lastUpdated: 0 },
-            [SiteEventType.PURCHASE_SUCCESS]: { total: 0, lastUpdated: 0 },
-          };
-          
-          p.trackedSiteEvents.forEach(te => {
-            const eventType = te.siteEvent.eventType;
-            
-            summaryTrackedSiteEvents[eventType].total += 1;
-            const createdAtTime = new Date(te.createdAt).getTime();
-            if (createdAtTime > summaryTrackedSiteEvents[eventType].lastUpdated) {
-              summaryTrackedSiteEvents[eventType].lastUpdated = createdAtTime;
-            }
+        participants: (() => {
+          // Create a map of siteEventId to {amount, volumeStep} for quick lookup
+          const siteEventConfigMap = new Map<string, { amount: number; volumeStep: number }>();
+          campaign.siteEvents.forEach((cse) => {
+            siteEventConfigMap.set(cse.siteEvent.id, {
+              amount: Number(cse.amount),
+              volumeStep: cse.volumeStep,
+            });
           });
-          
-          return {
-            id: p.influencer.id,
-            name: p.influencer.name || '',
-            walletAddress: p.influencer.walletAddress,
-            avatar: p.influencer.avatar || '',
-            status: p.status,
-            summaryTrackedSiteEvents,
-            influencerVerification: p.influencer.influencerVerification,
-          };
-        }),
+
+          return campaign.participations.map(p => {
+            const summaryTrackedSiteEvents: Record<SiteEventType, { total: number; lastUpdated: number; amount: number; volumeStep: number }> = {
+              [SiteEventType.LANDING_PAGE_VIEW]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
+              [SiteEventType.VIEW_ITEM]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
+              [SiteEventType.ADD_TO_CART]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
+              [SiteEventType.CHECKOUT]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
+              [SiteEventType.PURCHASE_SUCCESS]: { total: 0, lastUpdated: 0, amount: 0, volumeStep: 1 },
+            };
+
+            p.trackedSiteEvents.forEach(te => {
+              const eventType = te.siteEvent.eventType;
+              const config = siteEventConfigMap.get(te.siteEventId);
+
+              // Set amount and volumeStep from the campaign configuration
+              if (config && summaryTrackedSiteEvents[eventType].amount === 0) {
+                summaryTrackedSiteEvents[eventType].amount = config.amount;
+                summaryTrackedSiteEvents[eventType].volumeStep = config.volumeStep;
+              }
+
+              summaryTrackedSiteEvents[eventType].total += 1;
+              const createdAtTime = new Date(te.createdAt).getTime();
+              if (createdAtTime > summaryTrackedSiteEvents[eventType].lastUpdated) {
+                summaryTrackedSiteEvents[eventType].lastUpdated = createdAtTime;
+              }
+            });
+
+            return {
+              id: p.influencer.id,
+              name: p.influencer.name || '',
+              walletAddress: p.influencer.walletAddress,
+              avatar: p.influencer.avatar || '',
+              status: p.status,
+              summaryTrackedSiteEvents,
+              influencerVerification: p.influencer.influencerVerification,
+            };
+          });
+        })(),
         createdAt: campaign.createdAt.getTime(),
         updatedAt: campaign.updatedAt.getTime(),
         isDeleted: !!campaign.deletedAt,
