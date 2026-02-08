@@ -22,7 +22,6 @@ export interface AppDefinition {
   quorum: number;
   challenge: number;
   nonce: number;
-  asset: string;
 }
 
 /**
@@ -30,6 +29,7 @@ export interface AppDefinition {
  */
 export interface Allocation {
   participant: `0x${string}`;
+  asset: string; // ej: 'ytest.usd'
   amount: string; // En unidades mínimas (ej: 6 decimales para USDC)
 }
 

@@ -1,5 +1,34 @@
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
+import { baseSepolia } from 'viem/chains';
+
+export const switchNetwork = async (targetChainId: number) => {
+  const chainIdHex = `0x${targetChainId.toString(16)}`;
+  
+  try {
+    // @ts-ignore - window.waap es inyectado por WAAP SDK
+    await window.waap?.request({
+      method: 'wallet_switchEthereumChain',
+      params: [ { chainId: chainIdHex } ],
+    });
+  } catch (error) {
+    // Si la red no existe en la wallet (Error 4902), la agregamos
+    if ((error as { code: number })?.code === 4902) {
+      // @ts-ignore - window.waap es inyectado por WAAP SDK
+      await window.waap?.request({
+        method: 'wallet_addEthereumChain',
+        params: [ {
+          chainId: chainIdHex,
+          chainName: baseSepolia.name,
+          nativeCurrency: baseSepolia.nativeCurrency,
+          rpcUrls: [ baseSepolia.rpcUrls.default.http[0] ],
+          blockExplorerUrls: [ baseSepolia.blockExplorers.default.url ],
+        } ],
+      });
+    }
+  }
+};
 
 export default function Home() {
   return (
@@ -92,6 +121,47 @@ export default function Home() {
               <li>✓ Growi Judge firma</li>
             </ul>
           </Link>
+          <button
+              onClick={async () => {
+                if (!window.waap) return;
+                
+                try {
+                  const currentChainHex = await window.waap.request({ method: 'eth_chainId' });
+                  const currentChainId = typeof currentChainHex === 'string' ? parseInt(currentChainHex, 16) : parseInt(currentChainHex[0], 16);
+                  
+                  if (currentChainId !== baseSepolia.id) {
+                    alert(`Estás en la red equivocada. Por favor, cambia a ${baseSepolia.name}`);
+                    
+                    await switchNetwork(baseSepolia.id);
+                    return;
+                  }
+                  
+                  const accounts = await window.waap.request({ method: 'eth_accounts' });
+                  const userAddress = accounts[0];
+                  
+                  if (!userAddress) {
+                    alert('No se encontró una cuenta activa. ¿Ya iniciaste sesión?');
+                    return;
+                  }
+                  
+                  const txHash = await window.waap.request({
+                    method: 'eth_sendTransaction',
+                    params: [ {
+                      from: userAddress,
+                      to: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+                      value: '0x38D7EA4C68000',
+                    } ],
+                  });
+                  
+                  console.log('Transacción exitosa en Base Sepolia:', txHash);
+                } catch (error) {
+                  console.error('Error:', error);
+                }
+              }}
+              className="border-orange-500/50 text-orange-500 hover:bg-orange-500/10"
+            >
+              Mark as Hot
+            </button>
         </div>
       </div>
     </div>

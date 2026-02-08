@@ -1,0 +1,290 @@
+{
+  "info": {
+    "name": "Growi Yellow Adapter",
+    "description": "API collection for testing Growi Yellow Adapter (Off-Chain & On-Chain)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "app_session_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "manager_address",
+      "value": "0x1111111111111111111111111111111111111111",
+      "type": "string"
+    },
+    {
+      "key": "influencer_address",
+      "value": "0x2222222222222222222222222222222222222222",
+      "type": "string"
+    },
+    {
+      "key": "budget_usdc",
+      "value": "5000000",
+      "type": "string"
+    },
+    {
+      "key": "earned_usdc",
+      "value": "1000000",
+      "type": "string"
+    },
+    {
+      "key": "fee_bps",
+      "value": "250",
+      "type": "string"
+    },
+    {
+      "key": "chain_id",
+      "value": "84532",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/yellow/health",
+          "host": ["{{base_url}}"],
+          "path": ["api", "yellow", "health"]
+        },
+        "description": "Verifica que el servidor esté funcionando"
+      },
+      "response": []
+    },
+    {
+      "name": "Off-Chain",
+      "item": [
+        {
+          "name": "1. Create App Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.ok && data.data.appSessionId) {",
+                  "    pm.collectionVariables.set('app_session_id', data.data.appSessionId);",
+                  "    console.log('Session ID guardado:', data.data.appSessionId);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"managerAddress\": \"{{manager_address}}\",\n  \"influencerAddress\": \"{{influencer_address}}\",\n  \"budgetUsdc\": \"{{budget_usdc}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "yellow", "app-sessions", "create"]
+            },
+            "description": "Crea una nueva App Session con presupuesto inicial"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Apply Payout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appSessionId\": \"{{app_session_id}}\",\n  \"influencerAddress\": \"{{influencer_address}}\",\n  \"earnedUsdc\": \"{{earned_usdc}}\",\n  \"feeBps\": {{fee_bps}}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/payout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "yellow", "app-sessions", "payout"]
+            },
+            "description": "Aplica un payout al influencer"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Claim Funds",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appSessionId\": \"{{app_session_id}}\",\n  \"influencerAddress\": \"{{influencer_address}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/claim",
+              "host": ["{{base_url}}"],
+              "path": ["api", "yellow", "app-sessions", "claim"]
+            },
+            "description": "Retira fondos del influencer"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Get Session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/{{app_session_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "yellow", "app-sessions", "{{app_session_id}}"]
+            },
+            "description": "Consulta el estado de una sesión"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "On-Chain",
+      "item": [
+        {
+          "name": "0. Preflight Check",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chainId\": {{chain_id}},\n  \"wallet\": \"{{manager_address}}\",\n  \"budgetUsdc\": \"{{budget_usdc}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/channels/preflight",
+              "host": ["{{base_url}}"],
+              "path": ["api", "yellow", "channels", "preflight"]
+            },
+            "description": "Verifica balances y configuración antes de iniciar flujo"
+          },
+          "response": []
+        },
+        {
+          "name": "1. Approve Intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chainId\": {{chain_id}},\n  \"wallet\": \"{{manager_address}}\",\n  \"amountUsdc\": \"{{budget_usdc}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/channels/approve-intent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "yellow", "channels", "approve-intent"]
+            },
+            "description": "Genera TxIntent para aprobar USDC"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Deposit Intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chainId\": {{chain_id}},\n  \"wallet\": \"{{manager_address}}\",\n  \"amountUsdc\": \"{{budget_usdc}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/channels/deposit-intent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "yellow", "channels", "deposit-intent"]
+            },
+            "description": "Genera TxIntent para depositar USDC"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Sign Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chainId\": {{chain_id}},\n  \"managerAddress\": \"{{manager_address}}\",\n  \"influencerAddress\": \"{{influencer_address}}\",\n  \"budgetUsdc\": \"{{budget_usdc}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/channels/sign-data",
+              "host": ["{{base_url}}"],
+              "path": ["api", "yellow", "channels", "sign-data"]
+            },
+            "description": "Obtiene datos EIP-712 para firmar"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Create Intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chainId\": {{chain_id}},\n  \"managerAddress\": \"{{manager_address}}\",\n  \"influencerAddress\": \"{{influencer_address}}\",\n  \"budgetUsdc\": \"{{budget_usdc}}\",\n  \"managerSignature\": \"0x...\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/channels/create-intent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "yellow", "channels", "create-intent"]
+            },
+            "description": "Genera TxIntent para crear canal (requiere firma previa)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

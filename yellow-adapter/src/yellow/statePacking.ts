@@ -22,7 +22,7 @@ export function packState(channel: Channel, state: State): `0x${string}` {
     [
       channel.chainId,
       channel.participants,
-      channel.challenge,
+      Number(channel.challenge),
       channel.nonce,
       channel.asset,
     ]
@@ -40,7 +40,7 @@ export function packState(channel: Channel, state: State): `0x${string}` {
     [
       state.version,
       state.intent,
-      allocationsPacked.map((a) => [a.destination, a.amount]),
+      allocationsPacked.map((a) => [a.destination, a.amount] as const),
       state.data,
     ]
   );
@@ -88,7 +88,7 @@ export function calculateChannelId(channel: Channel): `0x${string}` {
     [
       channel.chainId,
       channel.participants,
-      channel.challenge,
+      Number(channel.challenge),
       channel.nonce,
       channel.asset,
     ]

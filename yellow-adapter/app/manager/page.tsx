@@ -2,9 +2,13 @@
 
 import { useState } from 'react';
 import { useWaap } from '@/src/components/WaapProvider';
+import OnChainChannelFlow from '@/src/components/OnChainChannelFlow';
+
+type TabType = 'off-chain' | 'on-chain';
 
 export default function ManagerPage() {
   const { address, isConnected, login } = useWaap();
+  const [activeTab, setActiveTab] = useState<TabType>('off-chain');
   const [influencerAddress, setInfluencerAddress] = useState('');
   const [budgetUsdc, setBudgetUsdc] = useState('1000000'); // 1 USDC
   const [loading, setLoading] = useState(false);
@@ -79,7 +83,34 @@ export default function ManagerPage() {
             </div>
           </div>
 
-          {/* Create Session Form */}
+          {/* Tabs */}
+          <div className="flex space-x-2 bg-white/95 backdrop-blur-sm rounded-xl p-2 border border-gray-200">
+            <button
+              onClick={() => setActiveTab('off-chain')}
+              className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all ${
+                activeTab === 'off-chain'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-transparent text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              ⚡ Off-Chain (App Sessions)
+            </button>
+            <button
+              onClick={() => setActiveTab('on-chain')}
+              className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all ${
+                activeTab === 'on-chain'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-transparent text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              🔗 On-Chain (State Channels)
+            </button>
+          </div>
+
+          {/* Off-Chain Tab */}
+          {activeTab === 'off-chain' && (
+            <>
+              {/* Create Session Form */}
           <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 border border-gray-200 shadow-lg">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Crear Nueva Campaña</h2>
 
@@ -166,6 +197,13 @@ export default function ManagerPage() {
               🔐 Tu wallet NO se usa para firmar ahora, solo para identificarte como Manager
             </p>
           </div>
+            </>
+          )}
+
+          {/* On-Chain Tab */}
+          {activeTab === 'on-chain' && address && (
+            <OnChainChannelFlow managerAddress={address} />
+          )}
         </div>
       )}
     </div>

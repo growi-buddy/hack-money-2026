@@ -50,15 +50,16 @@ export async function GET(
         },
       },
     });
-  } catch (error: any) {
-    console.error("[API] /api/yellow/app-sessions/:id error:", error);
+  } catch (error) {
+    const err = error as Error;
+    console.error("[API] /api/yellow/app-sessions/:id error:", err);
 
     return NextResponse.json(
       {
         ok: false,
         error: {
           code: "SESSION_ERROR",
-          message: error.message || "Failed to get session",
+          message: err.message || "Failed to get session",
         },
       },
       { status: 500 }

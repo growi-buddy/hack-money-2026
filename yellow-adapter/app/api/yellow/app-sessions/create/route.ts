@@ -11,14 +11,26 @@ import { ZodError } from "zod";
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  console.log('[API] ========================================');
+  console.log('[API] POST /api/yellow/app-sessions/create');
+  console.log('[API] ========================================');
+
   try {
-    // Parsear y validar body
+    // Parsear body
     const body = await request.json();
+    console.log('[API] Request body:', JSON.stringify(body, null, 2));
+
+    // Validar
+    console.log('[API] Validating with schema...');
     const input = CreateSessionSchema.parse(body);
+    console.log('[API] ✅ Validation passed');
 
     // Crear sesión
+    console.log('[API] Getting service instance...');
     const service = getAppSessionService();
+    console.log('[API] Calling createSession...');
     const session = await service.createSession(input);
+    console.log('[API] ✅ Session created:', session.appSessionId);
 
     return NextResponse.json({
       ok: true,
@@ -26,14 +38,19 @@ export async function POST(request: NextRequest) {
         appSessionId: session.appSessionId,
         definition: session.definition,
         allocations: session.allocations,
-        version: session.version,
-        createdAt: session.createdAt,
       },
     });
-  } catch (error: any) {
-    console.error("[API] /api/yellow/app-sessions/create error:", error);
+  } catch (error) {
+    const err = error as Error;
+    
+    console.error('[API] ========================================');
+    console.error('[API] ❌ ERROR');
+    console.error('[API] ========================================');
+    console.error('[API] Error message:', err.message);
+    console.error('[API] Error stack:', err.stack);
 
     if (error instanceof ZodError) {
+      console.error('[API] Validation errors:', error.issues);
       return NextResponse.json(
         {
           ok: false,
@@ -52,7 +69,7 @@ export async function POST(request: NextRequest) {
         ok: false,
         error: {
           code: "SESSION_CREATE_ERROR",
-          message: error.message || "Failed to create session",
+          message: err.message || "Failed to create session",
         },
       },
       { status: 500 }

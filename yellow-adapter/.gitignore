@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# postman generated files (variables personalizadas)
+postman/*.generated.json
+postman/*_run_*.json
+
+.pnpm-store/*

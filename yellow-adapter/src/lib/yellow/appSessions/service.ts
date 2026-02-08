@@ -1,114 +1,252 @@
 /**
- * App Sessions Service
- * Maneja creación y actualización de App Sessions con Yellow
+ * App Session Service
+ * Maneja creación de App Sessions con Yellow Network
  */
 
-import { privateKeyToAccount } from "viem/accounts";
-import { YellowRpcClient } from "../rpc/client";
-import { appSessionStore } from "./store";
-import { GrowiRole } from "./types";
-import type {
-  AppDefinition,
-  AppSessionState,
-  Allocation,
+import { PrivateKeyAccount } from 'viem';
+import { createAppSessionMessage, MessageSigner } from '@erc7824/nitrolite';
+import WebSocket from 'ws';
+import { authenticateWithYellow } from './auth';
+import { appSessionStore } from './store';
+import { 
   CreateSessionInput,
-  PayoutInput,
-  ClaimInput,
-} from "./types";
+  PayoutInput, 
+  ClaimInput, 
+  AppSessionState,
+  AppDefinition,
+  GrowiRole,
+  Allocation 
+} from './types';
 
-/**
- * Configuración de wallets de la plataforma (Growi)
- * Manager e Influencer NO están aquí, vienen del frontend
- */
-interface PlatformWallets {
-  judge: any;         // Growi platform wallet (firma payouts)
-  feeTreasury: any;   // Fee treasury wallet
+export interface CreateSessionOutput {
+  appSessionId: string;
+  definition: AppDefinition;
+  allocations: Allocation[];
 }
 
-/**
- * Crea la definición de App Session para Growi
- */
-export function createGrowiAppDefinition(
-  managerAddress: `0x${string}`,
-  influencerAddress: `0x${string}`,
-  judgeAddress: `0x${string}`,
-  feeTreasuryAddress: `0x${string}`,
-  asset: string = "ytest.usd"
-): AppDefinition {
-  return {
-    protocol: "growi-campaign-v1",
-    participants: [managerAddress, influencerAddress, judgeAddress, feeTreasuryAddress],
-    weights: [0, 0, 100, 0], // Solo judge tiene peso (quorum 100)
-    quorum: 100,
-    challenge: 0,
-    nonce: Date.now(),
-    asset,
-  };
-}
+// Re-exportar tipos para uso externo
+export type { AppDefinition, Allocation, AppSessionState };
 
 /**
- * Service para manejar App Sessions
+ * Servicio para App Sessions
  */
 export class AppSessionService {
-  private rpcClient: YellowRpcClient;
-  private platformWallets: PlatformWallets;
+  private ws: WebSocket | null = null;
+  private judgeAccount: PrivateKeyAccount;
+  private clearNodeUrl: string;
+  private messageHandlers = new Map<number | string, (response: unknown) => void>();
+  private isAuthenticated = false;
+  private sessionKey: PrivateKeyAccount | null = null;
 
-  constructor(wsUrl: string, platformWallets: PlatformWallets) {
-    this.rpcClient = new YellowRpcClient(wsUrl);
-    this.platformWallets = platformWallets;
+  constructor(clearNodeUrl: string, judgeAccount: PrivateKeyAccount) {
+    this.clearNodeUrl = clearNodeUrl;
+    this.judgeAccount = judgeAccount;
+    
+    console.log('[AppSession] Service created');
+    console.log('[AppSession] Judge address:', judgeAccount.address);
+    console.log('[AppSession] Clearnode URL:', clearNodeUrl);
   }
 
   /**
-   * Crea una nueva App Session
+   * Conectar WebSocket y autenticar
    */
-  async createSession(input: CreateSessionInput): Promise<AppSessionState> {
-    await this.rpcClient.ensureConnected();
+  private async connect(): Promise<void> {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN && this.isAuthenticated) {
+      console.log('[AppSession] Already connected');
+      return;
+    }
 
-    // Manager e Influencer addresses vienen del frontend (WAAP)
-    const managerAddr = input.managerAddress as `0x${string}`;
-    const influencerAddr = input.influencerAddress as `0x${string}`;
+    console.log('[AppSession] 🔌 Connecting...');
+
+    await new Promise<void>((resolve, reject) => {
+      this.ws = new WebSocket(this.clearNodeUrl);
+
+      this.ws.on('open', () => {
+        console.log('[AppSession] ✅ Connected');
+        resolve();
+      });
+
+      this.ws.on('message', (data) => {
+        this.handleMessage(data.toString());
+      });
+
+      this.ws.on('error', (error) => {
+        console.error('[AppSession] ❌ Error:', error);
+        reject(error);
+      });
+
+      this.ws.on('close', () => {
+        console.log('[AppSession] Closed');
+        this.isAuthenticated = false;
+      });
+    });
+
+    // Autenticar (retorna el judgeAccount autenticado)
+    if (!this.ws) {
+      throw new Error('WebSocket not initialized');
+    }
+    this.sessionKey = await authenticateWithYellow(this.ws, this.judgeAccount, this.messageHandlers);
+    this.isAuthenticated = true;
+  }
+
+  /**
+   * Manejar mensajes entrantes
+   */
+  private handleMessage(data: string): void {
+    try {
+      const message = JSON.parse(data); 
+      console.log('[AppSession] 📨 Message:', JSON.stringify(message, null, 2).substring(0, 200) + '...');
+
+      // Extraer ID - 0 es válido para broadcasts
+      let messageId: string | number | undefined;
+      
+      if (message.res && Array.isArray(message.res)) {
+        messageId = message.res[0];
+      } else if (message.req && Array.isArray(message.req)) {
+        messageId = message.req[0];
+      }
+      
+      const normalizedId = typeof messageId === 'string' ? parseInt(messageId, 10) : messageId;
+      
+      if (normalizedId !== undefined && !isNaN(normalizedId as number) && this.messageHandlers.has(normalizedId)) {
+        const handler = this.messageHandlers.get(normalizedId);
+        this.messageHandlers.delete(normalizedId);
+        handler?.(message);
+      }
+    } catch (error) {
+      console.error('[AppSession] ❌ Parse error:', error);
+    }
+  }
+
+  /**
+   * Enviar mensaje y esperar respuesta
+   */
+  private async sendMessage(message: string, timeoutMs = 30000): Promise<{
+    res?: [number | string, string, { app_session_id?: string; error?: string }, number];
+  }> {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN || !this.isAuthenticated) {
+      throw new Error('Not connected or not authenticated');
+    }
+
+    const parsedMessage = JSON.parse(message);
+    const messageId = parsedMessage.req?.[0];
+
+    if (!messageId) {
+      throw new Error('Message has no ID');
+    }
+
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        this.messageHandlers.delete(messageId);
+        reject(new Error(`Timeout (ID: ${messageId})`));
+      }, timeoutMs);
+
+      this.messageHandlers.set(messageId, (response: unknown) => {
+        clearTimeout(timeout);
+        const res = response as { res?: [number | string, string, { app_session_id?: string; error?: string }, number] };
+        
+        if (res.res?.[1] === 'error') {
+          const errorDetail = res.res[2];
+          reject(new Error(errorDetail?.error || JSON.stringify(errorDetail)));
+        } else {
+          resolve(res);
+        }
+      });
+
+      this.ws!.send(message);
+    });
+  }
+
+  /**
+   * Crear App Session
+   */
+  async createSession(input: CreateSessionInput): Promise<CreateSessionOutput> {
+    const { managerAddress, influencerAddress, budgetUsdc } = input;
     
-    // Judge y Fee son wallets de la plataforma (Growi)
-    const judgeAddr = this.platformWallets.judge.address;
-    const feeAddr = this.platformWallets.feeTreasury.address;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { validateOffChainConfig } = require('@/src/lib/config/env');
+    const config = validateOffChainConfig();
 
-    // Crear definición
-    const definition = createGrowiAppDefinition(
-      managerAddr,
-      influencerAddr,
-      judgeAddr,
-      feeAddr
-    );
+    console.log('[AppSession] Creating session...');
+    console.log('[AppSession] Manager:', managerAddress);
+    console.log('[AppSession] Influencer:', influencerAddress);
+    console.log('[AppSession] Budget:', budgetUsdc);
 
-    // Allocations iniciales
-    const allocations: Allocation[] = [
-      { participant: managerAddr, amount: input.budgetUsdc },
-      { participant: influencerAddr, amount: "0" },
-      { participant: judgeAddr, amount: "0" },
-      { participant: feeAddr, amount: "0" },
-    ];
-
-    // TODO: Enviar create_app_session al clearnode
-    // Por ahora, crear localmente
-    const appSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    const session: AppSessionState = {
-      appSessionId,
-      definition,
-      version: 0,
-      allocations,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    const definition: AppDefinition = {
+      protocol: 'NitroRPC/0.4',
+      participants: [
+        managerAddress as `0x${string}`, 
+        influencerAddress as `0x${string}`, 
+        this.judgeAccount.address, 
+        config.YELLOW_FEE_ADDRESS as `0x${string}`
+      ],
+      weights: [0, 0, 100, 0],
+      quorum: 100,
+      challenge: 0,
+      nonce: Date.now(),
     };
 
-    appSessionStore.save(session);
+    const allocations: Allocation[] = [
+      { participant: managerAddress as `0x${string}`, asset: 'ytest.usd', amount: budgetUsdc },
+      { participant: influencerAddress as `0x${string}`, asset: 'ytest.usd', amount: '0' },
+      { participant: this.judgeAccount.address, asset: 'ytest.usd', amount: '0' },
+      { participant: config.YELLOW_FEE_ADDRESS as `0x${string}`, asset: 'ytest.usd', amount: '0' },
+    ];
 
-    console.log("[AppSession] Created:", appSessionId);
-    return session;
+    try {
+      // Conectar y autenticar
+      await this.connect();
+      
+      if (!this.sessionKey) {
+        throw new Error('Authentication failed - no signing key');
+      }
+
+      // Message signer con el wallet autenticado
+      const signingWallet = this.sessionKey;
+      const messageSigner: MessageSigner = async (payload) => {
+        const payloadString = JSON.stringify(payload);
+        return await signingWallet.signMessage({ message: payloadString });
+      };
+
+      // Crear mensaje con SDK (v0.4.0 espera un objeto, no un array)
+      const sessionMessage = await createAppSessionMessage(
+        messageSigner,
+        { definition, allocations } as any // eslint-disable-line @typescript-eslint/no-explicit-any
+      );
+
+      // Enviar a Clearnode
+      const response = await this.sendMessage(sessionMessage, 60000);
+
+      // Extraer app_session_id
+      const appSessionId = response.res?.[2]?.app_session_id;
+
+      if (!appSessionId) {
+        throw new Error('No app_session_id in response');
+      }
+
+      console.log('[AppSession] ✅ Created:', appSessionId);
+
+      // Guardar en store
+      const sessionState: AppSessionState = {
+        appSessionId,
+        definition,
+        version: 0,
+        allocations,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      appSessionStore.save(sessionState);
+
+      return { appSessionId, definition, allocations };
+    } catch (error) {
+      const err = error as Error;
+      console.error('[AppSession] ❌ Failed:', err.message);
+      throw new Error(`Failed to create App Session: ${err.message}`);
+    }
   }
 
   /**
-   * Aplica un payout (OPERATE intent)
+   * Aplicar payout (OPERATE intent)
    */
   async applyPayout(input: PayoutInput): Promise<AppSessionState> {
     const session = appSessionStore.get(input.appSessionId);
@@ -121,57 +259,50 @@ export class AppSessionService {
     const fee = (earned * BigInt(input.feeBps)) / BigInt(10000);
     const total = earned + fee;
 
-    // Validar que manager tenga suficiente balance
+    // Validar balance del manager
     const managerAlloc = session.allocations[GrowiRole.MANAGER];
     const managerBalance = BigInt(managerAlloc.amount);
 
     if (managerBalance < total) {
-      throw new Error(
-        `Insufficient manager balance: ${managerBalance} < ${total}`
-      );
+      throw new Error(`Insufficient manager balance: ${managerBalance} < ${total}`);
     }
 
     // Calcular nuevas allocations
     const newAllocations: Allocation[] = [
       {
         participant: session.allocations[GrowiRole.MANAGER].participant,
+        asset: session.allocations[GrowiRole.MANAGER].asset,
         amount: (managerBalance - total).toString(),
       },
       {
         participant: session.allocations[GrowiRole.INFLUENCER].participant,
-        amount: (
-          BigInt(session.allocations[GrowiRole.INFLUENCER].amount) + earned
-        ).toString(),
+        asset: session.allocations[GrowiRole.INFLUENCER].asset,
+        amount: (BigInt(session.allocations[GrowiRole.INFLUENCER].amount) + earned).toString(),
       },
       {
         participant: session.allocations[GrowiRole.JUDGE].participant,
+        asset: session.allocations[GrowiRole.JUDGE].asset,
         amount: session.allocations[GrowiRole.JUDGE].amount,
       },
       {
         participant: session.allocations[GrowiRole.FEE_TREASURY].participant,
-        amount: (
-          BigInt(session.allocations[GrowiRole.FEE_TREASURY].amount) + fee
-        ).toString(),
+        asset: session.allocations[GrowiRole.FEE_TREASURY].asset,
+        amount: (BigInt(session.allocations[GrowiRole.FEE_TREASURY].amount) + fee).toString(),
       },
     ];
 
-    // Incrementar versión
     const newVersion = session.version + 1;
 
     // TODO: Enviar submit_app_state con intent OPERATE al clearnode
-    // Por ahora, actualizar localmente
     appSessionStore.updateVersion(input.appSessionId, newVersion, newAllocations);
 
-    console.log(
-      `[AppSession] Payout applied: earned=${input.earnedUsdc}, fee=${fee}, newVersion=${newVersion}`
-    );
+    console.log(`[AppSession] Payout applied: earned=${input.earnedUsdc}, fee=${fee}, newVersion=${newVersion}`);
 
-    const updatedSession = appSessionStore.get(input.appSessionId)!;
-    return updatedSession;
+    return appSessionStore.get(input.appSessionId)!;
   }
 
   /**
-   * Ejecuta un claim/withdraw (WITHDRAW intent)
+   * Ejecutar claim (WITHDRAW intent)
    */
   async claim(input: ClaimInput): Promise<AppSessionState> {
     const session = appSessionStore.get(input.appSessionId);
@@ -182,7 +313,7 @@ export class AppSessionService {
     const participantAddr = input.participant as `0x${string}`;
     const amount = BigInt(input.amountUsdc);
 
-    // Encontrar al participante en allocations
+    // Encontrar participante
     const participantIndex = session.allocations.findIndex(
       (a) => a.participant.toLowerCase() === participantAddr.toLowerCase()
     );
@@ -195,9 +326,7 @@ export class AppSessionService {
     const currentBalance = BigInt(participantAlloc.amount);
 
     if (currentBalance < amount) {
-      throw new Error(
-        `Insufficient balance: ${currentBalance} < ${amount}`
-      );
+      throw new Error(`Insufficient balance: ${currentBalance} < ${amount}`);
     }
 
     // Calcular nuevas allocations
@@ -211,96 +340,61 @@ export class AppSessionService {
       return alloc;
     });
 
-    // Incrementar versión
     const newVersion = session.version + 1;
 
     // TODO: Enviar submit_app_state con intent WITHDRAW al clearnode
-    // Por ahora, actualizar localmente
     appSessionStore.updateVersion(input.appSessionId, newVersion, newAllocations);
 
-    console.log(
-      `[AppSession] Claim executed: participant=${participantAddr}, amount=${amount}, newVersion=${newVersion}`
-    );
+    console.log(`[AppSession] Claim executed: amount=${input.amountUsdc}, participant=${input.participant}, newVersion=${newVersion}`);
 
-    const updatedSession = appSessionStore.get(input.appSessionId)!;
-    return updatedSession;
+    return appSessionStore.get(input.appSessionId)!;
   }
 
   /**
-   * Obtiene una sesión por ID
+   * Obtener sesión por ID
    */
   getSession(appSessionId: string): AppSessionState | undefined {
     return appSessionStore.get(appSessionId);
   }
 
   /**
-   * Lista todas las sesiones
+   * Listar todas las sesiones
    */
   listSessions(): AppSessionState[] {
     return appSessionStore.list();
   }
 
   /**
-   * Consulta sesiones desde el clearnode
+   * Desconectar
    */
-  async getSessionsFromClearnode(): Promise<any> {
-    await this.rpcClient.ensureConnected();
-
-    // TODO: Implementar get_app_sessions RPC call
-    return {
-      sessions: appSessionStore.list(),
-      note: "Currently using local store. ClearNode query pending.",
-    };
+  disconnect(): void {
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+      this.messageHandlers.clear();
+      this.isAuthenticated = false;
+      this.sessionKey = null;
+    }
   }
 }
 
 /**
- * Factory para crear el service con platform wallets (solo Growi)
- * Manager e Influencer conectan desde el frontend con WAAP
+ * Singleton
  */
-export function createAppSessionService(
-  wsUrl: string,
-  judgePk: `0x${string}`,
-  feePk: `0x${string}`
-): AppSessionService {
-  const platformWallets: PlatformWallets = {
-    judge: privateKeyToAccount(judgePk),
-    feeTreasury: privateKeyToAccount(feePk),
-  };
-
-  return new AppSessionService(wsUrl, platformWallets);
-}
-
-/**
- * Singleton del service
- */
-let serviceInstance: AppSessionService | null = null;
+let instance: AppSessionService | null = null;
 
 export function getAppSessionService(): AppSessionService {
-  if (!serviceInstance) {
-    // Leer env vars (solo platform keys)
-    const wsUrl =
-      process.env.YELLOW_WS_URL || "wss://clearnet-sandbox.yellow.com/ws";
-    const judgePk = process.env.YELLOW_JUDGE_PK as `0x${string}`;
-    const feePk = process.env.YELLOW_FEE_PK as `0x${string}`;
+  if (!instance) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { validateOffChainConfig } = require('@/src/lib/config/env');
+    const config = validateOffChainConfig();
 
-    // Solo validar platform keys (Growi)
-    // Manager e Influencer vienen del frontend con WAAP
-    if (!judgePk || !feePk) {
-      throw new Error(
-        "❌ Platform wallets not configured.\n" +
-        "Set YELLOW_JUDGE_PK and YELLOW_FEE_PK in .env\n\n" +
-        "💡 Manager and Influencer wallets connect from the frontend with WAAP.\n" +
-        "See SETUP.md for more details."
-      );
-    }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { privateKeyToAccount } = require('viem/accounts');
+    const judgeAccount = privateKeyToAccount(config.YELLOW_JUDGE_PK);
 
-    serviceInstance = createAppSessionService(
-      wsUrl,
-      judgePk,
-      feePk
-    );
+    instance = new AppSessionService(config.YELLOW_WS_URL, judgeAccount);
   }
 
-  return serviceInstance;
+  return instance;
 }

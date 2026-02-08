@@ -8,8 +8,6 @@ export interface YellowEnvConfig {
   chainId: number;
   custodyAddress: `0x${string}`;
   adjudicatorAddress: `0x${string}`;
-  treasuryPrivateKey: `0x${string}`;
-  treasuryRpcUrl: string;
   faucetUrl: string;
 }
 
@@ -20,18 +18,6 @@ function validateAddress(value: string | undefined, name: string): `0x${string}`
   
   if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
     throw new Error(`${name} must be a valid Ethereum address (0x + 40 hex chars)`);
-  }
-  
-  return value as `0x${string}`;
-}
-
-function validatePrivateKey(value: string | undefined): `0x${string}` {
-  if (!value) {
-    throw new Error("TREASURY_PRIVATE_KEY is required");
-  }
-  
-  if (!/^0x[a-fA-F0-9]{64}$/.test(value)) {
-    throw new Error("TREASURY_PRIVATE_KEY must be a valid private key (0x + 64 hex chars)");
   }
   
   return value as `0x${string}`;
@@ -81,8 +67,6 @@ export function loadYellowEnv(): YellowEnvConfig {
       process.env.YELLOW_ADJUDICATOR_ADDRESS,
       "YELLOW_ADJUDICATOR_ADDRESS"
     ),
-    treasuryPrivateKey: validatePrivateKey(process.env.TREASURY_PRIVATE_KEY),
-    treasuryRpcUrl: validateUrl(process.env.TREASURY_RPC_URL, "TREASURY_RPC_URL"),
     faucetUrl: validateUrl(
       process.env.YELLOW_FAUCET_URL || "https://clearnet-sandbox.yellow.com/faucet/requestTokens",
       "YELLOW_FAUCET_URL"

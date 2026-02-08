@@ -30,8 +30,9 @@ export async function POST(request: NextRequest) {
       },
       message: `Payout applied: ${input.earnedUsdc} earned, ${input.feeBps} BPS fee`,
     });
-  } catch (error: any) {
-    console.error("[API] /api/yellow/app-sessions/payout error:", error);
+  } catch (error) {
+    const err = error as Error;
+    console.error("[API] /api/yellow/app-sessions/payout error:", err);
 
     if (error instanceof ZodError) {
       return NextResponse.json(
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
         ok: false,
         error: {
           code: "PAYOUT_ERROR",
-          message: error.message || "Failed to apply payout",
+          message: err.message || "Failed to apply payout",
         },
       },
       { status: 500 }

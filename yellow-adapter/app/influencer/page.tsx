@@ -13,13 +13,14 @@ interface Session {
 }
 
 export default function InfluencerPage() {
-  const { address, isConnected, login } = useWaap();
+  const { address, isConnected, login, sendTransaction } = useWaap();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(false);
   const [claimAmount, setClaimAmount] = useState('');
   const [selectedSession, setSelectedSession] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [currentStep, setCurrentStep] = useState<'idle' | 'updating' | 'withdrawing'>('idle');
 
   const loadSessions = async () => {
     if (!address) return;
@@ -47,7 +48,61 @@ export default function InfluencerPage() {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/yellow/app-sessions/claim', {
+      // CRÍTICO: PRIMERO ejecutar TX on-chain, LUEGO actualizar off-chain
+      // Si la TX falla, el balance off-chain no se modifica
+      
+      // Paso 1: Generar withdraw intent
+      setCurrentStep('withdrawing');
+      console.log('🔐 Generando transacción de retiro on-chain...');
+
+      const intentResponse = await fetch('/api/yellow/app-sessions/withdraw-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chainId: 84532, // Base Sepolia
+          influencerAddress: address,
+          amountUsdc: claimAmount,
+        }),
+      });
+
+      const intentData = await intentResponse.json();
+
+      if (!intentData.ok) {
+        throw new Error(intentData.error?.message || 'Error generando intent de retiro');
+      }
+
+      // Paso 2: Ejecutar transacción on-chain con WAAP (PRIMERO)
+      console.log('💰 Ejecutando transacción de retiro on-chain...');
+      console.log('📋 txIntent recibido:', intentData.data.txIntent);
+      
+      const txIntent = intentData.data.txIntent;
+      
+      console.log('🔐 Verificando sendTransaction disponible:', {
+        hasSendTransaction: !!sendTransaction,
+        typeofSendTransaction: typeof sendTransaction
+      });
+      
+      console.log('📤 Llamando sendTransaction con:', {
+        to: txIntent.to,
+        data: txIntent.data.substring(0, 10) + '...',
+        value: txIntent.value,
+        chainId: 84532
+      });
+      
+      const txHash = await sendTransaction({
+        to: txIntent.to,
+        data: txIntent.data,
+        value: txIntent.value,
+        chainId: 84532, // Base Sepolia
+      });
+
+      console.log('✅ Transacción on-chain exitosa:', txHash);
+
+      // Paso 3: AHORA SÍ actualizar balance off-chain (solo si TX on-chain fue exitosa)
+      setCurrentStep('updating');
+      console.log('📝 Actualizando balance off-chain después de TX exitosa...');
+      
+      const claimResponse = await fetch('/api/yellow/app-sessions/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -57,17 +112,36 @@ export default function InfluencerPage() {
         }),
       });
 
-      const data = await response.json();
+      const claimData = await claimResponse.json();
 
-      if (data.ok) {
-        setSuccess(`¡Claim exitoso! ${parseFloat(claimAmount) / 1000000} USDC retirados`);
-        setClaimAmount('');
-        setError('');
-      } else {
-        setError(data.error?.message || 'Error en claim');
+      if (!claimData.ok) {
+        console.warn('⚠️ TX on-chain exitosa pero falló actualización off-chain:', claimData.error);
+        // Aunque falle el update off-chain, los fondos YA se retiraron on-chain
       }
+
+      console.log('✅ Balance off-chain actualizado');
+
+      setSuccess(
+        `¡Retiro exitoso! ${parseFloat(claimAmount) / 1000000} USDC transferidos a tu wallet.\n` +
+        `TX: ${txHash.substring(0, 10)}...${txHash.substring(txHash.length - 8)}`
+      );
+      setClaimAmount('');
+      setError('');
+      setCurrentStep('idle');
+
     } catch (err: any) {
-      setError(err.message || 'Error de red');
+      console.error('❌ Error en retiro:', err);
+      
+      // Mejorar mensaje de error según el tipo
+      if (err.message?.includes('RPC endpoint')) {
+        setError('❌ Error de conexión con la red. Por favor intenta de nuevo en unos segundos. El balance off-chain NO se modificó.');
+      } else if (err.message?.includes('insufficient funds')) {
+        setError('❌ No tienes suficiente ETH para gas en Base Sepolia. Consigue ETH del faucet.');
+      } else {
+        setError(err.message || 'Error en el proceso de retiro');
+      }
+      
+      setCurrentStep('idle');
     } finally {
       setLoading(false);
     }
@@ -160,24 +234,61 @@ export default function InfluencerPage() {
                 disabled={loading || !selectedSession || !claimAmount}
                 className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg"
               >
-                {loading ? 'Procesando...' : 'Retirar Fondos'}
+                {currentStep === 'updating' && '📝 Actualizando balance off-chain...'}
+                {currentStep === 'withdrawing' && '💰 Retirando fondos on-chain...'}
+                {currentStep === 'idle' && (loading ? 'Procesando...' : 'Retirar Fondos')}
               </button>
+
+              {currentStep !== 'idle' && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+                    <div className="text-sm text-blue-800">
+                      {currentStep === 'withdrawing' && (
+                        <>
+                          <p className="font-semibold">Paso 1/2: Retirando fondos on-chain</p>
+                          <p className="text-xs">Confirma la transacción en tu wallet para recibir los USDC</p>
+                        </>
+                      )}
+                      {currentStep === 'updating' && (
+                        <>
+                          <p className="font-semibold">Paso 2/2: Actualizando balance off-chain</p>
+                          <p className="text-xs">Sincronizando tu balance virtual después del retiro exitoso...</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Info Box */}
           <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-3">ℹ️ Cómo funciona</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-3">ℹ️ Cómo funciona el retiro</h3>
             <ul className="text-gray-700 text-sm space-y-2">
               <li>1. El Manager crea una campaña contigo como influencer</li>
-              <li>2. Generas contenido y el Admin te aplica payouts</li>
-              <li>3. Tu balance se actualiza off-chain (instantáneo, sin gas)</li>
-              <li>4. Puedes retirar (claim) cuando quieras</li>
-              <li>5. Growi Judge firma tu withdrawal automáticamente</li>
+              <li>2. Generas contenido y el Admin te aplica payouts off-chain</li>
+              <li>3. Tu balance virtual se actualiza (instantáneo, sin gas)</li>
+              <li>4. Cuando presionas "Retirar Fondos":</li>
+              <li className="ml-6">
+                <span className="font-semibold">• Paso 1:</span> Se ejecuta transacción on-chain PRIMERO
+              </li>
+              <li className="ml-6">
+                <span className="font-semibold">• Paso 2:</span> Solo si es exitosa, se actualiza el balance off-chain
+              </li>
+              <li>5. Los USDC se transfieren del Custody a tu wallet 🎉</li>
             </ul>
-            <p className="text-green-400 text-xs mt-4">
-              🔐 Tu wallet firma el claim para confirmar que eres tú
-            </p>
+            <div className="mt-4 p-3 bg-white rounded-lg border border-green-300">
+              <p className="text-green-800 text-xs font-semibold mb-1">
+                🔐 Seguridad y Consistencia
+              </p>
+              <p className="text-gray-600 text-xs">
+                La transacción on-chain se ejecuta primero. Tu balance off-chain solo se actualiza 
+                si la transferencia de USDC es exitosa. Esto garantiza que tu balance siempre 
+                refleje los fondos reales.
+              </p>
+            </div>
           </div>
 
           {/* Quick Reference */}

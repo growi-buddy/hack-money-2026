@@ -30,8 +30,9 @@ export async function POST(request: NextRequest) {
       },
       message: `Claim executed: ${input.amountUsdc} withdrawn by ${input.participant}`,
     });
-  } catch (error: any) {
-    console.error("[API] /api/yellow/app-sessions/claim error:", error);
+  } catch (error) {
+    const err = error as Error;
+    console.error("[API] /api/yellow/app-sessions/claim error:", err);
 
     if (error instanceof ZodError) {
       return NextResponse.json(
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
         ok: false,
         error: {
           code: "CLAIM_ERROR",
-          message: error.message || "Failed to execute claim",
+          message: err.message || "Failed to execute claim",
         },
       },
       { status: 500 }

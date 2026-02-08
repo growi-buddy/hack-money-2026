@@ -105,7 +105,10 @@ export async function POST(request: NextRequest) {
       abi: CUSTODY_ABI,
       functionName: "close",
       args: [
-        closeData.channel,
+        {
+          ...closeData.channel,
+          challenge: Number(closeData.channel.challenge),
+        },
         closeData.state,
         signatures,
       ],
