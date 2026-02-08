@@ -102,7 +102,8 @@ export type SiteEventType = (typeof SiteEventType)[keyof typeof SiteEventType]
 export const SelectorEventType: {
   ONCLICK: 'ONCLICK',
   HOVER: 'HOVER',
-  DOUBLE_CLICK: 'DOUBLE_CLICK'
+  DOUBLE_CLICK: 'DOUBLE_CLICK',
+  VISIT: 'VISIT'
 };
 
 export type SelectorEventType = (typeof SelectorEventType)[keyof typeof SelectorEventType]

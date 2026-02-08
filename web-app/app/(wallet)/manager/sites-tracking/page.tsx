@@ -203,11 +203,11 @@ export default function RewardEventsPage() {
             className="border-growi-blue/50 text-growi-blue hover:bg-growi-blue/10 bg-transparent"
           >
             <Plus className="mr-2 h-4 w-4" />
-            New Site
+            Add Site
           </Button>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage your site event templates for campaigns
+          Manage your site events templates for campaigns
         </p>
       </div>
       
@@ -227,7 +227,7 @@ export default function RewardEventsPage() {
       
       <ErrorCard error={error} />
       
-      <LoadingCard userRole="manager" />
+      {loading && <LoadingCard userRole="manager" />}
       
       {!loading && sites.length > 0 && (
         <motion.div
@@ -396,7 +396,7 @@ export default function RewardEventsPage() {
               </motion.div>
               <h3 className="text-xl font-bold text-foreground">No Site Events Tracking Yet</h3>
               <p className="mt-3 max-w-md text-muted-foreground">
-                Create a site to start
+                Add a site to start
               </p>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="mt-6">
                 <Button
@@ -405,7 +405,7 @@ export default function RewardEventsPage() {
                   onClick={() => setUpsertSite(EMPTY_SITE)}
                 >
                   <Plus className="mr-2 h-5 w-5" />
-                  Create SIte
+                  Add Site
                 </Button>
               </motion.div>
             </CardContent>

@@ -1,4 +1,4 @@
-import { SelectorEventType, SiteEventType } from '@/lib/db/enums';
+import { ParticipationStatus, SelectorEventType, SiteEventType } from '@/lib/db/enums';
 
 export const SITE_EVENT_FUNNEL_COLOR: Record<SiteEventType, string> = {
   [SiteEventType.LANDING_PAGE_VIEW]: '#4A90E2',
@@ -21,7 +21,7 @@ export const SITE_EVENT_TYPE_LABELS: Record<SiteEventType, string> = {
   [SiteEventType.VIEW_ITEM]: 'View Item',
   [SiteEventType.ADD_TO_CART]: 'Add to Cart',
   [SiteEventType.CHECKOUT]: 'Checkout',
-  [SiteEventType.PURCHASE_SUCCESS]: 'Purchase Success',
+  [SiteEventType.PURCHASE_SUCCESS]: 'Purchase',
 };
 
 export const SITE_EVENT_TYPE_SHORT_LABELS: Record<SiteEventType, string> = {
@@ -36,4 +36,11 @@ export const SELECTOR_SITE_EVENT_TYPE_LABELS: Record<SelectorEventType, string> 
   [SelectorEventType.ONCLICK]: 'Click',
   [SelectorEventType.HOVER]: 'Hover',
   [SelectorEventType.DOUBLE_CLICK]: 'Double Click',
+};
+
+export const PARTICIPATION_STATUS: Record<ParticipationStatus, string> = {
+  [ParticipationStatus.APPLY_PENDING]: 'Apply Pending',
+  [ParticipationStatus.INVITATION_SENT]: 'Invitation Sent',
+  [ParticipationStatus.ACCEPTED]: 'Accepted',
+  [ParticipationStatus.REJECTED]: 'Rejected',
 };

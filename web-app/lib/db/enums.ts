@@ -14,6 +14,7 @@ export const SelectorEventType = {
   ONCLICK: 'ONCLICK',
   HOVER: 'HOVER',
   DOUBLE_CLICK: 'DOUBLE_CLICK',
+  VISIT: 'VISIT',
 } as const;
 
 export type SelectorEventType = (typeof SelectorEventType)[keyof typeof SelectorEventType];

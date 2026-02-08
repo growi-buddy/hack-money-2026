@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWallet } from '@/contexts/wallet-context';
 import { useUsers } from '@/hooks/use-users';
 import { staggerContainer, staggerItem } from '@/lib/animations';
+import { PARTICIPATION_STATUS } from '@/lib/constants';
 import { CampaignStatus } from '@/lib/db/enums';
 import { ApiDataResponse, ApiListResponse, CampaignFiltersResponse, CampaignResponseDTO } from '@/types';
 import { motion } from 'framer-motion';
@@ -552,7 +553,7 @@ function CampaignCard({ campaign }: { campaign: CampaignResponseDTO }) {
               <CampaignStatusBadge status={campaign.status} />
               {participation ? (
                 <Badge className="bg-growi-success text-white hover:bg-growi-success/90">
-                  {participation.status}
+                  {PARTICIPATION_STATUS[participation.status]}
                 </Badge>
               ) : (
                 <Badge className="bg-growi-blue/90 text-white hover:bg-growi-blue">
