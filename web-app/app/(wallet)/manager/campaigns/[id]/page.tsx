@@ -1,6 +1,7 @@
 'use client';
 
 import { CampaignCompleteCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignCompleteCard';
+import { CampaignInfluencersCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignInfluencersCard';
 import { CampaignInfoCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignInfoCard';
 import { CampaignLiveEventsCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignLiveEventsCard';
 import { CampaignMetricsCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignMetricsCard';
@@ -172,6 +173,10 @@ export default function CampaignDashboardPage() {
         <CampaignMetricsCard campaign={campaign} />
       )}
       
+      {(campaign.status === CampaignStatus.PUBLISHED || campaign.status === CampaignStatus.ACTIVE) && (
+        <CampaignInfluencersCard campaign={campaign} />
+      )}
+      
       {campaign.status === CampaignStatus.ACTIVE && <CampaignLiveEventsCard campaign={campaign} />}
       
       <Dialog open={showPublishModal} onOpenChange={setShowPublishModal}>
@@ -210,14 +215,13 @@ export default function CampaignDashboardPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 mt-0.5 text-orange-500 flex-shrink-0" />
-                      <span>Influencers can start joining and participating</span>
+                      <span>Influencers will be able to apply</span>
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
             
-            {/* Campaign Info */}
             <div className="rounded-lg border border-border bg-secondary/30 p-4">
               <h4 className="font-medium text-foreground mb-2">{campaign.title}</h4>
               <div className="grid grid-cols-2 gap-2 text-sm">
@@ -232,7 +236,6 @@ export default function CampaignDashboardPage() {
               </div>
             </div>
             
-            {/* Action Buttons */}
             <div className="flex gap-2">
               <Button
                 variant="outline"

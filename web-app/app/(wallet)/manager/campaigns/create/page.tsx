@@ -3,9 +3,11 @@
 import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { InterestTag } from '@/components/ui/interest-tag';
 import { Label } from '@/components/ui/label';
 import { LoadingCard } from '@/components/ui/loading-card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { TargetAudienceTag } from '@/components/ui/target-audience-tag';
 import { useWallet } from '@/contexts/wallet-context';
 import { mapCampaignFormToAPI, validateCampaignForm } from '@/helpers/campaign-mapper';
 import { useSites } from '@/hooks';
@@ -513,8 +515,10 @@ export default function CreateCampaignPage() {
                     <label className="text-xs font-medium text-muted-foreground mb-2 block">Interests</label>
                     <div className="flex flex-wrap gap-1.5">
                       {[ ...new Set([ ...INTEREST_OPTIONS, ...(campaignData?.interests || []) ]) ].map((interest) => (
-                        <button
+                        <InterestTag
                           key={interest}
+                          label={interest}
+                          variant={campaignData.interests?.includes(interest) ? 'selected' : 'default'}
                           onClick={() =>
                             setCampaignData((prev) => ({
                               ...prev,
@@ -523,14 +527,7 @@ export default function CreateCampaignPage() {
                                 : [ ...(prev.interests || []), interest ],
                             }))
                           }
-                          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
-                            campaignData.interests?.includes(interest)
-                              ? 'bg-pink-500/20 text-pink-600 border border-pink-500/30'
-                              : 'bg-secondary text-muted-foreground hover:bg-secondary/80 border border-border'
-                          }`}
-                        >
-                          {interest}
-                        </button>
+                        />
                       ))}
                     </div>
                   </div>
@@ -539,7 +536,7 @@ export default function CreateCampaignPage() {
                     <label className="text-xs font-medium text-muted-foreground mb-2 block">Target Audience</label>
                     <div className="flex flex-wrap gap-1.5">
                       {[ ...new Set([ ...AUDIENCE_DEMOGRAPHIC_OPTIONS, ...(campaignData.demographics || []) ]) ].map((demo) => (
-                        <button
+                        <TargetAudienceTag
                           key={demo}
                           onClick={() => {
                             const current = campaignData.demographics || [];
@@ -548,14 +545,9 @@ export default function CreateCampaignPage() {
                               demographics: current.includes(demo) ? current.filter((d) => d !== demo) : [ ...current, demo ],
                             }));
                           }}
-                          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
-                            campaignData.demographics?.includes(demo)
-                              ? 'bg-purple-500/20 text-purple-600 border border-purple-500/30'
-                              : 'bg-secondary text-muted-foreground hover:bg-secondary/80 border border-border'
-                          }`}
-                        >
-                          {demo}
-                        </button>
+                          label={demo}
+                          variant={campaignData.demographics?.includes(demo) ? 'selected' : 'default'}
+                        />
                       ))}
                     </div>
                   </div>
@@ -939,9 +931,9 @@ function RewardEventField({
               <input
                 type="number"
                 step="0.001"
-                min="0.001"
-                value={amount || 0.01}
-                onChange={(e) => onAmountChange?.(parseFloat(e.target.value) || 0.01)}
+                min="0"
+                value={amount || 0}
+                onChange={(e) => onAmountChange?.(parseFloat(e.target.value) || 0)}
                 className="w-16 bg-transparent text-sm text-foreground focus:outline-none"
               />
             </div>

@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     
     const validatedData = CreateCampaignDTO.parse(body);
     
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       
       if (validatedData.siteEvents.length > 0) {
         const siteEventIds = validatedData.siteEvents.map(se => se.siteEventId);
@@ -58,9 +58,9 @@ export async function POST(req: Request) {
       });
     });
     
-    const response: ApiDataResponse<true> = {
+    const response: ApiDataResponse<{ id: string }> = {
       success: true,
-      data: true,
+      data: { id: result.id },
     };
     return { response, status: 201 };
   });
