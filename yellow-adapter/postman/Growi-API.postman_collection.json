@@ -1,13 +1,13 @@
 {
   "info": {
-    "name": "Growi API",
-    "_postman_id": "growi-api-v1",
-    "description": "API para Growi Campaign Manager - Sistema de pagos off-chain",
+    "name": "Growi Campaign Manager",
+    "_postman_id": "growi-complete-v2",
+    "description": "API completa para Growi - Sistema de pagos off-chain con Yellow Network",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "1. Health Check",
+      "name": "✅ 1. Health Check",
       "request": {
         "method": "GET",
         "header": [],
@@ -16,12 +16,12 @@
           "host": ["{{baseUrl}}"],
           "path": ["api", "yellow", "health"]
         },
-        "description": "Verifica que el servidor está funcionando correctamente."
+        "description": "✅ Verifica que el servidor está funcionando.\n\n**Esperado:** 200 OK con status healthy"
       },
       "response": []
     },
     {
-      "name": "2. Create Session",
+      "name": "🆕 2. Create Session (Manager)",
       "event": [
         {
           "listen": "test",
@@ -33,6 +33,7 @@
               "    if (response.ok && response.data.appSessionId) {",
               "        pm.environment.set('sessionId', response.data.appSessionId);",
               "        console.log('✅ Session ID guardado:', response.data.appSessionId);",
+              "        console.log('📋 Copia este ID para el siguiente request');",
               "    }",
               "}"
             ],
@@ -57,12 +58,12 @@
           "host": ["{{baseUrl}}"],
           "path": ["api", "yellow", "app-sessions", "create"]
         },
-        "description": "Crea una nueva campaña con presupuesto inicial.\n\n**Budget**: 1,000,000 units = 1 USDC"
+        "description": "🆕 Crea una nueva campaña con presupuesto inicial.\n\n**Manager Address**: Wallet del manager (viene del frontend con WAAP)\n**Influencer Address**: Wallet del influencer\n**Budget**: 1,000,000 units = 1 USDC\n\n⚡ El Session ID se guarda automáticamente en la variable {{sessionId}}"
       },
       "response": []
     },
     {
-      "name": "3. Get Session",
+      "name": "📊 3. Get Session Details",
       "request": {
         "method": "GET",
         "header": [],
@@ -71,12 +72,12 @@
           "host": ["{{baseUrl}}"],
           "path": ["api", "yellow", "app-sessions", "{{sessionId}}"]
         },
-        "description": "Obtiene los detalles de una sesión.\n\nUsa el Session ID guardado del request anterior."
+        "description": "📊 Obtiene los detalles de una sesión.\n\n**Usa el Session ID guardado** del request anterior.\n\n**Response incluye:**\n- Definition (protocol, participants, weights)\n- Allocations (balances actuales)\n- Version (número de actualizaciones)"
       },
       "response": []
     },
     {
-      "name": "4. Apply Payout",
+      "name": "💰 4. Apply Payout (Admin)",
       "request": {
         "method": "POST",
         "header": [
@@ -94,12 +95,12 @@
           "host": ["{{baseUrl}}"],
           "path": ["api", "yellow", "app-sessions", "payout"]
         },
-        "description": "Aplica un payout al influencer.\n\n**Earned**: 250,000 units = 0.25 USDC\n**Fee**: 200 BPS = 2%"
+        "description": "💰 Aplica un payout al influencer.\n\n**Admin ejecuta esto** para mover fondos del Manager al Influencer.\n\n**Earned**: 250,000 units = 0.25 USDC\n**Fee**: 200 BPS = 2%\n\n**Cálculo:**\n- Fee = (250,000 × 200) / 10,000 = 5,000 units\n- Total = 255,000 units\n- Manager pierde: 255,000\n- Influencer gana: 250,000\n- Fee Treasury gana: 5,000\n\n🔐 Growi Judge firma automáticamente (backend)"
       },
       "response": []
     },
     {
-      "name": "5. Claim Funds",
+      "name": "💸 5. Claim Funds (Influencer)",
       "request": {
         "method": "POST",
         "header": [
@@ -117,12 +118,12 @@
           "host": ["{{baseUrl}}"],
           "path": ["api", "yellow", "app-sessions", "claim"]
         },
-        "description": "El influencer retira sus fondos.\n\n**Amount**: 250,000 units = 0.25 USDC"
+        "description": "💸 El influencer retira sus fondos.\n\n**Participant**: Wallet del influencer\n**Amount**: 250,000 units = 0.25 USDC\n\n⚠️ El participant debe tener balance suficiente.\n⚠️ Esto es OFF-CHAIN (virtual, no requiere gas)"
       },
       "response": []
     },
     {
-      "name": "6. Request Faucet",
+      "name": "🚰 6. Request Faucet (Optional)",
       "request": {
         "method": "POST",
         "header": [
@@ -140,7 +141,7 @@
           "host": ["{{baseUrl}}"],
           "path": ["api", "yellow", "faucet"]
         },
-        "description": "Solicita ytest.usd de prueba (solo para transacciones on-chain reales).\n\n**Amount**: 1 ytest.usd = 1,000,000 units"
+        "description": "🚰 Solicita ytest.usd de prueba.\n\n⚠️ SOLO para transacciones on-chain reales.\n⚠️ NO necesario para App Sessions (off-chain).\n\n**Amount**: 1 ytest.usd = 1,000,000 units\n\nPara ETH de gas: https://www.alchemy.com/faucets/base-sepolia"
       },
       "response": []
     }

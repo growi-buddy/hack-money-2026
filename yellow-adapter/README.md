@@ -87,17 +87,25 @@ http://localhost:3000/influencer
 
 ## 🔧 Usar la API (Postman)
 
-### Setup
+### Setup Rápido
 
 ```bash
-# 1. Importar colección
+# 1. Importar en Postman:
 postman/Growi-API.postman_collection.json
-
-# 2. Importar environment
 postman/Growi.postman_environment.json
 
-# 3. Probar
-Collection → "1. Create Session"
+# 2. Activar environment:
+Arriba a la derecha → "Growi Environment"
+
+# 3. Cambiar puerto si es necesario:
+Edit Environment → baseUrl → http://localhost:3002
+
+# 4. Ejecutar en orden:
+✅ 1. Health Check
+🆕 2. Create Session (guarda Session ID automático)
+📊 3. Get Session Details
+💰 4. Apply Payout
+💸 5. Claim Funds
 ```
 
 ### Endpoints Principales

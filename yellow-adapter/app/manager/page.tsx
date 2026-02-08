@@ -49,20 +49,20 @@ export default function ManagerPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-300 to-blue-500 bg-clip-text text-transparent mb-2">Manager Dashboard</h1>
-        <p className="text-blue-300">Crea campañas y asigna presupuesto a influencers</p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">Manager Dashboard</h1>
+        <p className="text-gray-600 text-lg">Crea campañas y asigna presupuesto a influencers</p>
       </div>
 
       {!isConnected ? (
-        <div className="bg-blue-900/30 backdrop-blur-sm rounded-xl p-8 border border-blue-700/50 text-center">
-          <svg className="w-16 h-16 text-blue-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl p-8 border border-gray-200 text-center shadow-xl">
+          <svg className="w-16 h-16 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
-          <h3 className="text-xl font-semibold text-white mb-2">Conecta tu wallet</h3>
-          <p className="text-blue-300 mb-6">Necesitas conectar tu wallet para crear campañas</p>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Conecta tu wallet</h3>
+          <p className="text-gray-600 mb-6">Necesitas conectar tu wallet para crear campañas</p>
           <button
             onClick={login}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white px-8 py-3 rounded-lg font-semibold transition-all shadow-lg shadow-blue-500/50"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all shadow-lg"
           >
             Connect Wallet
           </button>
@@ -70,22 +70,22 @@ export default function ManagerPage() {
       ) : (
         <div className="space-y-6">
           {/* Wallet Info */}
-          <div className="bg-blue-900/30 backdrop-blur-sm rounded-xl p-6 border border-blue-700/50">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 border border-gray-200 shadow-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-400">Tu wallet (Manager)</p>
-                <p className="text-white font-mono text-sm">{address}</p>
+                <p className="text-sm font-medium text-gray-500">Tu wallet (Manager)</p>
+                <p className="text-gray-900 font-mono text-sm mt-1">{address}</p>
               </div>
             </div>
           </div>
 
           {/* Create Session Form */}
-          <div className="bg-blue-900/30 backdrop-blur-sm rounded-xl p-6 border border-blue-700/50">
-            <h2 className="text-2xl font-bold text-white mb-6">Crear Nueva Campaña</h2>
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 border border-gray-200 shadow-lg">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Crear Nueva Campaña</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-blue-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Influencer Address
                 </label>
                 <input
@@ -93,15 +93,15 @@ export default function ManagerPage() {
                   value={influencerAddress}
                   onChange={(e) => setInfluencerAddress(e.target.value)}
                   placeholder="0x..."
-                  className="w-full bg-blue-950/50 border border-blue-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
+                  className="w-full bg-white border-2 border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                 />
-                <p className="text-xs text-blue-400/70 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Address de la wallet del influencer que recibirá payouts
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-blue-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Budget (USDC units)
                 </label>
                 <input
@@ -109,9 +109,9 @@ export default function ManagerPage() {
                   value={budgetUsdc}
                   onChange={(e) => setBudgetUsdc(e.target.value)}
                   placeholder="1000000"
-                  className="w-full bg-blue-950/50 border border-blue-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
+                  className="w-full bg-white border-2 border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                 />
-                <p className="text-xs text-blue-400/70 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   1 USDC = 1,000,000 units | Ejemplo: 1000000 = 1 USDC
                 </p>
               </div>
@@ -125,7 +125,7 @@ export default function ManagerPage() {
               <button
                 onClick={handleCreateSession}
                 disabled={loading || !influencerAddress}
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-all shadow-lg shadow-blue-500/50"
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-all shadow-lg"
               >
                 {loading ? 'Creando...' : 'Crear Campaña'}
               </button>
@@ -152,9 +152,9 @@ export default function ManagerPage() {
           )}
 
           {/* Info Box */}
-          <div className="bg-blue-900/20 backdrop-blur-sm border border-blue-700/50 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-blue-300 mb-3">ℹ️ Cómo funciona</h3>
-            <ul className="text-blue-200 text-sm space-y-2">
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-3">ℹ️ Cómo funciona</h3>
+            <ul className="text-gray-700 text-sm space-y-2">
               <li>1. Conectas tu wallet (Manager)</li>
               <li>2. Ingresas el address del Influencer</li>
               <li>3. Defines el budget virtual (off-chain)</li>
@@ -162,7 +162,7 @@ export default function ManagerPage() {
               <li>5. El Admin puede aplicar payouts al influencer</li>
               <li>6. El influencer puede hacer claim cuando quiera</li>
             </ul>
-            <p className="text-blue-400 text-xs mt-4">
+            <p className="text-gray-600 text-xs mt-4 font-medium">
               🔐 Tu wallet NO se usa para firmar ahora, solo para identificarte como Manager
             </p>
           </div>

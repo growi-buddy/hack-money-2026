@@ -1,152 +1,102 @@
-# 📮 Postman Collections
+# 📮 Postman - Guía Rápida
 
-Colecciones de Postman para probar la API de Growi.
-
----
-
-## 📥 Importar
-
-### 1. Abrir Postman
-
-### 2. Importar Colección
-
-```
-File → Import → Seleccionar:
-postman/Growi-API.postman_collection.json
-```
-
-### 3. Importar Environment
-
-```
-File → Import → Seleccionar:
-postman/Growi.postman_environment.json
-```
-
-### 4. Activar Environment
-
-```
-En Postman, arriba a la derecha:
-"No Environment" → Seleccionar "Growi Environment"
-```
+Colección actualizada para probar Growi Campaign Manager.
 
 ---
 
-## 🚀 Probar Endpoints
+## 🚀 Setup (2 minutos)
 
-### Orden Recomendado
+### 1. Importar Archivos
+
+En Postman:
 
 ```
-1. Health Check      → Verifica servidor
-2. Create Session    → Crea campaña (guarda Session ID automáticamente)
-3. Get Session       → Ve detalles de la sesión
-4. Apply Payout      → Aplica earnings al influencer
-5. Claim Funds       → Influencer retira fondos
+Import → Seleccionar archivos:
+✅ Growi-API.postman_collection.json
+✅ Growi.postman_environment.json
 ```
 
-### Variables
+### 2. Activar Environment
 
-El environment tiene variables pre-configuradas:
+```
+Arriba a la derecha:
+"No Environment" → "Growi Environment" ✓
+```
+
+### 3. Cambiar Puerto (si es necesario)
+
+Si tu servidor corre en otro puerto:
+
+```
+Environments → Growi Environment → Edit
+baseUrl: http://localhost:3002 (o el puerto que uses)
+```
+
+---
+
+## 🎯 Probar (5 minutos)
+
+### Ejecutar en orden:
+
+```
+✅ 1. Health Check          → Verifica servidor
+🆕 2. Create Session        → Crea campaña (guarda Session ID auto)
+📊 3. Get Session Details   → Ve balances actuales
+💰 4. Apply Payout          → Admin aplica earnings
+💸 5. Claim Funds           → Influencer retira fondos
+```
+
+### Expected Flow:
+
+```
+1. Health Check
+   Response: { "ok": true, "status": "healthy" }
+
+2. Create Session
+   Request: Manager + Influencer addresses, budget
+   Response: { "ok": true, "data": { "appSessionId": "session_..." } }
+   ✅ Session ID se guarda automáticamente
+
+3. Get Session
+   Request: usa {{sessionId}}
+   Response: Allocations actuales
+
+4. Apply Payout
+   Request: earnedUsdc + feeBps
+   Response: Allocations actualizadas (version++)
+
+5. Claim Funds
+   Request: participant + amountUsdc
+   Response: Allocations finales (influencer balance = 0)
+```
+
+---
+
+## 🔧 Variables Configuradas
 
 | Variable | Valor | Descripción |
 |----------|-------|-------------|
-| `baseUrl` | `http://localhost:3000` | URL del servidor |
+| `baseUrl` | `http://localhost:3000` | URL servidor |
 | `sessionId` | (auto) | Se guarda automáticamente |
-| `managerAddress` | `0x742d...` | Wallet del manager |
-| `influencerAddress` | `0x7099...` | Wallet del influencer |
-| `budget` | `1000000` | 1 USDC |
+| `managerAddress` | `0x742d...` | Hardhat account #0 |
+| `influencerAddress` | `0x7099...` | Hardhat account #1 |
+| `budget` | `1000000` | 1 USDC = 1M units |
 | `earnedAmount` | `250000` | 0.25 USDC |
 | `claimAmount` | `250000` | 0.25 USDC |
-| `feeBps` | `200` | 2% |
-
----
-
-## 🔄 Flujo Completo
-
-### 1. Health Check
-
-```
-GET /api/yellow/health
-```
-
-Verifica que el servidor funciona.
-
-### 2. Create Session
-
-```
-POST /api/yellow/app-sessions/create
-
-Body:
-{
-  "budgetUsdc": "1000000",
-  "managerAddress": "0x742d35...",
-  "influencerAddress": "0x70997..."
-}
-```
-
-**El Session ID se guarda automáticamente** en la variable `{{sessionId}}`.
-
-### 3. Get Session
-
-```
-GET /api/yellow/app-sessions/{{sessionId}}
-```
-
-Ve los detalles y allocations de la sesión.
-
-### 4. Apply Payout
-
-```
-POST /api/yellow/app-sessions/payout
-
-Body:
-{
-  "appSessionId": "{{sessionId}}",
-  "earnedUsdc": "250000",
-  "feeBps": 200
-}
-```
-
-Mueve fondos de Manager a Influencer (+ fee).
-
-### 5. Claim Funds
-
-```
-POST /api/yellow/app-sessions/claim
-
-Body:
-{
-  "appSessionId": "{{sessionId}}",
-  "participant": "{{influencerAddress}}",
-  "amountUsdc": "250000"
-}
-```
-
-Influencer retira sus fondos.
-
----
-
-## 🧪 Testing
+| `feeBps` | `200` | 2% fee |
 
 ### Cambiar Valores
 
-Para probar diferentes escenarios, edita las variables del environment:
+Para probar diferentes escenarios:
 
 ```
-Click en "Growi Environment" → Edit
+Environments → Growi Environment → Edit
 
-Cambia:
+Ejemplos:
 - budget: "2000000" (2 USDC)
 - earnedAmount: "500000" (0.5 USDC)
 - feeBps: "500" (5%)
 ```
-
-### Múltiples Sesiones
-
-Para crear varias sesiones:
-
-1. Run "Create Session" → Copia el nuevo Session ID
-2. Edita variable `sessionId` manualmente
-3. Run "Apply Payout" / "Claim Funds"
 
 ---
 
@@ -154,34 +104,198 @@ Para crear varias sesiones:
 
 ### Auto-Save Session ID
 
-El request "Create Session" tiene un script que guarda automáticamente el Session ID:
+El request "Create Session" guarda automáticamente el Session ID:
 
 ```javascript
-// En Tests tab del request:
+// Ya está configurado en Tests tab:
 if (pm.response.code === 200) {
-    const response = pm.response.json();
     pm.environment.set('sessionId', response.data.appSessionId);
 }
 ```
 
 ### Ver Console
 
-Para ver logs:
+Para ver los logs:
+
 ```
-View → Show Postman Console (Ctrl+Alt+C)
+View → Show Postman Console (Ctrl+Alt+C o Cmd+Alt+C)
 ```
 
-### Cambiar Puerto
+### Múltiples Sesiones
 
-Si tu servidor corre en otro puerto:
+Para crear varias campañas:
+
 ```
-Edit Environment → baseUrl → http://localhost:3001
+1. Run "Create Session" → Nota el nuevo Session ID
+2. Environments → Edit → sessionId → Pega el nuevo ID
+3. Run los demás requests con el nuevo ID
 ```
+
+### Verificar Balances
+
+Después de cada operación:
+
+```
+Run "Get Session Details" para ver allocations actualizadas
+```
+
+---
+
+## 📊 Conversión Rápida
+
+```
+USDC → Units (multiplicar × 1,000,000)
+0.1 USDC   = 100,000
+0.25 USDC  = 250,000
+0.5 USDC   = 500,000
+1 USDC     = 1,000,000
+10 USDC    = 10,000,000
+
+Units → USDC (dividir ÷ 1,000,000)
+250,000 units    = 0.25 USDC
+1,000,000 units  = 1 USDC
+```
+
+---
+
+## 🔢 Cálculo de Fees
+
+```
+Fee (BPS) → Porcentaje
+100 BPS = 1%
+200 BPS = 2%
+500 BPS = 5%
+1000 BPS = 10%
+
+Formula:
+fee = (amount × feeBps) / 10,000
+
+Ejemplo:
+amount = 250,000 units
+feeBps = 200 (2%)
+fee = (250,000 × 200) / 10,000 = 5,000 units
+```
+
+---
+
+## 🧪 Ejemplo Completo
+
+### Escenario: Manager paga 0.25 USDC al Influencer
+
+```
+1. CREATE SESSION
+   Manager: 1 USDC (1,000,000 units)
+   Influencer: 0 USDC
+
+2. APPLY PAYOUT
+   Earned: 0.25 USDC (250,000 units)
+   Fee: 2% (200 BPS) = 0.005 USDC (5,000 units)
+   
+   Resultado:
+   Manager: 0.745 USDC (745,000 units)
+   Influencer: 0.25 USDC (250,000 units)
+   Fee: 0.005 USDC (5,000 units)
+
+3. CLAIM FUNDS
+   Influencer retira: 0.25 USDC (250,000 units)
+   
+   Resultado:
+   Manager: 0.745 USDC
+   Influencer: 0 USDC ✅
+   Fee: 0.005 USDC
+```
+
+---
+
+## ⚠️ OFF-CHAIN (Virtual)
+
+**IMPORTANTE:** Estos endpoints son **OFF-CHAIN**.
+
+```
+✓ Sin gas fees
+✓ Instantáneo
+✓ No requiere fondos reales
+✗ No hay transacciones en blockchain
+✗ No se abre MetaMask
+```
+
+Es perfecto para:
+- Testing rápido
+- MVP sin costos
+- Prototipar UX
+
+Para transacciones reales on-chain, ver: `ONCHAIN_VS_OFFCHAIN.md`
+
+---
+
+## 🐛 Troubleshooting
+
+### Error 400: Validation Error
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "VALIDATION_ERROR"
+  }
+}
+```
+
+**Solución:** Revisar que:
+- `budgetUsdc` sea string numérico
+- Addresses sean formato 0x... (40 hex chars)
+- Session ID sea correcto
+
+### Error 404: Session Not Found
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "SESSION_NOT_FOUND"
+  }
+}
+```
+
+**Solución:** 
+- Verificar que Session ID sea correcto
+- Ejecutar "Create Session" primero
+
+### Error 500: Platform Wallets Not Configured
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "SERVER_ERROR",
+    "message": "Platform wallets not configured..."
+  }
+}
+```
+
+**Solución:** 
+- Revisar que `.env` tenga `YELLOW_JUDGE_PK` y `YELLOW_FEE_PK`
+- Reiniciar servidor: `npm run dev`
+
+### Error 400: Insufficient Balance
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "INSUFFICIENT_BALANCE"
+  }
+}
+```
+
+**Solución:** 
+- Manager no tiene suficiente balance
+- Reducir `earnedAmount` o crear nueva sesión con más budget
 
 ---
 
 ## 📚 Ver También
 
 - [README.md](../README.md) - Quick Start
-- [API.md](../API.md) - Documentación completa de endpoints
-- [SETUP.md](../SETUP.md) - Configuración del servidor
+- [API.md](../API.md) - Documentación completa
+- [ONCHAIN_VS_OFFCHAIN.md](../ONCHAIN_VS_OFFCHAIN.md) - Virtual vs Real
