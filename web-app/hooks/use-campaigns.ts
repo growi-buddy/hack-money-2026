@@ -1,6 +1,6 @@
 import { useWallet } from '@/contexts/wallet-context';
 import { CampaignStatus } from '@/lib/db/enums';
-import { ApiListResponse, CampaignResponseDTO, UserRoleType } from '@/types';
+import { ApiDataResponse, ApiListResponse, CampaignResponseDTO, UserRoleType } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
 
 export function useCampaigns(statuses: CampaignStatus[], userRole: UserRoleType, isDeleted: boolean, deps?: (number | Date | string)[]) {
@@ -56,6 +56,56 @@ export function useCampaigns(statuses: CampaignStatus[], userRole: UserRoleType,
   return {
     campaigns,
     setCampaigns,
+    isLoading,
+    isRevalidating,
+    error,
+  };
+}
+
+export function useCampaign(campaignId: string, deps?: (number | Date | string)[]) {
+  
+  const { address } = useWallet();
+  const [ campaign, setCampaign ] = useState<CampaignResponseDTO | null>(null);
+  const [ isLoading, setIsLoading ] = useState(true);
+  const [ isRevalidating, setIsRevalidating ] = useState(false);
+  const [ error, setError ] = useState('');
+  
+  const fetchCampaigns = useCallback(async () => {
+    if (!address) {
+      setCampaign(null);
+      setIsRevalidating(false);
+      return;
+    }
+    
+    try {
+      setIsRevalidating(true);
+      setError('');
+      const response = await fetch(
+        `/api/campaigns/${campaignId}?walletAddress=${address}`,
+      );
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.error?.message || 'Failed to fetch campaigns');
+      }
+      
+      const result: ApiDataResponse<CampaignResponseDTO> = await response.json();
+      setCampaign(result.data);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsRevalidating(false);
+    }
+  }, [ address, campaignId ]);
+  
+  const depsString = JSON.stringify(deps);
+  useEffect(() => {
+    void fetchCampaigns();
+  }, [ fetchCampaigns, depsString ]);
+  
+  return {
+    campaign,
+    setCampaign,
     isLoading,
     isRevalidating,
     error,

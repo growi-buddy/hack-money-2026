@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
 import { LoadingCard } from '@/components/ui/loading-card';
+import { ParticipationStatusBadge } from '@/components/ui/participation-status-badge';
+import { useWallet } from '@/contexts/wallet-context';
 import { groupTrackedEventsByType } from '@/helpers/campaigns';
 import { useCampaigns } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
@@ -62,8 +64,9 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
     setCampaigns,
     isLoading,
     error: campaignsError,
-  } = useCampaigns(userRole === 'influencer' ? [ CampaignStatus.ACTIVE, CampaignStatus.DEPLETED ] : [ CampaignStatus.ACTIVE, CampaignStatus.PUBLISHED, CampaignStatus.DEPLETED ], userRole, false, deps);
+  } = useCampaigns([ CampaignStatus.ACTIVE, CampaignStatus.PUBLISHED, CampaignStatus.DEPLETED ], userRole, false, deps);
   const [ togglingHot, setTogglingHot ] = useState<string | null>(null);
+  const { address } = useWallet();
   
   const handleToggleHot = useCallback(
     async (campaignId: string, isCurrentlyHot: boolean) => {
@@ -147,9 +150,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
               ? Math.round((campaign.budgetSpent / campaign.budgetTotal) * 100)
               : 0;
             
-            const slotsProgress = campaign.slots && campaign.slots > 0
-              ? Math.round((campaign.participants.length / campaign.slots) * 100)
-              : 0;
+            const participation = campaign.participants.find(({ walletAddress }) => walletAddress === address);
             
             return (
               <motion.div key={campaign.id} variants={staggerItem}>
@@ -161,6 +162,9 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
                           <CardTitle className="text-foreground">{campaign.title}</CardTitle>
                         </div>
                         <div className="flex items-center gap-2">
+                          {userRole === 'influencer' && participation && (
+                            <ParticipationStatusBadge status={participation.status} />
+                          )}
                           <CampaignStatusBadge status={campaign.status} />
                           {campaign.status === CampaignStatus.PUBLISHED && userRole === 'manager' && (
                             <button

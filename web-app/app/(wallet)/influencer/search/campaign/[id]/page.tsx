@@ -7,10 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
 import { useWallet } from '@/contexts/wallet-context';
-import { staggerContainer, staggerItem } from '@/lib/animations';
-import { PARTICIPATION_STATUS, SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
+import { PARTICIPATION_STATUS } from '@/lib/constants';
 import { ParticipationStatus, SiteEventType } from '@/lib/db/enums';
-import { CampaignResponseDTO, TrackedSiteEventSummaryResponseDTO } from '@/types';
+import { CampaignResponseDTO } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -138,6 +137,7 @@ export default function CampaignDetailsPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <BackButton href="/influencer/search" label="Back to Search" />
       
+      {/* Status Badges */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -150,7 +150,6 @@ export default function CampaignDetailsPage() {
             HOT
           </Badge>
         )}
-        
         {participant && (
           <Badge className="bg-growi-success/20 text-growi-success">
             <Check className="mr-1 h-3 w-3" />
@@ -161,6 +160,7 @@ export default function CampaignDetailsPage() {
       
       <ErrorCard error={error} />
       
+      {/* Campaign Header Card */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <Card>
           <CardHeader className="border-b border-border">
@@ -174,7 +174,9 @@ export default function CampaignDetailsPage() {
                 />
               </div>
               <div className="flex-1">
-                <CardTitle className="text-2xl text-foreground">{campaign.title}</CardTitle>
+                <CardTitle className="text-2xl text-foreground">
+                  {campaign.title}
+                </CardTitle>
                 <CardDescription className="mt-1">
                   by {campaign.owner.name || campaign.owner.walletAddress.slice(0, 8) + '...'}
                 </CardDescription>
@@ -184,79 +186,50 @@ export default function CampaignDetailsPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
-            <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-6">
-              
-              <CampaignInfoCard campaign={campaign} withoutTitle />
-              
-              <motion.div variants={staggerItem}>
-                <h3 className="mb-3 font-semibold text-foreground">Available Bounties</h3>
-                <div className="space-y-3">
-                  {campaign.sites.reduce((sum, { trackedSiteEventsGroupedByType }) => [ ...sum, ...trackedSiteEventsGroupedByType ], [] as TrackedSiteEventSummaryResponseDTO[]).map(event => {
-                    const Icon = EVENT_TYPE_ICONS[event.siteEventType] || Eye;
-                    return (
-                      <div
-                        key={event.siteEventType}
-                        className="flex items-center gap-4 rounded-lg border border-border bg-secondary/30 p-4"
-                      >
-                        <Icon className="h-5 w-5 text-growi-blue" />
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground">{SITE_EVENT_TYPE_LABELS[event.siteEventType]}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-growi-money">
-                            ${event.amount.toFixed(3)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            per {event.volumeStep} {event.volumeStep === 1 ? 'event' : 'events'}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-              
-              <motion.div variants={staggerItem}>
-                {participant ? null : (campaign.participants.filter(({ status }) => status === ParticipationStatus.ACCEPTED)).length >= campaign.slots ? (
-                  <Button disabled className="w-full">
-                    <Users className="mr-2 h-4 w-4" />
-                    Campaign Full
-                  </Button>
-                ) : (
-                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                    <Button
-                      onClick={handleApply}
-                      disabled={isApplying || !address}
-                      className="relative w-full overflow-hidden bg-growi-blue text-white hover:bg-growi-blue/90"
-                    >
-                      {isApplying ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Applying...
-                        </>
-                      ) : (
-                        <>
-                          <motion.div
-                            className="absolute inset-0 bg-growi-lime/30"
-                            initial={{ x: '-100%' }}
-                            whileHover={{ x: '100%' }}
-                            transition={{ duration: 0.5 }}
-                          />
-                          Apply
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </>
-                      )}
-                    </Button>
-                  </motion.div>
-                )}
-              </motion.div>
-            </motion.div>
-          </CardContent>
         </Card>
       </motion.div>
       
-      {/* Success Modal */}
+      {/* Campaign Info Card */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <CampaignInfoCard campaign={campaign} withoutTitle />
+      </motion.div>
+      
+      {/* Apply Button */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+        {participant ? null : (campaign.participants.filter(({ status }) => status === ParticipationStatus.ACCEPTED)).length >= campaign.slots ? (
+          <Button disabled className="w-full">
+            <Users className="mr-2 h-4 w-4" />
+            Campaign Full
+          </Button>
+        ) : (
+          <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+            <Button
+              onClick={handleApply}
+              disabled={isApplying || !address}
+              className="relative w-full overflow-hidden bg-growi-blue text-white hover:bg-growi-blue/90"
+            >
+              {isApplying ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Applying...
+                </>
+              ) : (
+                <>
+                  <motion.div
+                    className="absolute inset-0 bg-growi-lime/30"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '100%' }}
+                    transition={{ duration: 0.5 }}
+                  />
+                  Apply
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </motion.div>
+        )}
+      </motion.div>
+      
       <AnimatePresence>
         {showSuccess && (
           <motion.div

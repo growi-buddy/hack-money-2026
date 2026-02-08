@@ -75,7 +75,7 @@ export default function EditCampaignPage() {
         
         if (data.data.status !== CampaignStatus.DRAFT) {
           setError('Only campaigns in DRAFT status can be edited');
-          return;
+          // return; // MOCK
         }
         const siteEvents: Required<UpdateCampaignInput>['siteEvents'] = (data.data.sites || [])
           .map(({ siteEvents }) => siteEvents).flat()

@@ -1,47 +1,20 @@
 'use client';
 
+import { CampaignInfoCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignInfoCard';
+import { CampaignLiveEventsCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignLiveEventsCard';
 import { CampaignStatusBadge } from '@/components/campaigns/CampaignStatusBadge';
+import { BackButton } from '@/components/ui/back-button';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ErrorCard } from '@/components/ui/error-card';
+import { useCampaign } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
+import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
 import { animate, AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
-import {
-  ArrowLeft,
-  Calendar,
-  CreditCard,
-  DollarSign,
-  Eye,
-  Flame,
-  Globe,
-  Loader2,
-  Package,
-  ShoppingCart,
-  Tag,
-  TrendingUp,
-  Users,
-  Zap,
-} from 'lucide-react';
-import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { CreditCard, DollarSign, Eye, Flame, Loader2, Package, ShoppingCart, Zap } from 'lucide-react';
+import { use, useEffect, useState } from 'react';
 
-// Types based on InfluencerCampaignView from API
 interface CampaignDetail {
   id: string;
   title: string;
@@ -153,12 +126,12 @@ function CountUpMoney({ value }: { value: number }) {
   return <motion.span>{rounded}</motion.span>;
 }
 
-function formatDate(dateStr: string | null): string {
+function formatDate(dateStr: string | number | null): string {
   if (!dateStr) return 'Not set';
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function getCampaignDuration(startDate: string | null, endDate: string | null): string {
+function getCampaignDuration(startDate: string | number | null, endDate: string | number | null): string {
   if (!startDate || !endDate) return 'Ongoing';
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -171,9 +144,6 @@ function getCampaignDuration(startDate: string | null, endDate: string | null): 
 }
 
 export default function InfluencerCampaignDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const [ campaign, setCampaign ] = useState<CampaignDetail | null>(null);
-  const [ loading, setLoading ] = useState(true);
-  const [ error, setError ] = useState('');
   
   const [ earnings, setEarnings ] = useState(245.67);
   const [ transactions, setTransactions ] = useState<Transaction[]>(initialTransactions);
@@ -185,29 +155,8 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
     purchases: { count: 98, earned: 98.17 },
   });
   
-  const fetchCampaign = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError('');
-      const { id } = await params;
-      const response = await fetch(`/api/campaigns/${id}?view=influencer`);
-      
-      if (!response.ok) {
-        throw new Error('Campaign not found');
-      }
-      
-      const result = await response.json();
-      setCampaign(result.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  }, [ params ]);
-  
-  useEffect(() => {
-    void fetchCampaign();
-  }, [ fetchCampaign ]);
+  const { id } = use(params);
+  const { campaign, error, isLoading } = useCampaign(id);
   
   // Simulate real-time transactions
   useEffect(() => {
@@ -267,28 +216,10 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
     }
   };
   
-  if (loading) {
+  if (isLoading || !campaign) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-  
-  if (error || !campaign) {
-    return (
-      <div className="space-y-4">
-        <Link href="/influencer/campaigns">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Campaigns
-          </Button>
-        </Link>
-        <Card className="border-destructive/50">
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-destructive">{error || 'Campaign not found'}</p>
-          </CardContent>
-        </Card>
       </div>
     );
   }
@@ -298,13 +229,9 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
   
   return (
     <div className="space-y-6">
-      {/* Back Button */}
-      <Link href="/influencer/campaigns">
-        <Button variant="ghost" size="sm" className="text-muted-foreground">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Campaigns
-        </Button>
-      </Link>
+      <BackButton href="/influencer/campaigns" label="ack to Campaigns" />
+      
+      <ErrorCard error={error} />
       
       {/* Campaign Title */}
       <motion.div
@@ -332,136 +259,8 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
         </div>
       </motion.div>
       
-      {/* Campaign Info Card */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-      >
-        <Card className="border-growi-success/30">
-          <CardHeader className="pb-3">
-            {campaign.description && (
-              <p className="text-sm text-muted-foreground">{campaign.description}</p>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Campaign Details Grid */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {/* Dates */}
-              <div className="flex items-start gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Period</p>
-                  <p className="text-sm font-medium text-foreground">
-                    {formatDate(campaign.startDate)} - {formatDate(campaign.endDate)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{getCampaignDuration(campaign.startDate, campaign.endDate)}</p>
-                </div>
-              </div>
-              
-              {/* Influencers */}
-              <div className="flex items-start gap-2">
-                <Users className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Influencers</p>
-                  <p className="text-sm font-medium text-foreground">
-                    {campaign.filledSlots} / {campaign.slots}
-                  </p>
-                  <p className="text-xs text-muted-foreground">slots filled</p>
-                </div>
-              </div>
-              
-              {/* Budget */}
-              <div className="flex items-start gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Budget</p>
-                  <p className="text-sm font-medium text-growi-money">
-                    ${campaign.budgetTotal.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-muted-foreground">total</p>
-                </div>
-              </div>
-              
-              {/* Reward Events */}
-              <div className="flex items-start gap-2">
-                <Zap className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Events</p>
-                  <p className="text-sm font-medium text-foreground">
-                    {campaign.rewardEvents.length}
-                  </p>
-                  <p className="text-xs text-muted-foreground">reward types</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Tags Section */}
-            {hasTags && (
-              <div className="space-y-2 pt-2 border-t border-border">
-                {/* Interests */}
-                {campaign.interests.length > 0 && (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-                    {campaign.interests.map((interest) => (
-                      <Badge
-                        key={interest}
-                        variant="secondary"
-                        className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
-                      >
-                        {interest}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-                
-                {/* Demographics */}
-                {campaign.demographics.length > 0 && (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                    {campaign.demographics.map((demo) => (
-                      <Badge
-                        key={demo}
-                        variant="secondary"
-                        className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
-                      >
-                        {demo}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-                
-                {/* Regions & Countries */}
-                {(campaign.regions.length > 0 || campaign.countries.length > 0) && (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-                    {campaign.regions.map((region) => (
-                      <Badge
-                        key={region}
-                        variant="secondary"
-                        className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
-                      >
-                        {region}
-                      </Badge>
-                    ))}
-                    {campaign.countries.map((country) => (
-                      <Badge
-                        key={country}
-                        variant="secondary"
-                        className="text-[10px] px-1.5 py-0 h-5 bg-muted/50 text-muted-foreground border-transparent"
-                      >
-                        {country}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </motion.div>
+      <CampaignInfoCard campaign={campaign} withoutSiteEvents />
       
-      {/* Earnings Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -513,7 +312,7 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-lg font-bold text-foreground">{metrics.landingViews.count.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Landing Views</p>
+                  <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.LANDING_PAGE_VIEW]}</p>
                 </div>
                 <p className="text-sm font-semibold text-growi-money">${metrics.landingViews.earned.toFixed(2)}</p>
               </div>
@@ -530,7 +329,7 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-lg font-bold text-foreground">{metrics.viewItems.count.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">View Items</p>
+                  <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.VIEW_ITEM]}</p>
                 </div>
                 <p className="text-sm font-semibold text-growi-money">${metrics.viewItems.earned.toFixed(2)}</p>
               </div>
@@ -547,7 +346,7 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-lg font-bold text-foreground">{metrics.addToCart.count.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Add to Cart</p>
+                  <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.ADD_TO_CART]}</p>
                 </div>
                 <p className="text-sm font-semibold text-growi-money">${metrics.addToCart.earned.toFixed(2)}</p>
               </div>
@@ -564,7 +363,7 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-lg font-bold text-foreground">{metrics.checkout.count.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Checkout</p>
+                  <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.CHECKOUT]}</p>
                 </div>
                 <p className="text-sm font-semibold text-growi-money">${metrics.checkout.earned.toFixed(2)}</p>
               </div>
@@ -581,7 +380,7 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-lg font-bold text-foreground">{metrics.purchases.count.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Purchases</p>
+                  <p className="text-xs text-muted-foreground">{SITE_EVENT_TYPE_LABELS[SiteEventType.PURCHASE_SUCCESS]}</p>
                 </div>
                 <p className="text-sm font-semibold text-growi-money">${metrics.purchases.earned.toFixed(2)}</p>
               </div>
@@ -591,159 +390,161 @@ export default function InfluencerCampaignDetailPage({ params }: { params: Promi
       </motion.div>
       
       {/* Performance Overview - Timeline, Funnel & Daily */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <TrendingUp className="h-5 w-5 text-growi-blue" />
-            Performance Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="timeline" className="w-full">
-            <TabsList className="mb-4 grid w-full grid-cols-3">
-              <TabsTrigger value="timeline">Timeline</TabsTrigger>
-              <TabsTrigger value="daily">Daily</TabsTrigger>
-              <TabsTrigger value="funnel">Funnel</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="timeline">
-              <div className="h-64 sm:h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={timelineData}>
-                    <defs>
-                      <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />
-                    <YAxis stroke="#94a3b8" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
-                        borderRadius: '8px',
-                        color: '#f1f5f9',
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="earnings"
-                      stroke="#22c55e"
-                      fillOpacity={1}
-                      fill="url(#colorEarnings)"
-                      strokeWidth={2}
-                      name="Earnings ($)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="daily">
-              <div className="h-64 sm:h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={timelineData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />
-                    <YAxis stroke="#94a3b8" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
-                        borderRadius: '8px',
-                        color: '#f1f5f9',
-                      }}
-                      formatter={(value, name) => {
-                        const labels: Record<string, string> = {
-                          landingViews: 'Landing Views',
-                          viewItems: 'View Items',
-                          addToCart: 'Add to Cart',
-                          checkout: 'Checkout',
-                          purchases: 'Purchases',
-                        };
-                        return [ Number(value).toLocaleString(), labels[name as string] || name ];
-                      }}
-                    />
-                    <Bar dataKey="landingViews" fill="#4A90E2" name="landingViews" radius={[ 2, 2, 0, 0 ]} />
-                    <Bar dataKey="viewItems" fill="#60a5fa" name="viewItems" radius={[ 2, 2, 0, 0 ]} />
-                    <Bar dataKey="addToCart" fill="#FFB347" name="addToCart" radius={[ 2, 2, 0, 0 ]} />
-                    <Bar dataKey="checkout" fill="#9ACD32" name="checkout" radius={[ 2, 2, 0, 0 ]} />
-                    <Bar dataKey="purchases" fill="#34d399" name="purchases" radius={[ 2, 2, 0, 0 ]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-4 flex flex-wrap justify-center gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#4A90E2' }} />
-                  <span className="text-xs text-muted-foreground">Landing Views</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#60a5fa' }} />
-                  <span className="text-xs text-muted-foreground">View Items</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#FFB347' }} />
-                  <span className="text-xs text-muted-foreground">Add to Cart</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#9ACD32' }} />
-                  <span className="text-xs text-muted-foreground">Checkout</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#34d399' }} />
-                  <span className="text-xs text-muted-foreground">Purchases</span>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="funnel">
-              <div className="flex flex-col gap-4 md:flex-row md:items-center">
-                <div className="h-64 flex-1">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={funnelData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={2}
-                        dataKey="value"
-                      >
-                        {funnelData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: '#1e293b',
-                          border: '1px solid #334155',
-                          borderRadius: '8px',
-                          color: '#f1f5f9',
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="space-y-2 md:w-48">
-                  {funnelData.map((item) => (
-                    <div key={item.name} className="flex items-center gap-2">
-                      <div
-                        className="h-3 w-3 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <span className="flex-1 text-sm text-muted-foreground">{item.name}</span>
-                      <span className="text-sm font-medium text-foreground">{item.value.toLocaleString()}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+      {/*<Card>*/}
+      {/*  <CardHeader>*/}
+      {/*    <CardTitle className="flex items-center gap-2 text-foreground">*/}
+      {/*      <TrendingUp className="h-5 w-5 text-growi-blue" />*/}
+      {/*      Performance Overview*/}
+      {/*    </CardTitle>*/}
+      {/*  </CardHeader>*/}
+      {/*  <CardContent>*/}
+      {/*    <Tabs defaultValue="timeline" className="w-full">*/}
+      {/*      <TabsList className="mb-4 grid w-full grid-cols-3">*/}
+      {/*        <TabsTrigger value="timeline">Timeline</TabsTrigger>*/}
+      {/*        <TabsTrigger value="daily">Daily</TabsTrigger>*/}
+      {/*        <TabsTrigger value="funnel">Funnel</TabsTrigger>*/}
+      {/*      </TabsList>*/}
+      {/*      */}
+      {/*      <TabsContent value="timeline">*/}
+      {/*        <div className="h-64 sm:h-80">*/}
+      {/*          <ResponsiveContainer width="100%" height="100%">*/}
+      {/*            <AreaChart data={timelineData}>*/}
+      {/*              <defs>*/}
+      {/*                <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">*/}
+      {/*                  <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />*/}
+      {/*                  <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />*/}
+      {/*                </linearGradient>*/}
+      {/*              </defs>*/}
+      {/*              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />*/}
+      {/*              <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />*/}
+      {/*              <YAxis stroke="#94a3b8" fontSize={12} />*/}
+      {/*              <Tooltip*/}
+      {/*                contentStyle={{*/}
+      {/*                  backgroundColor: '#1e293b',*/}
+      {/*                  border: '1px solid #334155',*/}
+      {/*                  borderRadius: '8px',*/}
+      {/*                  color: '#f1f5f9',*/}
+      {/*                }}*/}
+      {/*              />*/}
+      {/*              <Area*/}
+      {/*                type="monotone"*/}
+      {/*                dataKey="earnings"*/}
+      {/*                stroke="#22c55e"*/}
+      {/*                fillOpacity={1}*/}
+      {/*                fill="url(#colorEarnings)"*/}
+      {/*                strokeWidth={2}*/}
+      {/*                name="Earnings ($)"*/}
+      {/*              />*/}
+      {/*            </AreaChart>*/}
+      {/*          </ResponsiveContainer>*/}
+      {/*        </div>*/}
+      {/*      </TabsContent>*/}
+      {/*      */}
+      {/*      <TabsContent value="daily">*/}
+      {/*        <div className="h-64 sm:h-80">*/}
+      {/*          <ResponsiveContainer width="100%" height="100%">*/}
+      {/*            <BarChart data={timelineData}>*/}
+      {/*              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />*/}
+      {/*              <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />*/}
+      {/*              <YAxis stroke="#94a3b8" fontSize={12} />*/}
+      {/*              <Tooltip*/}
+      {/*                contentStyle={{*/}
+      {/*                  backgroundColor: '#1e293b',*/}
+      {/*                  border: '1px solid #334155',*/}
+      {/*                  borderRadius: '8px',*/}
+      {/*                  color: '#f1f5f9',*/}
+      {/*                }}*/}
+      {/*                formatter={(value, name) => {*/}
+      {/*                  const labels: Record<string, string> = {*/}
+      {/*                    landingViews: 'Landing Views',*/}
+      {/*                    viewItems: 'View Items',*/}
+      {/*                    addToCart: 'Add to Cart',*/}
+      {/*                    checkout: 'Checkout',*/}
+      {/*                    purchases: 'Purchases',*/}
+      {/*                  };*/}
+      {/*                  return [ Number(value).toLocaleString(), labels[name as string] || name ];*/}
+      {/*                }}*/}
+      {/*              />*/}
+      {/*              <Bar dataKey="landingViews" fill="#4A90E2" name="landingViews" radius={[ 2, 2, 0, 0 ]} />*/}
+      {/*              <Bar dataKey="viewItems" fill="#60a5fa" name="viewItems" radius={[ 2, 2, 0, 0 ]} />*/}
+      {/*              <Bar dataKey="addToCart" fill="#FFB347" name="addToCart" radius={[ 2, 2, 0, 0 ]} />*/}
+      {/*              <Bar dataKey="checkout" fill="#9ACD32" name="checkout" radius={[ 2, 2, 0, 0 ]} />*/}
+      {/*              <Bar dataKey="purchases" fill="#34d399" name="purchases" radius={[ 2, 2, 0, 0 ]} />*/}
+      {/*            </BarChart>*/}
+      {/*          </ResponsiveContainer>*/}
+      {/*        </div>*/}
+      {/*        <div className="mt-4 flex flex-wrap justify-center gap-4">*/}
+      {/*          <div className="flex items-center gap-2">*/}
+      {/*            <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#4A90E2' }} />*/}
+      {/*            <span className="text-xs text-muted-foreground">Landing Views</span>*/}
+      {/*          </div>*/}
+      {/*          <div className="flex items-center gap-2">*/}
+      {/*            <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#60a5fa' }} />*/}
+      {/*            <span className="text-xs text-muted-foreground">View Items</span>*/}
+      {/*          </div>*/}
+      {/*          <div className="flex items-center gap-2">*/}
+      {/*            <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#FFB347' }} />*/}
+      {/*            <span className="text-xs text-muted-foreground">Add to Cart</span>*/}
+      {/*          </div>*/}
+      {/*          <div className="flex items-center gap-2">*/}
+      {/*            <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#9ACD32' }} />*/}
+      {/*            <span className="text-xs text-muted-foreground">Checkout</span>*/}
+      {/*          </div>*/}
+      {/*          <div className="flex items-center gap-2">*/}
+      {/*            <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: '#34d399' }} />*/}
+      {/*            <span className="text-xs text-muted-foreground">Purchases</span>*/}
+      {/*          </div>*/}
+      {/*        </div>*/}
+      {/*      </TabsContent>*/}
+      {/*      */}
+      {/*      <TabsContent value="funnel">*/}
+      {/*        <div className="flex flex-col gap-4 md:flex-row md:items-center">*/}
+      {/*          <div className="h-64 flex-1">*/}
+      {/*            <ResponsiveContainer width="100%" height="100%">*/}
+      {/*              <PieChart>*/}
+      {/*                <Pie*/}
+      {/*                  data={funnelData}*/}
+      {/*                  cx="50%"*/}
+      {/*                  cy="50%"*/}
+      {/*                  innerRadius={60}*/}
+      {/*                  outerRadius={100}*/}
+      {/*                  paddingAngle={2}*/}
+      {/*                  dataKey="value"*/}
+      {/*                >*/}
+      {/*                  {funnelData.map((entry, index) => (*/}
+      {/*                    <Cell key={`cell-${index}`} fill={entry.color} />*/}
+      {/*                  ))}*/}
+      {/*                </Pie>*/}
+      {/*                <Tooltip*/}
+      {/*                  contentStyle={{*/}
+      {/*                    backgroundColor: '#1e293b',*/}
+      {/*                    border: '1px solid #334155',*/}
+      {/*                    borderRadius: '8px',*/}
+      {/*                    color: '#f1f5f9',*/}
+      {/*                  }}*/}
+      {/*                />*/}
+      {/*              </PieChart>*/}
+      {/*            </ResponsiveContainer>*/}
+      {/*          </div>*/}
+      {/*          <div className="space-y-2 md:w-48">*/}
+      {/*            {funnelData.map((item) => (*/}
+      {/*              <div key={item.name} className="flex items-center gap-2">*/}
+      {/*                <div*/}
+      {/*                  className="h-3 w-3 rounded-full"*/}
+      {/*                  style={{ backgroundColor: item.color }}*/}
+      {/*                />*/}
+      {/*                <span className="flex-1 text-sm text-muted-foreground">{item.name}</span>*/}
+      {/*                <span className="text-sm font-medium text-foreground">{item.value.toLocaleString()}</span>*/}
+      {/*              </div>*/}
+      {/*            ))}*/}
+      {/*          </div>*/}
+      {/*        </div>*/}
+      {/*      </TabsContent>*/}
+      {/*    </Tabs>*/}
+      {/*  </CardContent>*/}
+      {/*</Card>*/}
+      
+      {campaign.status === CampaignStatus.ACTIVE && <CampaignLiveEventsCard campaign={campaign} />}
       
       {/* Live Transmissions */}
       <Card>

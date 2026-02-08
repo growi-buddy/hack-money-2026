@@ -8,8 +8,8 @@ import { CampaignMetricsCard } from '@/app/(wallet)/manager/campaigns/[id]/Campa
 import { CampaignStatusBadge } from '@/components/campaigns/CampaignStatusBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ErrorCard } from '@/components/ui/error-card';
 import { useWallet } from '@/contexts/wallet-context';
 import { CampaignStatus } from '@/lib/db/enums';
 import { sendFunds } from '@/lib/web3';
@@ -31,18 +31,18 @@ export default function CampaignDashboardPage() {
   const [ error, setError ] = useState<string | null>(null);
   const [ showPublishModal, setShowPublishModal ] = useState(false);
   const [ isPublishing, setIsPublishing ] = useState(false);
-
+  
   const fetchCampaign = async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`);
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.error?.message || 'Failed to fetch campaign');
       }
-
+      
       setCampaign(data.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -50,7 +50,7 @@ export default function CampaignDashboardPage() {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     if (campaignId) {
       void fetchCampaign();
@@ -65,7 +65,7 @@ export default function CampaignDashboardPage() {
         success,
         error,
         txHash,
-      } = await sendFunds('0x75a26Ca9e3Ef85d8e118Ec2b260c143f8738BA19', '0.01');
+      } = await sendFunds('0x75a26Ca9e3Ef85d8e118Ec2b260c143f8738BA19', '0.001');
       
       if (success) {
         console.log('Transacción exitosa en Base Sepolia:', txHash);
@@ -81,13 +81,12 @@ export default function CampaignDashboardPage() {
           throw new Error(data.error?.message || 'Failed to publish campaign');
         }
         
-        // Update local state
         setCampaign(prev => prev ? { ...prev, status: CampaignStatus.PUBLISHED } : null);
-        setShowPublishModal(false);
       } else {
         console.error('Error:', error);
         setError(error);
       }
+      setShowPublishModal(false);
     } catch (err) {
       console.error('Failed to publish campaign:', err);
       alert(err instanceof Error ? err.message : 'Failed to publish campaign');
@@ -96,27 +95,11 @@ export default function CampaignDashboardPage() {
     }
   };
   
-  // Loading state
-  if (loading) {
+  if (loading || !campaign) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    );
-  }
-  
-  if (error || !campaign) {
-    return (
-      <Card className="border-destructive/50">
-        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-destructive">{error || 'Campaign not found'}</p>
-          <Link href="/client">
-            <Button variant="outline" className="mt-4">
-              Back to Dashboard
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
     );
   }
   
@@ -177,6 +160,8 @@ export default function CampaignDashboardPage() {
           </motion.div>
         </div>
       </motion.div>
+      
+      <ErrorCard error={error} />
       
       {campaign.status !== CampaignStatus.COMPLETED && <CampaignInfoCard campaign={campaign} />}
       

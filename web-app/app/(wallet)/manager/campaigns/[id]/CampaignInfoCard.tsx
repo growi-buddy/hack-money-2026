@@ -6,9 +6,10 @@ import { RegionTag } from '@/components/ui/region-tag';
 import { TargetAudienceTag } from '@/components/ui/target-audience-tag';
 import { staggerItem } from '@/lib/animations';
 import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
+import { SiteEventType } from '@/lib/db/enums';
 import { CampaignResponseDTO } from '@/types';
 import { motion } from 'framer-motion';
-import { Calendar, DollarSign, Globe, Tag, Users, Zap } from 'lucide-react';
+import { Calendar, CreditCard, DollarSign, Eye, Globe, Package, ShoppingCart, Tag, Users } from 'lucide-react';
 
 const formatDate = (dateStr: string | number | null) => {
   if (!dateStr) return 'TBD';
@@ -19,9 +20,18 @@ const formatDate = (dateStr: string | number | null) => {
   });
 };
 
-export const CampaignInfoCard = ({ campaign, withoutTitle }: {
+const EVENT_TYPE_ICONS: Record<SiteEventType, typeof Eye> = {
+  [SiteEventType.LANDING_PAGE_VIEW]: Eye,
+  [SiteEventType.VIEW_ITEM]: Package,
+  [SiteEventType.ADD_TO_CART]: ShoppingCart,
+  [SiteEventType.CHECKOUT]: CreditCard,
+  [SiteEventType.PURCHASE_SUCCESS]: DollarSign,
+};
+
+export const CampaignInfoCard = ({ campaign, withoutTitle, withoutSiteEvents }: {
   campaign: CampaignResponseDTO,
-  withoutTitle?: boolean
+  withoutTitle?: boolean,
+  withoutSiteEvents?: boolean,
 }) => {
   return (
     <Card>
@@ -67,7 +77,7 @@ export const CampaignInfoCard = ({ campaign, withoutTitle }: {
           </motion.div>
           
           {/* Site Events */}
-          {campaign.sites && campaign.sites.length > 0 && (
+          {campaign.sites && campaign.sites.length > 0 && !withoutSiteEvents && (
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-2">
                 <Globe className="h-4 w-4 text-growi-blue" />
@@ -91,28 +101,31 @@ export const CampaignInfoCard = ({ campaign, withoutTitle }: {
                       <p className="text-xs text-muted-foreground mb-2">{site.description}</p>
                     )}
                     <div className="space-y-1.5">
-                      {site.trackedSiteEventsGroupedByType.map((event) => (
-                        <div
-                          key={event.siteEventType}
-                          className="flex items-center justify-between rounded bg-background/50 px-2.5 py-1.5 border border-border/50"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Zap className="h-3.5 w-3.5 text-growi-blue" />
-                            <span className="text-xs font-medium text-foreground">
-                              {SITE_EVENT_TYPE_LABELS[event.siteEventType]}
-                            </span>
+                      {site.trackedSiteEventsGroupedByType.map((event) => {
+                        const Icon = EVENT_TYPE_ICONS[event.siteEventType];
+                        return (
+                          <div
+                            key={event.siteEventType}
+                            className="flex items-center justify-between rounded bg-background/50 px-2.5 py-1.5 border border-border/50"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Icon className="h-3.5 w-3.5 text-growi-blue" />
+                              <span className="text-xs font-medium text-foreground">
+                                {SITE_EVENT_TYPE_LABELS[event.siteEventType]}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-semibold text-growi-money">
+                                ${event.amount.toFixed(3)}
+                              </span>
+                              <span className="text-xs text-muted-foreground">per</span>
+                              <span className="text-xs font-semibold text-foreground">
+                                {event.volumeStep} {event.volumeStep === 1 ? 'event' : 'events'}
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-semibold text-growi-money">
-                              ${event.amount.toFixed(3)}
-                            </span>
-                            <span className="text-xs text-muted-foreground">per</span>
-                            <span className="text-xs font-semibold text-foreground">
-                              {event.volumeStep} {event.volumeStep === 1 ? 'event' : 'events'}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 ))}

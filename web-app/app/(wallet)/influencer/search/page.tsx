@@ -9,6 +9,7 @@ import { CountryTag } from '@/components/ui/country-tag';
 import { Input } from '@/components/ui/input';
 import { InterestTag } from '@/components/ui/interest-tag';
 import { LoadingCard } from '@/components/ui/loading-card';
+import { ParticipationStatusBadge } from '@/components/ui/participation-status-badge';
 import { RegionTag } from '@/components/ui/region-tag';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,7 +17,6 @@ import { TargetAudienceTag } from '@/components/ui/target-audience-tag';
 import { useWallet } from '@/contexts/wallet-context';
 import { useUsers } from '@/hooks/use-users';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { PARTICIPATION_STATUS } from '@/lib/constants';
 import { CampaignStatus } from '@/lib/db/enums';
 import { ApiDataResponse, ApiListResponse, CampaignFiltersResponse, CampaignResponseDTO } from '@/types';
 import { motion } from 'framer-motion';
@@ -553,11 +553,7 @@ function CampaignCard({ campaign }: { campaign: CampaignResponseDTO }) {
             />
             <div className="absolute left-2 top-2 flex gap-2">
               <CampaignStatusBadge status={campaign.status} />
-              {participation ? (
-                <Badge className="bg-growi-success text-white hover:bg-growi-success/90">
-                  {PARTICIPATION_STATUS[participation.status]}
-                </Badge>
-              ) : (
+              {participation ? <ParticipationStatusBadge status={participation.status} /> : (
                 <Badge className="bg-growi-blue/90 text-white hover:bg-growi-blue">
                   Available
                 </Badge>
