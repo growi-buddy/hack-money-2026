@@ -32,25 +32,18 @@ export async function authenticateWithYellow(
   const sessionKey = privateKeyToAccount(sessionKeyPk) as PrivateKeyAccount;
   console.log('[Auth] Generated session key:', sessionKey.address);
 
-  // Step 1: Crear mensaje de auth_request usando el SDK v0.4.0
-  console.log('[Auth] Creating auth_request with SDK v0.4.0...');
+  // Step 1: Crear mensaje de auth_request siguiendo docs oficiales
+  // https://docs.yellow.org/docs/learn/getting-started/quickstart/#3-authentication
+  console.log('[Auth] Creating auth_request...');
   
-  // MessageSigner para firmar los mensajes con session key
-  const requestMessageSigner = async (payload: unknown) => {
-    console.log('[Auth] Signing auth_request payload...');
-    const payloadString = JSON.stringify(payload);
-    return await sessionKey.signMessage({ message: payloadString });
-  };
-  
-  // API v0.4.0: primer argumento es el objeto completo, segundo es messageSigner
+  // Formato EXACTO de la documentación oficial
   const authRequestMessage = await createAuthRequestMessage({
     address: mainWallet.address,
+    application: 'Growi Campaign Manager',
     session_key: sessionKey.address,
-    application: 'growi-campaign-manager',
-    expires_at: (Math.floor(Date.now() / 1000) + 86400).toString(),
-    scope: 'console',
-    allowances: [],
-    messageSigner: requestMessageSigner
+    allowances: [{ asset: 'ytest.usd', amount: '1000000000' }], // 1000 USDC allowance
+    expires_at: BigInt(Math.floor(Date.now() / 1000) + 86400), // 24 horas (BigInt, NO string)
+    scope: 'growi.app',
   } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
   
   console.log('[Auth] Auth request message created');

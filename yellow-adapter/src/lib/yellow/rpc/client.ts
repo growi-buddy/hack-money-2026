@@ -174,21 +174,15 @@ export class YellowRpcClient {
         const sessionKeyPk = generatePrivateKey();
         const sessionKey = privateKeyToAccount(sessionKeyPk);
         
-        // MessageSigner para auth_request
-        const requestMessageSigner = async (payload: unknown) => {
-          const payloadString = JSON.stringify(payload);
-          return await sessionKey.signMessage({ message: payloadString });
-        };
-        
-        // API v0.4.0: recibe objeto con messageSigner incluido
+        // Formato EXACTO de la documentación oficial
+        // https://docs.yellow.org/docs/learn/getting-started/quickstart/#3-authentication
         const authRequestMessage = await createAuthRequestMessage({
           address: clientAddress,
+          application: 'Growi Campaign Manager',
           session_key: sessionKey.address,
-          application: 'growi-campaign-manager',
-          expires_at: (Math.floor(Date.now() / 1000) + 86400).toString(),
-          scope: 'console',
-          allowances: [],
-          messageSigner: requestMessageSigner
+          allowances: [{ asset: 'ytest.usd', amount: '1000000000' }],
+          expires_at: BigInt(Math.floor(Date.now() / 1000) + 86400), // BigInt, NO string
+          scope: 'growi.app',
         } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
         
         console.log("[RpcClient] Generated auth request message:", authRequestMessage);
