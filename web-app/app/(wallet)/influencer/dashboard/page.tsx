@@ -134,7 +134,7 @@ export default function InfluencerDashboardPage() {
         </p>
       </div>
       
-      {error && <ErrorCard error={error} />}
+      <ErrorCard error={error} />
       
       {data && (
         <>

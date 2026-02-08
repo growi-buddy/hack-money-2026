@@ -1,9 +1,9 @@
 import { safeRoute } from '@/helpers';
 import { prisma } from '@/lib/db';
-import { InfluencerVerificationStatus, Prisma, SocialMedia, User } from '@/lib/db/prisma/generated';
+import { InfluencerVerificationStatus } from '@/lib/db/enums';
+import { Prisma, SocialMedia, User } from '@/lib/db/prisma/generated';
 import { ApiDataResponse, ApiListResponse, CreateUserDTO, UserResponseDTO } from '@/types';
 
-// Helper function to transform User to UserResponseDTO
 function transformToUserResponseDTO(user: User & { socialMedias: SocialMedia[] }): UserResponseDTO {
   return {
     id: user.id,
@@ -16,7 +16,8 @@ function transformToUserResponseDTO(user: User & { socialMedias: SocialMedia[] }
     avatar: user.avatar || '',
     interests: user.interests || [],
     affinities: user.affinities || [],
-    influencerVerification: user.influencerVerification === InfluencerVerificationStatus.VERIFIED,
+    influencerVerification: user.influencerVerification || InfluencerVerificationStatus.NONE,
+    isOnline: false,
     socialMedias: user.socialMedias.map(sm => ({
       platform: sm.platform || '',
       username: sm.username || '',
@@ -32,7 +33,7 @@ export async function GET(req: Request) {
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
     const limit = Math.max(1, parseInt(searchParams.get('limit') ?? '10'));
     const skip = (page - 1) * limit;
-    const type = searchParams.get('type');
+    const type = searchParams.get('userRole');
     
     const where: Prisma.UserWhereInput = {};
     

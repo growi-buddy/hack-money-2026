@@ -6,16 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
 import { LoadingCard } from '@/components/ui/loading-card';
-import { useWallet } from '@/contexts/wallet-context';
 import { groupTrackedEventsByType } from '@/helpers/campaigns';
+import { useCampaigns } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { SITE_EVENT_TYPE_SHORT_LABELS } from '@/lib/constants';
 import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
-import { ApiListResponse, CampaignResponseDTO, UserRoleType } from '@/types';
+import { UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
 import { Calendar, Flame, Sparkles, TrendingUp, Users } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 interface MyCampaignsListProps {
   userRole: UserRoleType,
@@ -53,56 +53,42 @@ function getDateRange(startDate: string | number, endDate: string | number): str
 }
 
 export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => {
+  const {
+    campaigns,
+    setCampaigns,
+    isLoading,
+    error,
+  } = useCampaigns(userRole === 'influencer' ? [ CampaignStatus.ACTIVE, CampaignStatus.DEPLETED ] : [ CampaignStatus.ACTIVE, CampaignStatus.PUBLISHED, CampaignStatus.DEPLETED ], userRole, false, deps);
+  const [ togglingHot, setTogglingHot ] = useState<string | null>(null);
   
-  const { address } = useWallet();
-  const [ campaigns, setCampaigns ] = useState<CampaignResponseDTO[]>([]);
-  const [ isLoading, setIsLoading ] = useState(false);
-  const [ error, setError ] = useState('');
-  
-  const fetchCampaigns = useCallback(async (isManualRefresh = false) => {
-    if (!address) {
-      setCampaigns([]);
-      return;
-    }
-    
-    try {
-      if (isManualRefresh) {
-        setIsLoading(true);
-      } else {
-        setIsLoading(true);
-      }
-      setError('');
-      let response;
-      if (userRole === 'influencer') {
-        response = await fetch(`/api/campaigns/all?walletAddress=${address}&status=${CampaignStatus.ACTIVE},${CampaignStatus.DEPLETED}`);
-      } else {
-        response = await fetch(`/api/campaigns/all?walletAddress=${address}&status=${CampaignStatus.ACTIVE},${CampaignStatus.PUBLISHED},${CampaignStatus.DEPLETED}`);
-      }
-      if (!response.ok) {
-        // 1. Intentamos obtener el mensaje de error del body
-        const errorData = await response.json().catch(() => ({}));
+  const handleToggleHot = useCallback(
+    async (campaignId: string, isCurrentlyHot: boolean) => {
+      setTogglingHot(campaignId);
+      
+      try {
+        const response = await fetch(`/api/campaigns/${campaignId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isHot: !isCurrentlyHot }),
+        });
         
-        // 2. Lanzamos el error usando el mensaje del backend o uno por defecto
-        throw new Error(errorData?.error?.message || 'Failed to fetch campaigns');
+        if (!response.ok) {
+          throw new Error('Failed to toggle hot status');
+        }
+        
+        setCampaigns((prev) =>
+          prev.map((campaign) =>
+            campaign.id === campaignId ? { ...campaign, isHot: !isCurrentlyHot } : campaign,
+          ),
+        );
+      } catch (err) {
+        console.error('Error toggling hot:', err);
+      } finally {
+        setTogglingHot(null);
       }
-      
-      const result: ApiListResponse<CampaignResponseDTO> = await response.json();
-      
-      const filteredCampaigns = result.data.filter(
-        campaign => campaign.userRole === userRole,
-      );
-      
-      const sortedCampaigns = filteredCampaigns.sort((a, b) => {
-        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-      });
-      
-      setCampaigns(sortedCampaigns);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [ address, userRole ]);
+    },
+    [ setCampaigns ],
+  );
   
   // Define color scheme based on user role
   const isManager = userRole === 'manager';
@@ -114,42 +100,6 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
   const primaryBorder = isManager ? 'border-growi-blue/30' : 'border-growi-success/30';
   const primaryBorderHover = isManager ? 'hover:border-growi-blue/50' : 'hover:border-growi-success/50';
   const primaryBadge = isManager ? 'bg-growi-blue/20 text-growi-blue' : 'bg-growi-success/20 text-growi-success';
-  
-  const [ togglingHot, setTogglingHot ] = useState<string | null>(null);
-  
-  const handleToggleHot = useCallback(async (campaignId: string, isCurrentlyHot: boolean) => {
-    setTogglingHot(campaignId);
-    
-    try {
-      const response = await fetch(`/api/campaigns/${campaignId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isHot: !isCurrentlyHot }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to toggle hot status');
-      }
-      
-      setCampaigns((prev) =>
-        prev.map((campaign) =>
-          campaign.id === campaignId
-            ? { ...campaign, isHot: !isCurrentlyHot }
-            : campaign,
-        ),
-      );
-    } catch (err) {
-      console.error('Error toggling hot:', err);
-      // setError(err instanceof Error ? err.message : 'Failed to toggle hot status');
-    } finally {
-      setTogglingHot(null);
-    }
-  }, []);
-  
-  const depsString = JSON.stringify(deps);
-  useEffect(() => {
-    void fetchCampaigns();
-  }, [ fetchCampaigns, depsString ]);
   
   const hasCampaigns = campaigns.length > 0;
   

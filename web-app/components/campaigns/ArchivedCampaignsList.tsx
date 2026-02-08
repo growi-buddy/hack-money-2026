@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
 import { LoadingCard } from '@/components/ui/loading-card';
-import { useWallet } from '@/contexts/wallet-context';
 import { groupTrackedEventsByType } from '@/helpers/campaigns';
+import { useCampaigns } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { SiteEventType } from '@/lib/db/enums';
-import { ApiListResponse, CampaignResponseDTO, UserRoleType } from '@/types';
+import { CampaignResponseDTO, UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
 import { Archive, Flame, RotateCcw } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface ArchivedCampaignsListProps {
   userRole: UserRoleType;
@@ -28,9 +28,6 @@ function getTotalPurchases(campaign: CampaignResponseDTO): number {
 }
 
 export const ArchivedCampaignsList = ({ userRole, deps, onReload }: ArchivedCampaignsListProps) => {
-  const { address } = useWallet();
-  const [ campaigns, setCampaigns ] = useState<CampaignResponseDTO[]>([]);
-  const [ isLoading, setIsLoading ] = useState(false);
   const [ error, setError ] = useState('');
   const [ restoringId, setRestoringId ] = useState<string | null>(null);
   
@@ -61,46 +58,15 @@ export const ArchivedCampaignsList = ({ userRole, deps, onReload }: ArchivedCamp
     }
   };
   
-  const fetchCampaigns = useCallback(async () => {
-    if (!address) {
-      setCampaigns([]);
-      return;
-    }
-    
-    try {
-      setIsLoading(true);
-      setError('');
-      
-      // Fetch expired and completed campaigns as archived
-      const response = await fetch(`/api/campaigns/all?walletAddress=${address}&isDeleted=true`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch campaigns');
-      }
-      
-      const result: ApiListResponse<CampaignResponseDTO> = await response.json();
-      
-      // Filter campaigns by userRole (manager or influencer)
-      const filteredCampaigns = result.data.filter(
-        campaign => campaign.userRole === userRole,
-      );
-      
-      setCampaigns(filteredCampaigns);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [ address, userRole ]);
-  
-  const depsString = JSON.stringify(deps);
-  useEffect(() => {
-    void fetchCampaigns();
-  }, [ fetchCampaigns, depsString ]);
+  const {
+    campaigns,
+    setCampaigns,
+    isLoading,
+    error: campaignError,
+  } = useCampaigns([], userRole, true, deps);
   
   const hasCampaigns = campaigns.length > 0;
   
-  // Define if manager or influencer
   const isManager = userRole === 'manager';
   
   if (!hasCampaigns) {
@@ -117,7 +83,7 @@ export const ArchivedCampaignsList = ({ userRole, deps, onReload }: ArchivedCamp
         <Badge variant="secondary">{campaigns.length} archived</Badge>
       </div>
       
-      <ErrorCard error={error} />
+      <ErrorCard error={campaignError || error} />
       
       {(isLoading && !hasCampaigns) ? <LoadingCard userRole={userRole} /> : (
         <motion.div

@@ -5,16 +5,15 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
 import { LoadingCard } from '@/components/ui/loading-card';
-import { useWallet } from '@/contexts/wallet-context';
 import { groupTrackedEventsByType } from '@/helpers/campaigns';
+import { useCampaigns } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { SITE_EVENT_TYPE_SHORT_LABELS } from '@/lib/constants';
 import { CampaignStatus } from '@/lib/db/enums';
-import { ApiListResponse, CampaignResponseDTO, UserRoleType } from '@/types';
+import { UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
-import { Calendar, DollarSign, Eraser, Flame, Users } from 'lucide-react';
+import { Calendar, DollarSign, Eraser, Users } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
 
 interface MyCampaignsListProps {
   userRole: UserRoleType,
@@ -53,94 +52,16 @@ function getDateRange(startDate: string | number, endDate: string | number): str
 
 export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => {
   
-  const { address } = useWallet();
-  const [ campaigns, setCampaigns ] = useState<CampaignResponseDTO[]>([]);
-  const [ isLoading, setIsLoading ] = useState(false);
-  const [ error, setError ] = useState('');
-  
-  const fetchCampaigns = useCallback(async (isManualRefresh = false) => {
-    if (!address) {
-      setCampaigns([]);
-      return;
-    }
-    
-    try {
-      if (isManualRefresh) {
-        setIsLoading(true);
-      } else {
-        setIsLoading(true);
-      }
-      setError('');
-      
-      const response = await fetch(`/api/campaigns/all?walletAddress=${address}&status=${CampaignStatus.DRAFT}`);
-      
-      if (!response.ok) {
-        // 1. Intentamos obtener el mensaje de error del body
-        const errorData = await response.json().catch(() => ({}));
-        
-        // 2. Lanzamos el error usando el mensaje del backend o uno por defecto
-        throw new Error(errorData?.error?.message || 'Failed to fetch campaigns');
-      }
-      
-      const result: ApiListResponse<CampaignResponseDTO> = await response.json();
-      
-      const filteredCampaigns = result.data.filter(
-        campaign => campaign.userRole === userRole,
-      );
-      
-      const sortedCampaigns = filteredCampaigns.sort((a, b) => {
-        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-      });
-      
-      setCampaigns(sortedCampaigns);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [ address, userRole ]);
+  const {
+    campaigns,
+    isLoading,
+    error,
+  } = useCampaigns([ CampaignStatus.DRAFT ], userRole, false, deps);
   
   const isManager = userRole === 'manager';
   const primaryColorClass = isManager ? 'text-growi-blue' : 'text-growi-success';
   const primaryBorderHover = isManager ? 'hover:border-growi-blue/50' : 'hover:border-growi-success/50';
   const primaryBadge = isManager ? 'bg-growi-blue/20 text-growi-blue' : 'bg-growi-success/20 text-growi-success';
-  
-  const [ togglingHot, setTogglingHot ] = useState<string | null>(null);
-  
-  const handleToggleHot = useCallback(async (campaignId: string, isCurrentlyHot: boolean) => {
-    setTogglingHot(campaignId);
-    
-    try {
-      const response = await fetch(`/api/campaigns/${campaignId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isHot: !isCurrentlyHot }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to toggle hot status');
-      }
-      
-      // Update local state
-      setCampaigns((prev) =>
-        prev.map((campaign) =>
-          campaign.id === campaignId
-            ? { ...campaign, isHot: !isCurrentlyHot }
-            : campaign,
-        ),
-      );
-    } catch (err) {
-      console.error('Error toggling hot:', err);
-      setError(err instanceof Error ? err.message : 'Failed to toggle hot status');
-    } finally {
-      setTogglingHot(null);
-    }
-  }, []);
-  
-  const depsString = JSON.stringify(deps);
-  useEffect(() => {
-    void fetchCampaigns();
-  }, [ fetchCampaigns, depsString ]);
   
   const hasCampaigns = campaigns.length > 0;
   
@@ -181,32 +102,6 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
                         </div>
                         <div className="flex items-center gap-2">
                           <CampaignStatusBadge status={campaign.status} />
-                          {campaign.status === CampaignStatus.PUBLISHED && userRole === 'manager' && (
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                void handleToggleHot(campaign.id, campaign.isHot ?? false);
-                              }}
-                              disabled={togglingHot === campaign.id}
-                              className={`p-1.5 rounded-full transition-all ${
-                                campaign.isHot ?? false
-                                  ? 'bg-amber-500/20 text-amber-600 hover:bg-amber-500/30'
-                                  : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
-                              } disabled:opacity-50`}
-                              title={campaign.isHot ? 'Remove from Hot' : 'Mark as Hot'}
-                            >
-                              <Flame className={`h-4 w-4 ${togglingHot === campaign.id ? 'animate-spin' : ''}`} />
-                            </button>
-                          )}
-                          {campaign.status === CampaignStatus.PUBLISHED && userRole === 'influencer' && campaign.isHot && (
-                            <div
-                              className="p-1.5 rounded-full bg-amber-500/20"
-                              title="Hot Campaign"
-                            >
-                              <Flame className="h-4 w-4 text-amber-600" />
-                            </div>
-                          )}
                         </div>
                       </div>
                     </CardHeader>

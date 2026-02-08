@@ -87,7 +87,7 @@ export default function CampaignDetailsPage() {
     setError('');
     
     try {
-      const response = await fetch(`/api/campaigns/${campaignId}/participate?walletAddress=${address}`, {
+      const response = await fetch(`/api/campaigns/${campaignId}/apply?walletAddress=${address}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress: address }),
@@ -159,7 +159,7 @@ export default function CampaignDetailsPage() {
         )}
       </motion.div>
       
-      {error && <ErrorCard error={error} />}
+      <ErrorCard error={error} />
       
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <Card>

@@ -1,0 +1,43 @@
+{
+  "id": "ens-writer-env",
+  "name": "ENS Writer - Development",
+  "values": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3000",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "CAMPAIGN_CODE",
+      "value": "test1",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "WALLET_ADDRESS",
+      "value": "0x1234567890123456789012345678901234567890",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "ENS_NAME",
+      "value": "test1.growi.eth",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "TEXT_RECORD_KEY",
+      "value": "growi:payoutRoot",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "ENS_WRITER_API_KEY",
+      "value": "your-api-key-here",
+      "type": "secret",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

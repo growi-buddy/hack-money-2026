@@ -94,7 +94,7 @@ export default function ProfilePage() {
       id: sm.id,
       platform: sm.platform as SocialMediaPlatform,
       username: sm.username,
-      followers: sm.followers || '',
+      followers: sm.followers || 0,
       url: sm.url || '',
     })));
     setSelectedInterests(profile.interests || []);
@@ -180,7 +180,7 @@ export default function ProfilePage() {
       id: `new-${Date.now()}`,
       platform: SocialMediaPlatform.INSTAGRAM,
       username: '',
-      followers: '',
+      followers: 0,
       url: '',
     };
     setSocialMedias([ ...socialMedias, newSocial ]);
@@ -190,7 +190,7 @@ export default function ProfilePage() {
     setSocialMedias(socialMedias.filter(s => s.id !== id));
   };
   
-  const updateSocialMedia = (id: string, field: keyof SocialMedia, value: string) => {
+  const updateSocialMedia = (id: string, field: keyof SocialMedia, value: string | number) => {
     setSocialMedias(socialMedias.map(s =>
       s.id === id ? { ...s, [field]: value } : s,
     ));
@@ -212,12 +212,7 @@ export default function ProfilePage() {
     );
   };
   
-  const totalFollowers = socialMedias.reduce((acc, s) => {
-    const num = Number.parseFloat(s.followers.replace(/[^0-9.]/g, '')) || 0;
-    const multiplier = s.followers.toLowerCase().includes('k') ? 1000 :
-      s.followers.toLowerCase().includes('m') ? 1000000 : 1;
-    return acc + (num * multiplier);
-  }, 0);
+  const totalFollowers = socialMedias.reduce((acc, s) => acc + (s.followers || 0), 0);
   
   if (isLoading) {
     return (
@@ -608,7 +603,8 @@ export default function ProfilePage() {
                       <Label>Followers</Label>
                       <Input
                         value={social.followers}
-                        onChange={(e) => updateSocialMedia(social.id, 'followers', e.target.value)}
+                        type="number"
+                        onChange={(e) => updateSocialMedia(social.id, 'followers', +e.target.value || 0)}
                         placeholder="125K"
                       />
                     </div>

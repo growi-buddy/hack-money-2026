@@ -4,7 +4,7 @@ export interface SocialMedia {
   id: string;
   platform: SocialMediaPlatform;
   username: string;
-  followers: string;
+  followers: number;
   url: string;
 }
 

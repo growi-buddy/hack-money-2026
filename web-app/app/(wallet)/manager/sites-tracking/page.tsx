@@ -5,6 +5,7 @@ import { UpsertSiteEvent } from '@/app/(wallet)/manager/sites-tracking/UpsertSit
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorCard } from '@/components/ui/error-card';
+import { LoadingCard } from '@/components/ui/loading-card';
 import { API_BASE_URL } from '@/config/envs';
 import { useWallet } from '@/contexts/wallet-context';
 import { scaleIn, staggerContainer, staggerItem } from '@/lib/animations';
@@ -224,13 +225,9 @@ export default function RewardEventsPage() {
         )}
       </AnimatePresence>
       
-      {error && <ErrorCard error={error} />}
+      <ErrorCard error={error} />
       
-      {loading && (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      )}
+      <LoadingCard userRole="manager" />
       
       {!loading && sites.length > 0 && (
         <motion.div

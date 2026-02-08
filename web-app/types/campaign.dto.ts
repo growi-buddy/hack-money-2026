@@ -1,4 +1,4 @@
-import { CampaignStatus, SelectorEventType, SiteEventType } from '@/lib/db/enums';
+import { CampaignStatus, ParticipationStatus, SelectorEventType, SiteEventType } from '@/lib/db/enums';
 import { CampaignUserRole } from '@/types/user';
 import { BasicUserResponseDTO } from '@/types/user.dto';
 import { z } from 'zod';
@@ -108,12 +108,9 @@ export interface SiteWithEventsResponseDTO {
   trackedSiteEventsGroupedByType: TrackedSiteEventSummaryResponseDTO[],
 }
 
-export interface OwnerResponseDTO extends BasicUserResponseDTO {
-
-}
-
 export interface CampaignParticipantResponseDTO extends BasicUserResponseDTO {
-
+  status: ParticipationStatus,
+  summaryTrackedSiteEvents: Record<SiteEventType, { total: number, lastUpdated: number }>,
 }
 
 export interface CampaignResponseDTO {
@@ -132,7 +129,7 @@ export interface CampaignResponseDTO {
   endDate: number,
   sites: SiteWithEventsResponseDTO[];
   participants: CampaignParticipantResponseDTO[];
-  owner: OwnerResponseDTO;
+  owner: BasicUserResponseDTO;
   userRole: CampaignUserRole,
   
   id: string;
@@ -143,4 +140,11 @@ export interface CampaignResponseDTO {
 
 export interface InfluencerCampaignSummaryResponseDTO extends CampaignResponseDTO {
   participationId: string,
+}
+
+export interface CampaignFiltersResponse {
+  interests: string[];
+  demographics: string[];
+  regions: string[];
+  countries: string[];
 }

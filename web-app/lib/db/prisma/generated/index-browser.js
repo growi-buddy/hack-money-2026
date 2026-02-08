@@ -232,6 +232,7 @@ exports.Prisma.ParticipationScalarFieldEnum = {
   id: 'id',
   influencerId: 'influencerId',
   campaignId: 'campaignId',
+  status: 'status',
   currentBalance: 'currentBalance',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -339,6 +340,13 @@ exports.SelectorEventType = exports.$Enums.SelectorEventType = {
   ONCLICK: 'ONCLICK',
   HOVER: 'HOVER',
   DOUBLE_CLICK: 'DOUBLE_CLICK'
+};
+
+exports.ParticipationStatus = exports.$Enums.ParticipationStatus = {
+  APPLY_PENDING: 'APPLY_PENDING',
+  INVITATION_SENT: 'INVITATION_SENT',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED'
 };
 
 exports.Prisma.ModelName = {
