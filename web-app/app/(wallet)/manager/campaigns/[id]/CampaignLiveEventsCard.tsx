@@ -16,6 +16,8 @@ interface LiveTrackedEvent {
   eventName: string;
   amount: number;
   timestamp: string;
+  influencerWallet: string,
+  influencerName: string,
   data?: Record<string, unknown>;
 }
 
@@ -115,6 +117,7 @@ export const CampaignLiveEventsCard = ({ campaign }: { campaign: CampaignRespons
                         {SITE_EVENT_TYPE_LABELS[event.eventType].split(' ')[0]}
                       </Badge>
                     </div>
+                    {event.influencerName || event.influencerWallet}
                     <p className="text-xs text-muted-foreground">
                       {new Date(event.timestamp).toLocaleTimeString()}
                     </p>

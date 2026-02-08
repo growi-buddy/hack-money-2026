@@ -1,3 +1,4 @@
+import { getCampaignResponseDTO } from '@/app/api/campaigns/services';
 import { corsJsonResponse, handleOptions } from '@/lib/cors';
 import { prisma } from '@/lib/db';
 import { ServerPublisher } from '@/lib/realtime';
@@ -41,10 +42,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const payload = TrackEventSchema.parse(body);
     
-    // Extract IP from request headers (override if provided in payload)
     const clientIp = payload.ipAddress || getClientIp(req);
     
-    // Verify the CampaignSiteEvent exists
     const campaignSiteEvent = await prisma.campaignSiteEvent.findUnique({
       where: { id: payload.campaignSiteEventId },
       include: {
@@ -123,6 +122,7 @@ export async function POST(req: Request) {
     
     // Publish to Ably for real-time updates
     try {
+      // Publish tracked event
       await ServerPublisher.publishCampaignEvent(
         campaignSiteEvent.campaignId,
         'tracked_event',
@@ -135,8 +135,23 @@ export async function POST(req: Request) {
           data: trackedEvent.data,
           participationId: participation.id,
           influencerWallet: participation.influencer.walletAddress,
+          influencerName: participation.influencer.name,
         },
       );
+      
+      // Publish campaign changes with full campaign DTO
+      const campaignDTO = await getCampaignResponseDTO(
+        campaignSiteEvent.campaignId,
+        participation.influencer.walletAddress,
+      );
+      
+      if (campaignDTO) {
+        await ServerPublisher.publishCampaignEvent(
+          campaignSiteEvent.campaignId,
+          'campaign_changes',
+          campaignDTO,
+        );
+      }
     } catch (ablyError) {
       // Log but don't fail the request if Ably publish fails
       console.error('[Event API] Failed to publish to Ably:', ablyError);
