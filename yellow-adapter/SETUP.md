@@ -1,22 +1,23 @@
-# Setup - Yellow Adapter
+# ⚙️ Setup Completo
 
-Guía completa de instalación y configuración.
+Guía de instalación y configuración de Growi Campaign Manager.
 
 ---
 
 ## 📦 Instalación
 
 ```bash
-# 1. Clonar/Navegar al proyecto
+# Clonar repo
+git clone <repo-url>
 cd yellow-adapter
 
-# 2. Instalar dependencias
+# Instalar dependencias
 npm install
 ```
 
 ---
 
-## ⚙️ Configuración
+## 🔧 Configuración
 
 ### 1. Copiar .env
 
@@ -24,286 +25,233 @@ npm install
 cp .env.example .env
 ```
 
-### 2. Editar .env
-
-Abre `.env` y configura:
+### 2. Generar Private Keys
 
 ```bash
-# ============================================
-# Yellow ClearNode (Sandbox)
-# ============================================
-
-YELLOW_WS_URL=wss://clearnet-sandbox.yellow.com/ws
-YELLOW_HTTP_URL=https://clearnet-sandbox.yellow.com
-
-# ============================================
-# Chain RPCs (Públicos funcionan OK)
-# ============================================
-
-BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
-POLYGON_AMOY_RPC_URL=https://rpc-amoy.polygon.technology
-
-# ============================================
-# Test Wallets (SOLO para testing)
-# ============================================
-
-# ⚠️ IMPORTANTE: Estas son wallets de PRUEBA
-# NUNCA uses wallets reales aquí
-
-# Manager wallet (provee presupuesto en campañas)
-YELLOW_MANAGER_PK=0xYOUR_MANAGER_PRIVATE_KEY_HERE
-
-# Influencer wallet (recibe payouts)
-YELLOW_INFLUENCER_PK=0xYOUR_INFLUENCER_PRIVATE_KEY_HERE
-
-# 🔑 Growi Judge wallet (LA WALLET DE GROWI - firma todos los payouts)
-# Esta es la wallet que CONTROLA la plataforma
-YELLOW_JUDGE_PK=0xYOUR_GROWI_PLATFORM_PRIVATE_KEY_HERE
-
-# Fee Treasury wallet (recibe fees de plataforma)
-YELLOW_FEE_PK=0xYOUR_FEE_TREASURY_PRIVATE_KEY_HERE
+# Generar 2 keys para la plataforma:
+node -e "console.log('YELLOW_JUDGE_PK=0x' + require('crypto').randomBytes(32).toString('hex'))"
+node -e "console.log('YELLOW_FEE_PK=0x' + require('crypto').randomBytes(32).toString('hex'))"
 ```
 
----
-
-## 🔑 Generar Wallets de Test
-
-### Opción 1: Node.js
-
-```javascript
-// En la consola de node:
-const { generatePrivateKey } = require("viem/accounts");
-console.log(generatePrivateKey());
-```
-
-### Opción 2: Online
-
-Usa: https://vanity-eth.tk/ (SOLO para testnet)
-
-### Opción 3: Metamask
-
-1. Crear nueva wallet en Metamask
-2. Exportar private key
-3. Copiar a `.env`
-
-⚠️ **NUNCA** compartas estas keys. Son SOLO para testing local.
-
----
-
-## 💰 Obtener Fondos de Test
-
-### Paso 1: ETH en Base Sepolia (Para gas)
-
-Necesitas ETH en las wallets para pagar gas de TXs on-chain.
-
-**Faucets ETH**:
-- Alchemy: https://www.alchemy.com/faucets/base-sepolia
-- Coinbase: https://portal.cdp.coinbase.com/products/faucet
-
-**Addresses de tus wallets** (las que generaste):
-- Manager: La address correspondiente a YELLOW_MANAGER_PK
-- Influencer: La address correspondiente a YELLOW_INFLUENCER_PK
-
-Necesitas ~0.01 ETH por wallet.
-
-### Paso 2: ytest.usd (Yellow Test USDC)
-
-Yellow Sandbox usa `ytest.usd` (token de prueba, NO es USDC real).
-
-**🎯 Obtener ytest.usd con tu API**:
+### 3. Editar .env
 
 ```bash
-# Opción 1: Todas las wallets a la vez (RECOMENDADO)
-curl -X POST http://localhost:3003/api/yellow/faucet/all
+# Solo necesitas configurar estas 2 líneas:
+YELLOW_JUDGE_PK=
+YELLOW_FEE_PK=
 
-# Opción 2: Solo Manager
-curl -X POST http://localhost:3003/api/yellow/faucet/manager
-
-# Opción 3: Solo Influencer
-curl -X POST http://localhost:3003/api/yellow/faucet/influencer
-
-# Opción 4: Cualquier address
-curl -X POST http://localhost:3003/api/yellow/faucet \
-  -H "Content-Type: application/json" \
-  -d '{"userAddress": "0x..."}'
+# El resto ya está configurado correctamente ✓
 ```
-
-**Respuesta esperada**:
-```json
-{
-  "ok": true,
-  "data": {
-    "wallets": {
-      "manager": { "success": true, "address": "0x742d35..." },
-      "influencer": { "success": true, "address": "0x5B38Da..." }
-    }
-  },
-  "message": "Faucet requested for all test wallets: 4/4 succeeded"
-}
-```
-
-**⚠️ Nota sobre App Sessions**:
-- Los App Sessions son **OFF-CHAIN** → NO necesitas ytest.usd
-- El `budgetUsdc` es virtual (solo memoria)
-- Solo necesitas ytest.usd para **Happy Path** (transacciones on-chain reales)
 
 ---
 
-## 🎯 Entender el Budget
-
-### ¿De dónde sale el budget?
-
-```json
-{
-  "budgetUsdc": "1000000",  // ← Esto es VIRTUAL (off-chain)
-  "managerAddress": "0x...",
-  "influencerAddress": "0x..."
-}
-```
-
-**Explicación**:
-
-1. **El budget es CONTABILIDAD OFF-CHAIN**:
-   - No se verifica que el manager tenga fondos reales
-   - Es como un "crédito virtual" en la sesión
-   - Los payouts solo mueven números off-chain
-
-2. **El token se define en el código** (línea 37 de `service.ts`):
-   ```typescript
-   asset: string = "ytest.usd"  // ← Token por defecto
-   ```
-
-3. **Formato del budget**:
-   ```
-   "1000000" = 1 USDC (6 decimales)
-   "500000"  = 0.5 USDC
-   "250000"  = 0.25 USDC
-   ```
-
-### ¿Cuándo se necesitan fondos reales?
-
-Solo cuando haces **settlement on-chain**:
-
-1. **Create Channel** (INITIALIZE):
-   - Necesitas fondos reales en la wallet
-   - Se bloquean en Custody contract
-
-2. **Close Channel** (FINALIZE):
-   - Los fondos se distribuyen según allocations
-   - Se envían a las wallets de los participantes
-
-Pero para **App Sessions** (testing básico), es todo off-chain y no necesitas fondos reales.
-
----
-
-## 🧪 Verificar Setup
-
-### 1. Levantar servidor
+## 🚀 Levantar Servidor
 
 ```bash
 npm run dev
 ```
 
-**Expected**:
-```
-▲ Next.js 16.1.6 (Turbopack)
-- Local: http://localhost:3003
-✓ Ready in 620ms
-```
-
-### 2. Health Check
-
-```bash
-curl http://localhost:3003/api/yellow/health
-```
-
-**Expected**:
-```json
-{
-  "ok": true,
-  "service": "yellow-adapter",
-  "nitroRpc": {
-    "connected": true,
-    "latencyMs": 150
-  },
-  "chainsConfigured": [...]
-}
-```
-
-### 3. Crear una sesión de prueba
-
-```bash
-curl -X POST http://localhost:3003/api/yellow/app-sessions/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "budgetUsdc": "1000000",
-    "managerAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEbB",
-    "influencerAddress": "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"
-  }'
-```
-
-**Expected**:
-```json
-{
-  "ok": true,
-  "data": {
-    "appSessionId": "session_...",
-    "allocations": [
-      { "participant": "0x742d35...", "amount": "1000000" },
-      { "participant": "0x5B38Da...", "amount": "0" },
-      ...
-    ],
-    "version": 0
-  }
-}
-```
-
-✅ Si ves esto, el setup está correcto!
+Abre: **http://localhost:3000**
 
 ---
 
-## 🎯 Chains Soportadas
+## 🎨 Frontend
 
-| Chain | ChainId | Custody Contract | Testnet |
-|-------|---------|------------------|---------|
-| Base Sepolia | 84532 | `0x9f5314FB00C98Eb274B83001e37902c91b332e8A` | ✅ |
-| Polygon Amoy | 80002 | `0x9f5314FB00C98Eb274B83001e37902c91b332e8A` | ✅ |
+### Manager (http://localhost:3000/manager)
+
+1. Click "Connect Wallet"
+2. Elige tu método de autenticación:
+   - 📧 Email
+   - 🔗 Google / Twitter
+   - 🦊 MetaMask
+3. Crea una campaña
+
+### Influencer (http://localhost:3000/influencer)
+
+1. Click "Connect Wallet"
+2. Ingresa el Session ID
+3. Retira fondos
+
+### Admin (http://localhost:3000/admin)
+
+1. Ingresa Session ID
+2. Aplica payouts
+3. La plataforma (Judge) firma automáticamente
+
+---
+
+## 📡 API (Postman)
+
+### Importar Colección
+
+```bash
+# 1. Importar archivo:
+postman/Growi-API.postman_collection.json
+
+# 2. Importar environment:
+postman/Growi.postman_environment.json
+
+# 3. Probar endpoint "Health Check"
+```
+
+### Probar Flujo Completo
+
+```bash
+1. Health Check       → Verifica que el servidor funciona
+2. Create Session     → Crea una campaña
+3. Get Session        → Ve los detalles
+4. Apply Payout       → Aplica earnings al influencer
+5. Claim              → Influencer retira fondos
+```
+
+---
+
+## 💰 Faucets (Para On-Chain)
+
+Si quieres hacer transacciones reales on-chain:
+
+### 1. ETH en Base Sepolia
+
+```
+URL: https://www.alchemy.com/faucets/base-sepolia
+Cantidad: ~0.05 ETH (para gas)
+```
+
+### 2. Yellow test USDC
+
+```bash
+curl -X POST http://localhost:3000/api/yellow/faucet \
+  -H "Content-Type: application/json" \
+  -d '{"userAddress": "0xTU_WALLET_ADDRESS"}'
+
+# Te da: 1 ytest.usd (= 1,000,000 units)
+```
+
+---
+
+## 🔐 Modelo de Seguridad
+
+### Keys en el Servidor (.env)
+
+```bash
+YELLOW_JUDGE_PK    # Growi platform (firma payouts)
+YELLOW_FEE_PK      # Fee treasury (recibe fees)
+```
+
+### Keys en el Frontend (WAAP)
+
+```bash
+Manager Address     → Wallet conectada en /manager
+Influencer Address  → Wallet conectada en /influencer
+```
+
+**❌ NUNCA pongas las private keys de usuarios en .env**
+
+---
+
+## 🧪 Testing
+
+### Opción 1: Frontend
+
+```
+1. http://localhost:3000/manager
+2. Conectar wallet
+3. Crear campaña
+4. Copiar Session ID
+5. Ir a /admin y aplicar payout
+6. Ir a /influencer y hacer claim
+```
+
+### Opción 2: Postman
+
+```
+1. Importar colección
+2. Ejecutar requests en orden:
+   - Create Session
+   - Apply Payout
+   - Claim
+```
+
+### Opción 3: cURL
+
+```bash
+# Health check
+curl http://localhost:3000/api/yellow/health
+
+# Create session
+curl -X POST http://localhost:3000/api/yellow/app-sessions/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "budgetUsdc": "1000000",
+    "managerAddress": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    "influencerAddress": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+  }'
+```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Error: "Port 3000 is in use"
+### Error: "Platform wallets not configured"
 
 ```bash
-# Matar procesos node
-pkill -9 node
+# Solución: Revisa que .env tenga:
+YELLOW_JUDGE_PK=0x...
+YELLOW_FEE_PK=0x...
+```
 
-# Limpiar cache
+### Error: "WAAP SDK not found"
+
+```bash
+# Solución: Instalar WAAP
+npm install @human.tech/waap-sdk
+```
+
+### Error: "Port 3000 in use"
+
+```bash
+# Opción 1: Cambiar puerto
+PORT=3001 npm run dev
+
+# Opción 2: Matar proceso
+lsof -ti:3000 | xargs kill -9
+```
+
+### Frontend se ve roto
+
+```bash
+# Limpiar cache de Tailwind
 rm -rf .next
-
-# Reintentar
 npm run dev
 ```
 
-### Error: "NitroRPC not connected"
+---
 
-- Verifica internet connection
-- Verifica `YELLOW_WS_URL` en `.env`
-- Debe ser: `wss://clearnet-sandbox.yellow.com/ws`
+## 📂 Estructura del Proyecto
 
-### Error: "Test wallets not configured"
-
-- Verifica que `.env` tiene las 4 keys:
-  - `YELLOW_MANAGER_PK`
-  - `YELLOW_INFLUENCER_PK`
-  - `YELLOW_JUDGE_PK`
-  - `YELLOW_FEE_PK`
+```
+yellow-adapter/
+├── app/                  # Frontend Next.js
+│   ├── api/             # API routes
+│   ├── manager/         # Manager dashboard
+│   ├── influencer/      # Influencer dashboard
+│   └── admin/           # Admin dashboard
+├── src/
+│   ├── lib/             # Utilidades
+│   │   └── yellow/      # Yellow SDK integration
+│   └── components/      # React components
+├── public/              # Assets estáticos
+├── postman/             # Postman collections
+└── .env                 # Configuración
+```
 
 ---
 
-## 📚 Siguiente Paso
+## 🎯 Próximos Pasos
 
-Lee **[API.md](./API.md)** para ver todos los endpoints con ejemplos.
+1. ✅ Levantar servidor: `npm run dev`
+2. ✅ Probar frontend: `http://localhost:3000`
+3. ✅ Importar Postman
+4. ✅ Crear primera campaña
 
-O ve **[TESTING.md](./TESTING.md)** para empezar a testear con Postman.
+**¿Dudas?** Ver [README.md](./README.md) o [API.md](./API.md)

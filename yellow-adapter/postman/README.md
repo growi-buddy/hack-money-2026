@@ -1,219 +1,187 @@
-# Postman Collection - Yellow Adapter
+# 📮 Postman Collections
 
-Testing completo del API con Postman.
-
----
-
-## 📦 Archivos
-
-### 1. Yellow-Complete-Testing.postman_collection.json
-
-Collection con TODOS los endpoints:
-- 🏥 Health & Config
-- 💧 Faucet (obtener ytest.usd)
-- 🎯 App Sessions (3 wallets)
-- 🔥 Channel Close & Settle
-- 🚀 Demo Happy Path
-
-**Features**:
-- Tests automáticos
-- Console logs
-- Variables auto-actualizadas
-
-### 2. Yellow-Complete.postman_environment.json
-
-Environment con variables pre-configuradas:
-- `base_url`: http://localhost:3003
-- `chainId`: 84532 (Base Sepolia)
-- `custody_contract`: 0x9f5314...
-- Wallets: `wallet1`, `wallet2`, `wallet3`
-
-⚠️ **IMPORTANTE**: Este archivo usa placeholders. Debes reemplazarlos con tus propias keys.
+Colecciones de Postman para probar la API de Growi.
 
 ---
 
-## 🚀 Setup
+## 📥 Importar
 
-### 1. Importar en Postman
+### 1. Abrir Postman
 
-```
-1. Abrir Postman
-2. Click "Import"
-3. Arrastrar estos 2 archivos:
-   - Yellow-Complete-Testing.postman_collection.json
-   - Yellow-Complete.postman_environment.json
-4. Click "Import"
-```
-
-### 2. Configurar Environment
+### 2. Importar Colección
 
 ```
-1. En Postman, click en el selector de environment (arriba derecha)
-2. Seleccionar "Yellow Complete Environment"
-3. Click en el ícono "👁️" (ojo) → "Edit"
-4. Reemplazar los placeholders:
-
-   wallet1_address: 0xTU_ADDRESS_MANAGER
-   wallet1_pk: 0xTU_PRIVATE_KEY_MANAGER
-   
-   wallet2_address: 0xTU_ADDRESS_INFLUENCER
-   wallet2_pk: 0xTU_PRIVATE_KEY_INFLUENCER
-   
-   wallet3_address: 0xTU_ADDRESS_SPECTATOR
-   wallet3_pk: 0xTU_PRIVATE_KEY_SPECTATOR
-
-5. Click "Save"
+File → Import → Seleccionar:
+postman/Growi-API.postman_collection.json
 ```
 
-**¿Cómo obtener wallets de test?**
-
-Ver: **[../SETUP.md](../SETUP.md)** sección "Generar Wallets de Test"
-
-Opción rápida:
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-### 3. Sincronizar con .env
-
-Las wallets en Postman deben ser las MISMAS que en tu `.env`:
-
-```bash
-# .env
-YELLOW_MANAGER_PK=0xTU_KEY_1
-YELLOW_INFLUENCER_PK=0xTU_KEY_2
-YELLOW_JUDGE_PK=0xTU_KEY_3
-```
+### 3. Importar Environment
 
 ```
-# Postman environment
-wallet1_pk=0xTU_KEY_1  (Manager)
-wallet2_pk=0xTU_KEY_2  (Influencer)
-wallet3_pk=0xTU_KEY_3  (opcional)
+File → Import → Seleccionar:
+postman/Growi.postman_environment.json
 ```
 
-**Importante**: El `YELLOW_JUDGE_PK` del .env es la **wallet de Growi** que controla todos los payouts.
+### 4. Activar Environment
+
+```
+En Postman, arriba a la derecha:
+"No Environment" → Seleccionar "Growi Environment"
+```
+
+---
+
+## 🚀 Probar Endpoints
+
+### Orden Recomendado
+
+```
+1. Health Check      → Verifica servidor
+2. Create Session    → Crea campaña (guarda Session ID automáticamente)
+3. Get Session       → Ve detalles de la sesión
+4. Apply Payout      → Aplica earnings al influencer
+5. Claim Funds       → Influencer retira fondos
+```
+
+### Variables
+
+El environment tiene variables pre-configuradas:
+
+| Variable | Valor | Descripción |
+|----------|-------|-------------|
+| `baseUrl` | `http://localhost:3000` | URL del servidor |
+| `sessionId` | (auto) | Se guarda automáticamente |
+| `managerAddress` | `0x742d...` | Wallet del manager |
+| `influencerAddress` | `0x7099...` | Wallet del influencer |
+| `budget` | `1000000` | 1 USDC |
+| `earnedAmount` | `250000` | 0.25 USDC |
+| `claimAmount` | `250000` | 0.25 USDC |
+| `feeBps` | `200` | 2% |
+
+---
+
+## 🔄 Flujo Completo
+
+### 1. Health Check
+
+```
+GET /api/yellow/health
+```
+
+Verifica que el servidor funciona.
+
+### 2. Create Session
+
+```
+POST /api/yellow/app-sessions/create
+
+Body:
+{
+  "budgetUsdc": "1000000",
+  "managerAddress": "0x742d35...",
+  "influencerAddress": "0x70997..."
+}
+```
+
+**El Session ID se guarda automáticamente** en la variable `{{sessionId}}`.
+
+### 3. Get Session
+
+```
+GET /api/yellow/app-sessions/{{sessionId}}
+```
+
+Ve los detalles y allocations de la sesión.
+
+### 4. Apply Payout
+
+```
+POST /api/yellow/app-sessions/payout
+
+Body:
+{
+  "appSessionId": "{{sessionId}}",
+  "earnedUsdc": "250000",
+  "feeBps": 200
+}
+```
+
+Mueve fondos de Manager a Influencer (+ fee).
+
+### 5. Claim Funds
+
+```
+POST /api/yellow/app-sessions/claim
+
+Body:
+{
+  "appSessionId": "{{sessionId}}",
+  "participant": "{{influencerAddress}}",
+  "amountUsdc": "250000"
+}
+```
+
+Influencer retira sus fondos.
 
 ---
 
 ## 🧪 Testing
 
-### Flujo Básico (App Sessions - Off-chain)
+### Cambiar Valores
+
+Para probar diferentes escenarios, edita las variables del environment:
 
 ```
-1. Ejecutar carpeta "🎯 App Sessions (3 Wallets)"
-2. Ver resultados en Console (abajo en Postman)
-3. Verificar que todos los tests pasen ✅
+Click en "Growi Environment" → Edit
+
+Cambia:
+- budget: "2000000" (2 USDC)
+- earnedAmount: "500000" (0.5 USDC)
+- feeBps: "500" (5%)
 ```
 
-**No necesitas tokens** - Todo es off-chain.
+### Múltiples Sesiones
 
-### Flujo Avanzado (Happy Path - On-chain)
+Para crear varias sesiones:
 
-```
-1. Obtener ETH de faucet:
-   https://www.alchemy.com/faucets/base-sepolia
-   
-2. Ejecutar "💧 Faucet - Request Tokens All"
-   → Obtiene ytest.usd para todas tus wallets
-   
-3. Ejecutar "🔥 Demo Happy Path"
-   → Hace TXs reales en Base Sepolia
-   
-4. Ver TX hash en Basescan:
-   https://sepolia.basescan.org/tx/0x...
-```
-
-**Necesitas tokens reales** - ETH para gas, ytest.usd para balance.
+1. Run "Create Session" → Copia el nuevo Session ID
+2. Edita variable `sessionId` manualmente
+3. Run "Apply Payout" / "Claim Funds"
 
 ---
 
-## 📊 Estructura de la Collection
+## 💡 Tips
 
+### Auto-Save Session ID
+
+El request "Create Session" tiene un script que guarda automáticamente el Session ID:
+
+```javascript
+// En Tests tab del request:
+if (pm.response.code === 200) {
+    const response = pm.response.json();
+    pm.environment.set('sessionId', response.data.appSessionId);
+}
 ```
-Yellow Complete Testing
-├── 🏥 Health & Config (2 requests)
-│   ├── Health Check
-│   └── Get Config
-│
-├── 💧 Faucet (4 requests)
-│   ├── Request Tokens - All Wallets
-│   ├── Request Tokens - Manager
-│   ├── Request Tokens - Influencer
-│   └── Request Tokens - Custom Address
-│
-├── 🎯 App Sessions (8 requests)
-│   ├── Create Session
-│   ├── Get Session (Initial)
-│   ├── Payout #1 (0.25 USDC)
-│   ├── Payout #2 (0.15 USDC)
-│   ├── Payout #3 (0.1 USDC)
-│   ├── Get Session (After Payouts)
-│   ├── Claim (0.2 USDC)
-│   └── Get Session (Final)
-│
-└── 🔥 Channel Close & Settle (1 request)
-    └── Demo Happy Path
+
+### Ver Console
+
+Para ver logs:
+```
+View → Show Postman Console (Ctrl+Alt+C)
+```
+
+### Cambiar Puerto
+
+Si tu servidor corre en otro puerto:
+```
+Edit Environment → baseUrl → http://localhost:3001
 ```
 
 ---
 
-## 🔐 Seguridad
+## 📚 Ver También
 
-### ⚠️ NUNCA subas a GitHub:
-
-- ❌ Private keys reales
-- ❌ API keys de producción
-- ❌ Wallets con fondos reales
-
-### ✅ Solo usa en Postman:
-
-- ✅ Wallets de testnet (Base Sepolia)
-- ✅ Private keys de prueba
-- ✅ Fondos de faucets gratuitos
-
-**El archivo en GitHub tiene placeholders**. Cada desarrollador debe configurar sus propias keys localmente.
-
----
-
-## 🐛 Troubleshooting
-
-### Error: "wallet1_address is not defined"
-
-**Causa**: No configuraste el environment.
-
-**Solución**:
-1. Click en selector de environment (arriba derecha)
-2. Seleccionar "Yellow Complete Environment"
-3. Editar y agregar tus addresses/keys
-
-### Error: "VALIDATION_ERROR: Invalid Ethereum address"
-
-**Causa**: Address mal formateada.
-
-**Solución**:
-- Address debe empezar con `0x`
-- Debe tener 40 caracteres hex después del `0x`
-- Ejemplo: `0x742d35Cc6634C0532925a3b844Bc9e7595f0bEbB`
-
-### Tests fallan con "Session not found"
-
-**Causa**: No ejecutaste "Create Session" primero.
-
-**Solución**:
-- Ejecutar los requests en orden (de arriba a abajo)
-- O ejecutar toda la carpeta con "Run folder"
-
----
-
-## 📚 Más Info
-
-- **[../SETUP.md](../SETUP.md)** - Setup y configuración
-- **[../API.md](../API.md)** - Referencia de endpoints
-- **[../TESTING.md](../TESTING.md)** - Guía de testing completa
-
----
-
-**🚀 Ready to test!**
-
-Importa los archivos, configura tus keys, y ejecuta la collection.
+- [README.md](../README.md) - Quick Start
+- [API.md](../API.md) - Documentación completa de endpoints
+- [SETUP.md](../SETUP.md) - Configuración del servidor

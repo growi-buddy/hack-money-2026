@@ -17,13 +17,12 @@ import type {
 } from "./types";
 
 /**
- * Configuración de wallets para modo test
+ * Configuración de wallets de la plataforma (Growi)
+ * Manager e Influencer NO están aquí, vienen del frontend
  */
-interface TestWallets {
-  manager: any;
-  influencer: any;
-  judge: any;
-  feeTreasury: any;
+interface PlatformWallets {
+  judge: any;         // Growi platform wallet (firma payouts)
+  feeTreasury: any;   // Fee treasury wallet
 }
 
 /**
@@ -52,11 +51,11 @@ export function createGrowiAppDefinition(
  */
 export class AppSessionService {
   private rpcClient: YellowRpcClient;
-  private testWallets: TestWallets;
+  private platformWallets: PlatformWallets;
 
-  constructor(wsUrl: string, testWallets: TestWallets) {
+  constructor(wsUrl: string, platformWallets: PlatformWallets) {
     this.rpcClient = new YellowRpcClient(wsUrl);
-    this.testWallets = testWallets;
+    this.platformWallets = platformWallets;
   }
 
   /**
@@ -65,10 +64,13 @@ export class AppSessionService {
   async createSession(input: CreateSessionInput): Promise<AppSessionState> {
     await this.rpcClient.ensureConnected();
 
+    // Manager e Influencer addresses vienen del frontend (WAAP)
     const managerAddr = input.managerAddress as `0x${string}`;
     const influencerAddr = input.influencerAddress as `0x${string}`;
-    const judgeAddr = this.testWallets.judge.address;
-    const feeAddr = this.testWallets.feeTreasury.address;
+    
+    // Judge y Fee son wallets de la plataforma (Growi)
+    const judgeAddr = this.platformWallets.judge.address;
+    const feeAddr = this.platformWallets.feeTreasury.address;
 
     // Crear definición
     const definition = createGrowiAppDefinition(
@@ -253,23 +255,20 @@ export class AppSessionService {
 }
 
 /**
- * Factory para crear el service con test wallets
+ * Factory para crear el service con platform wallets (solo Growi)
+ * Manager e Influencer conectan desde el frontend con WAAP
  */
 export function createAppSessionService(
   wsUrl: string,
-  managerPk: `0x${string}`,
-  influencerPk: `0x${string}`,
   judgePk: `0x${string}`,
   feePk: `0x${string}`
 ): AppSessionService {
-  const testWallets: TestWallets = {
-    manager: privateKeyToAccount(managerPk),
-    influencer: privateKeyToAccount(influencerPk),
+  const platformWallets: PlatformWallets = {
     judge: privateKeyToAccount(judgePk),
     feeTreasury: privateKeyToAccount(feePk),
   };
 
-  return new AppSessionService(wsUrl, testWallets);
+  return new AppSessionService(wsUrl, platformWallets);
 }
 
 /**
@@ -279,24 +278,25 @@ let serviceInstance: AppSessionService | null = null;
 
 export function getAppSessionService(): AppSessionService {
   if (!serviceInstance) {
-    // Leer env vars
+    // Leer env vars (solo platform keys)
     const wsUrl =
       process.env.YELLOW_WS_URL || "wss://clearnet-sandbox.yellow.com/ws";
-    const managerPk = process.env.YELLOW_MANAGER_PK as `0x${string}`;
-    const influencerPk = process.env.YELLOW_INFLUENCER_PK as `0x${string}`;
     const judgePk = process.env.YELLOW_JUDGE_PK as `0x${string}`;
     const feePk = process.env.YELLOW_FEE_PK as `0x${string}`;
 
-    if (!managerPk || !influencerPk || !judgePk || !feePk) {
+    // Solo validar platform keys (Growi)
+    // Manager e Influencer vienen del frontend con WAAP
+    if (!judgePk || !feePk) {
       throw new Error(
-        "Test wallets not configured. Set YELLOW_MANAGER_PK, YELLOW_INFLUENCER_PK, YELLOW_JUDGE_PK, YELLOW_FEE_PK in .env"
+        "❌ Platform wallets not configured.\n" +
+        "Set YELLOW_JUDGE_PK and YELLOW_FEE_PK in .env\n\n" +
+        "💡 Manager and Influencer wallets connect from the frontend with WAAP.\n" +
+        "See SETUP.md for more details."
       );
     }
 
     serviceInstance = createAppSessionService(
       wsUrl,
-      managerPk,
-      influencerPk,
       judgePk,
       feePk
     );

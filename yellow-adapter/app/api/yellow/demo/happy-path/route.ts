@@ -1,14 +1,24 @@
 /**
  * POST /api/yellow/demo/happy-path
- * Demo completo end-to-end SOLO para testnet
  * 
- * Flujo:
+ * ⚠️ LEGACY ENDPOINT - DEPRECADO ⚠️
+ * 
+ * Este endpoint es del modelo anterior (custodial para testing).
+ * Ahora usamos WAAP en el frontend para que los usuarios conecten sus wallets.
+ * 
+ * ✅ NUEVA FORMA DE TESTEAR:
+ * 1. Ve a http://localhost:3004/manager
+ * 2. Conecta tu wallet con WAAP
+ * 3. Crea una campaña desde el frontend
+ * 
+ * Si AÚN quieres usar este endpoint legacy:
+ * - Añade YELLOW_MANAGER_PK y YELLOW_INFLUENCER_PK a tu .env
+ * - Son solo para testing local, no para producción
+ * 
+ * Flujo legacy:
  * 1. Create channel + on-chain create (INITIALIZE)
  * 2. Off-chain payouts (OPERATE)
  * 3. Close cooperatively (FINALIZE)
- * 
- * IMPORTANTE: Usa wallets de test configuradas en .env
- * NO viola la regla de oro porque son wallets de prueba locales
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -50,7 +60,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Cargar wallets de test desde env
+    // ⚠️ LEGACY: Este endpoint requiere private keys en el servidor
+    // En el nuevo flujo con WAAP, las keys están en el frontend
     const managerPk = process.env.YELLOW_MANAGER_PK as `0x${string}`;
     const influencerPk = process.env.YELLOW_INFLUENCER_PK as `0x${string}`;
 
@@ -59,11 +70,12 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           error: {
-            code: "MISSING_TEST_WALLETS",
-            message: "Set YELLOW_MANAGER_PK and YELLOW_INFLUENCER_PK in .env",
+            code: "ENDPOINT_DEPRECATED",
+            message: "⚠️ Este endpoint es LEGACY. Usa el frontend con WAAP: http://localhost:3004/manager. Si quieres usar este endpoint, añade YELLOW_MANAGER_PK y YELLOW_INFLUENCER_PK a .env (solo para testing local).",
+            recommendation: "Use the new frontend flow with WAAP instead of this legacy endpoint",
           },
         },
-        { status: 500 }
+        { status: 400 }
       );
     }
 

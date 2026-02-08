@@ -1,0 +1,149 @@
+{
+  "info": {
+    "name": "Growi API",
+    "_postman_id": "growi-api-v1",
+    "description": "API para Growi Campaign Manager - Sistema de pagos off-chain",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/yellow/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "yellow", "health"]
+        },
+        "description": "Verifica que el servidor está funcionando correctamente."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Create Session",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Guardar Session ID automáticamente",
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    if (response.ok && response.data.appSessionId) {",
+              "        pm.environment.set('sessionId', response.data.appSessionId);",
+              "        console.log('✅ Session ID guardado:', response.data.appSessionId);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"budgetUsdc\": \"{{budget}}\",\n  \"managerAddress\": \"{{managerAddress}}\",\n  \"influencerAddress\": \"{{influencerAddress}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/yellow/app-sessions/create",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "yellow", "app-sessions", "create"]
+        },
+        "description": "Crea una nueva campaña con presupuesto inicial.\n\n**Budget**: 1,000,000 units = 1 USDC"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get Session",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/yellow/app-sessions/{{sessionId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "yellow", "app-sessions", "{{sessionId}}"]
+        },
+        "description": "Obtiene los detalles de una sesión.\n\nUsa el Session ID guardado del request anterior."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Apply Payout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"appSessionId\": \"{{sessionId}}\",\n  \"earnedUsdc\": \"{{earnedAmount}}\",\n  \"feeBps\": {{feeBps}}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/yellow/app-sessions/payout",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "yellow", "app-sessions", "payout"]
+        },
+        "description": "Aplica un payout al influencer.\n\n**Earned**: 250,000 units = 0.25 USDC\n**Fee**: 200 BPS = 2%"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Claim Funds",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"appSessionId\": \"{{sessionId}}\",\n  \"participant\": \"{{influencerAddress}}\",\n  \"amountUsdc\": \"{{claimAmount}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/yellow/app-sessions/claim",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "yellow", "app-sessions", "claim"]
+        },
+        "description": "El influencer retira sus fondos.\n\n**Amount**: 250,000 units = 0.25 USDC"
+      },
+      "response": []
+    },
+    {
+      "name": "6. Request Faucet",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userAddress\": \"{{managerAddress}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/yellow/faucet",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "yellow", "faucet"]
+        },
+        "description": "Solicita ytest.usd de prueba (solo para transacciones on-chain reales).\n\n**Amount**: 1 ytest.usd = 1,000,000 units"
+      },
+      "response": []
+    }
+  ],
+  "variable": []
+}
