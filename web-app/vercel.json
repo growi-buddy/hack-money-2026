@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/sync-chat",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/activate-campaigns",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/sync-campaigns-ens",
+      "schedule": "0 2 * * *"
     }
   ]
 }

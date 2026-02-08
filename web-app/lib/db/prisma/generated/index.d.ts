@@ -4953,6 +4953,7 @@ export namespace Prisma {
     startDate: Date | null
     endDate: Date | null
     yellowChannelId: string | null
+    ensSubdomain: string | null
     status: $Enums.CampaignStatus | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -4971,6 +4972,7 @@ export namespace Prisma {
     startDate: Date | null
     endDate: Date | null
     yellowChannelId: string | null
+    ensSubdomain: string | null
     status: $Enums.CampaignStatus | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -4993,6 +4995,7 @@ export namespace Prisma {
     startDate: number
     endDate: number
     yellowChannelId: number
+    ensSubdomain: number
     status: number
     createdAt: number
     updatedAt: number
@@ -5023,6 +5026,7 @@ export namespace Prisma {
     startDate?: true
     endDate?: true
     yellowChannelId?: true
+    ensSubdomain?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -5041,6 +5045,7 @@ export namespace Prisma {
     startDate?: true
     endDate?: true
     yellowChannelId?: true
+    ensSubdomain?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -5063,6 +5068,7 @@ export namespace Prisma {
     startDate?: true
     endDate?: true
     yellowChannelId?: true
+    ensSubdomain?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -5172,6 +5178,7 @@ export namespace Prisma {
     startDate: Date | null
     endDate: Date | null
     yellowChannelId: string | null
+    ensSubdomain: string | null
     status: $Enums.CampaignStatus
     createdAt: Date
     updatedAt: Date
@@ -5213,6 +5220,7 @@ export namespace Prisma {
     startDate?: boolean
     endDate?: boolean
     yellowChannelId?: boolean
+    ensSubdomain?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5239,6 +5247,7 @@ export namespace Prisma {
     startDate?: boolean
     endDate?: boolean
     yellowChannelId?: boolean
+    ensSubdomain?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5262,6 +5271,7 @@ export namespace Prisma {
     startDate?: boolean
     endDate?: boolean
     yellowChannelId?: boolean
+    ensSubdomain?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5285,13 +5295,14 @@ export namespace Prisma {
     startDate?: boolean
     endDate?: boolean
     yellowChannelId?: boolean
+    ensSubdomain?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
   }
 
-  export type CampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "title" | "description" | "escrowAddress" | "budgetTotal" | "isHot" | "slots" | "interests" | "demographics" | "regions" | "countries" | "startDate" | "endDate" | "yellowChannelId" | "status" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["campaign"]>
+  export type CampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "title" | "description" | "escrowAddress" | "budgetTotal" | "isHot" | "slots" | "interests" | "demographics" | "regions" | "countries" | "startDate" | "endDate" | "yellowChannelId" | "ensSubdomain" | "status" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["campaign"]>
   export type CampaignInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     siteEvents?: boolean | Campaign$siteEventsArgs<ExtArgs>
@@ -5328,6 +5339,7 @@ export namespace Prisma {
       startDate: Date | null
       endDate: Date | null
       yellowChannelId: string | null
+      ensSubdomain: string | null
       status: $Enums.CampaignStatus
       createdAt: Date
       updatedAt: Date
@@ -5773,6 +5785,7 @@ export namespace Prisma {
     readonly startDate: FieldRef<"Campaign", 'DateTime'>
     readonly endDate: FieldRef<"Campaign", 'DateTime'>
     readonly yellowChannelId: FieldRef<"Campaign", 'String'>
+    readonly ensSubdomain: FieldRef<"Campaign", 'String'>
     readonly status: FieldRef<"Campaign", 'CampaignStatus'>
     readonly createdAt: FieldRef<"Campaign", 'DateTime'>
     readonly updatedAt: FieldRef<"Campaign", 'DateTime'>
@@ -18603,6 +18616,7 @@ export namespace Prisma {
     startDate: 'startDate',
     endDate: 'endDate',
     yellowChannelId: 'yellowChannelId',
+    ensSubdomain: 'ensSubdomain',
     status: 'status',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
@@ -19183,6 +19197,7 @@ export namespace Prisma {
     startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableFilter<"Campaign"> | string | null
+    ensSubdomain?: StringNullableFilter<"Campaign"> | string | null
     status?: EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
     createdAt?: DateTimeFilter<"Campaign"> | Date | string
     updatedAt?: DateTimeFilter<"Campaign"> | Date | string
@@ -19208,6 +19223,7 @@ export namespace Prisma {
     startDate?: SortOrderInput | SortOrder
     endDate?: SortOrderInput | SortOrder
     yellowChannelId?: SortOrderInput | SortOrder
+    ensSubdomain?: SortOrderInput | SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -19219,6 +19235,7 @@ export namespace Prisma {
 
   export type CampaignWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    ensSubdomain?: string
     AND?: CampaignWhereInput | CampaignWhereInput[]
     OR?: CampaignWhereInput[]
     NOT?: CampaignWhereInput | CampaignWhereInput[]
@@ -19243,7 +19260,7 @@ export namespace Prisma {
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
     siteEvents?: CampaignSiteEventListRelationFilter
     participations?: ParticipationListRelationFilter
-  }, "id">
+  }, "id" | "ensSubdomain">
 
   export type CampaignOrderByWithAggregationInput = {
     id?: SortOrder
@@ -19261,6 +19278,7 @@ export namespace Prisma {
     startDate?: SortOrderInput | SortOrder
     endDate?: SortOrderInput | SortOrder
     yellowChannelId?: SortOrderInput | SortOrder
+    ensSubdomain?: SortOrderInput | SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -19291,6 +19309,7 @@ export namespace Prisma {
     startDate?: DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableWithAggregatesFilter<"Campaign"> | string | null
+    ensSubdomain?: StringNullableWithAggregatesFilter<"Campaign"> | string | null
     status?: EnumCampaignStatusWithAggregatesFilter<"Campaign"> | $Enums.CampaignStatus
     createdAt?: DateTimeWithAggregatesFilter<"Campaign"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Campaign"> | Date | string
@@ -20291,6 +20310,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20316,6 +20336,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20339,6 +20360,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20364,6 +20386,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20388,6 +20411,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20409,6 +20433,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20431,6 +20456,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21612,6 +21638,7 @@ export namespace Prisma {
     startDate?: SortOrder
     endDate?: SortOrder
     yellowChannelId?: SortOrder
+    ensSubdomain?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -21635,6 +21662,7 @@ export namespace Prisma {
     startDate?: SortOrder
     endDate?: SortOrder
     yellowChannelId?: SortOrder
+    ensSubdomain?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -21653,6 +21681,7 @@ export namespace Prisma {
     startDate?: SortOrder
     endDate?: SortOrder
     yellowChannelId?: SortOrder
+    ensSubdomain?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -23810,6 +23839,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23833,6 +23863,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -24064,6 +24095,7 @@ export namespace Prisma {
     startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     yellowChannelId?: StringNullableFilter<"Campaign"> | string | null
+    ensSubdomain?: StringNullableFilter<"Campaign"> | string | null
     status?: EnumCampaignStatusFilter<"Campaign"> | $Enums.CampaignStatus
     createdAt?: DateTimeFilter<"Campaign"> | Date | string
     updatedAt?: DateTimeFilter<"Campaign"> | Date | string
@@ -24912,6 +24944,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -24936,6 +24969,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25001,6 +25035,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25025,6 +25060,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25411,6 +25447,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25435,6 +25472,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -25616,6 +25654,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25640,6 +25679,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26283,6 +26323,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     yellowChannelId?: string | null
+    ensSubdomain?: string | null
     status?: $Enums.CampaignStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26377,6 +26418,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26400,6 +26442,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26423,6 +26466,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     yellowChannelId?: NullableStringFieldUpdateOperationsInput | string | null
+    ensSubdomain?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumCampaignStatusFieldUpdateOperationsInput | $Enums.CampaignStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

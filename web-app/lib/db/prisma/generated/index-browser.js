@@ -163,6 +163,7 @@ exports.Prisma.CampaignScalarFieldEnum = {
   startDate: 'startDate',
   endDate: 'endDate',
   yellowChannelId: 'yellowChannelId',
+  ensSubdomain: 'ensSubdomain',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',

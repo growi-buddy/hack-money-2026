@@ -72,7 +72,8 @@ model Campaign {
   siteEvents CampaignSiteEvent[]
 
   yellowChannelId String?
-  status          CampaignStatus  @default(DRAFT)
+  ensSubdomain    String?          @unique
+  status          CampaignStatus   @default(DRAFT)
   participations  Participation[]
 
   createdAt DateTime  @default(now())
