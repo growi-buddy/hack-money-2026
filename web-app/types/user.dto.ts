@@ -1,3 +1,4 @@
+import { InfluencerVerificationStatus } from '@/lib/db/enums';
 import { z } from 'zod';
 
 export const CreateUserDTO = z.object({
@@ -6,7 +7,9 @@ export const CreateUserDTO = z.object({
   email: z.string().email().optional(),
 });
 
-export const UpdateUserDTO = CreateUserDTO.partial();
+export const UpdateUserDTO = CreateUserDTO.partial().extend({
+  influencerVerification: z.nativeEnum(InfluencerVerificationStatus).optional(),
+});
 
 export interface BasicUserResponseDTO {
   id: string,
@@ -24,6 +27,7 @@ export interface UserResponseDTO extends BasicUserResponseDTO {
   interests: string[],
   affinities: string[],
   influencerVerification: boolean,
+  influencerVerificationStatus: string,
   socialMedias: {
     platform: string,
     username: string,

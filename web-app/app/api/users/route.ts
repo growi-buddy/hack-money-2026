@@ -17,6 +17,7 @@ function transformToUserResponseDTO(user: User & { socialMedias: SocialMedia[] }
     interests: user.interests || [],
     affinities: user.affinities || [],
     influencerVerification: user.influencerVerification === InfluencerVerificationStatus.VERIFIED,
+    influencerVerificationStatus: user.influencerVerification,
     socialMedias: user.socialMedias.map(sm => ({
       platform: sm.platform || '',
       username: sm.username || '',
