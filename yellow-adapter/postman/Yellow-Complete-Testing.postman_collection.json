@@ -1,0 +1,887 @@
+{
+  "info": {
+    "name": "Yellow Complete Testing - 3 Wallets",
+    "description": "Testing completo con ejemplos de 3 wallets: Manager, Influencer, Spectator",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🏥 Health & Config",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Service is healthy\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    if (jsonData.nitroRpc) {",
+                  "        console.log(\"NitroRPC Connected:\", jsonData.nitroRpc.connected);",
+                  "        console.log(\"Latency:\", jsonData.nitroRpc.latencyMs, \"ms\");",
+                  "    }",
+                  "    ",
+                  "    if (jsonData.chainsConfigured) {",
+                  "        console.log(\"Chains:\", jsonData.chainsConfigured.length);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "health"
+              ]
+            },
+            "description": "Verifica que el servicio esté funcionando"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Config",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Config retrieved\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    console.log(\"Environment:\", jsonData.data.environment);",
+                  "    console.log(\"Chains:\", JSON.stringify(jsonData.data.chains, null, 2));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/config",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "config"
+              ]
+            },
+            "description": "Obtiene configuración de chains soportadas"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "💧 Faucet (ytest.usd)",
+      "item": [
+        {
+          "name": "Request Tokens - All Wallets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Faucet request successful\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    if (jsonData.data && jsonData.data.summary) {",
+                  "        console.log(\"✅ Tokens requested:\", jsonData.data.summary.successful, \"/\", jsonData.data.summary.total);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/faucet/all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "faucet",
+                "all"
+              ]
+            },
+            "description": "Solicita ytest.usd del faucet Yellow para todas las wallets de test"
+          },
+          "response": []
+        },
+        {
+          "name": "Request Tokens - Manager Only",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Manager faucet successful\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    console.log(\"✅ Manager:\", jsonData.data.address);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/faucet/manager",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "faucet",
+                "manager"
+              ]
+            },
+            "description": "Solicita ytest.usd solo para Manager wallet"
+          },
+          "response": []
+        },
+        {
+          "name": "Request Tokens - Influencer Only",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Influencer faucet successful\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    console.log(\"✅ Influencer:\", jsonData.data.address);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/faucet/influencer",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "faucet",
+                "influencer"
+              ]
+            },
+            "description": "Solicita ytest.usd solo para Influencer wallet"
+          },
+          "response": []
+        },
+        {
+          "name": "Request Tokens - Custom Address",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Custom faucet successful\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    console.log(\"✅ Address:\", jsonData.data.userAddress);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userAddress\": \"{{wallet1_address}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/faucet",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "faucet"
+              ]
+            },
+            "description": "Solicita ytest.usd para cualquier address"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🎯 App Sessions (3 Wallets)",
+      "item": [
+        {
+          "name": "1. Create Session (Manager + Influencer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Session created\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    const sessionId = jsonData.data.appSessionId;",
+                  "    pm.collectionVariables.set(\"app_session_id\", sessionId);",
+                  "    ",
+                  "    console.log(\"✅ Session ID:\", sessionId);",
+                  "    console.log(\"Participants:\", jsonData.data.definition.participants);",
+                  "    console.log(\"Initial Allocations:\", JSON.stringify(jsonData.data.allocations, null, 2));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"budgetUsdc\": \"1000000\",\n  \"managerAddress\": \"{{wallet1_address}}\",\n  \"influencerAddress\": \"{{wallet2_address}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/create",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "app-sessions",
+                "create"
+              ]
+            },
+            "description": "Crea sesión con:\n- Wallet 1 (Manager): Budget 1 USDC\n- Wallet 2 (Influencer): 0 USDC inicial"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get Session (Initial State)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Session found\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    pm.expect(jsonData.data.session.version).to.eql(0);",
+                  "    ",
+                  "    console.log(\"📊 Session State:\");",
+                  "    console.log(\"Version:\", jsonData.data.session.version);",
+                  "    console.log(\"Allocations:\");",
+                  "    jsonData.data.session.allocations.forEach((alloc, i) => {",
+                  "        const usdcAmount = (parseInt(alloc.amount) / 1000000).toFixed(2);",
+                  "        console.log(`  [${i}] ${alloc.participant}: ${usdcAmount} USDC`);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/{{app_session_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "app-sessions",
+                "{{app_session_id}}"
+              ]
+            },
+            "description": "Consulta estado inicial de la sesión"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Payout #1 - Click (0.25 USDC)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Payout applied\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    pm.expect(jsonData.data.version).to.eql(1);",
+                  "    ",
+                  "    console.log(\"💸 Payout #1 Applied\");",
+                  "    console.log(\"Version:\", jsonData.data.version);",
+                  "    jsonData.data.allocations.forEach((alloc, i) => {",
+                  "        const usdcAmount = (parseInt(alloc.amount) / 1000000).toFixed(2);",
+                  "        console.log(`  [${i}] ${alloc.participant.substring(0, 10)}...: ${usdcAmount} USDC`);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appSessionId\": \"{{app_session_id}}\",\n  \"earnedUsdc\": \"250000\",\n  \"feeBps\": 200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/payout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "app-sessions",
+                "payout"
+              ]
+            },
+            "description": "Payout de 0.25 USDC con 2% fee\n- Influencer gana: 0.25 USDC\n- Fee: 0.005 USDC (2%)\n- Total deducido del manager: 0.255 USDC"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Payout #2 - View (0.15 USDC)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Payout applied\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    pm.expect(jsonData.data.version).to.eql(2);",
+                  "    ",
+                  "    console.log(\"💸 Payout #2 Applied\");",
+                  "    console.log(\"Version:\", jsonData.data.version);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appSessionId\": \"{{app_session_id}}\",\n  \"earnedUsdc\": \"150000\",\n  \"feeBps\": 200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/payout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "app-sessions",
+                "payout"
+              ]
+            },
+            "description": "Segundo payout de 0.15 USDC"
+          },
+          "response": []
+        },
+        {
+          "name": "5. Payout #3 - Share (0.1 USDC)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Payout applied\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    pm.expect(jsonData.data.version).to.eql(3);",
+                  "    ",
+                  "    console.log(\"💸 Payout #3 Applied\");",
+                  "    console.log(\"Version:\", jsonData.data.version);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appSessionId\": \"{{app_session_id}}\",\n  \"earnedUsdc\": \"100000\",\n  \"feeBps\": 200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/payout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "app-sessions",
+                "payout"
+              ]
+            },
+            "description": "Tercer payout de 0.1 USDC"
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Session (After Payouts)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Session updated\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    console.log(\"\\n📊 Estado después de 3 payouts:\");",
+                  "    console.log(\"Version:\", jsonData.data.session.version);",
+                  "    console.log(\"\\nAllocations:\");",
+                  "    jsonData.data.session.allocations.forEach((alloc, i) => {",
+                  "        const usdcAmount = (parseInt(alloc.amount) / 1000000).toFixed(2);",
+                  "        const role = i === 0 ? 'Manager' : i === 1 ? 'Influencer' : i === 2 ? 'Judge' : 'Fee';",
+                  "        console.log(`  ${role}: ${usdcAmount} USDC`);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/{{app_session_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "app-sessions",
+                "{{app_session_id}}"
+              ]
+            },
+            "description": "Ver estado después de todos los payouts"
+          },
+          "response": []
+        },
+        {
+          "name": "7. Claim - Influencer retira 0.2 USDC",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Claim executed\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    console.log(\"💰 Claim Executed\");",
+                  "    console.log(\"Version:\", jsonData.data.version);",
+                  "    console.log(\"Message:\", jsonData.message);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appSessionId\": \"{{app_session_id}}\",\n  \"participant\": \"{{wallet2_address}}\",\n  \"amountUsdc\": \"200000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/claim",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "app-sessions",
+                "claim"
+              ]
+            },
+            "description": "Wallet 2 (Influencer) retira 0.2 USDC"
+          },
+          "response": []
+        },
+        {
+          "name": "8. Get Session (Final State)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Final state\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    console.log(\"\\n🎯 ESTADO FINAL:\");",
+                  "    console.log(\"Version:\", jsonData.data.session.version);",
+                  "    console.log(\"\\nAllocations Finales:\");",
+                  "    jsonData.data.session.allocations.forEach((alloc, i) => {",
+                  "        const usdcAmount = (parseInt(alloc.amount) / 1000000).toFixed(2);",
+                  "        const role = i === 0 ? 'Manager' : i === 1 ? 'Influencer' : i === 2 ? 'Judge' : 'Fee';",
+                  "        console.log(`  ${role}: ${usdcAmount} USDC`);",
+                  "    });",
+                  "    console.log(\"\\nSummary:\", JSON.stringify(jsonData.data.summary, null, 2));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/app-sessions/{{app_session_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "app-sessions",
+                "{{app_session_id}}"
+              ]
+            },
+            "description": "Estado final después de claim"
+          },
+          "response": []
+        }
+      ],
+      "description": "Flujo completo de App Sessions con 3 wallets"
+    },
+    {
+      "name": "🔥 Channel Close & Settle",
+      "item": [
+        {
+          "name": "0. [DEMO] Happy Path (Full Flow)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Demo completed\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    console.log(\"\\n🎉 HAPPY PATH DEMO COMPLETED\\n\");",
+                  "    ",
+                  "    console.log(\"📋 Steps:\");",
+                  "    jsonData.data.steps.forEach(step => {",
+                  "        const icon = step.status === 'success' ? '✅' : '❌';",
+                  "        console.log(`${icon} Step ${step.step}: ${step.name}`);",
+                  "        if (step.txHash) {",
+                  "            console.log(`   TX: https://sepolia.basescan.org/tx/${step.txHash}`);",
+                  "        }",
+                  "    });",
+                  "    ",
+                  "    console.log(\"\\n💰 Summary:\");",
+                  "    console.log(`Channel ID: ${jsonData.data.summary.channelId}`);",
+                  "    console.log(`Total Payouts: ${jsonData.data.summary.totalPayouts}`);",
+                  "    console.log(`\\nFinal Balances:`);",
+                  "    console.log(`  Manager: ${jsonData.data.summary.finalBalances.manager}`);",
+                  "    console.log(`  Influencer: ${jsonData.data.summary.finalBalances.influencer}`);",
+                  "    ",
+                  "    console.log(\"\\n🔗 Explorer URLs:\");",
+                  "    console.log(`Create TX: https://sepolia.basescan.org/tx/${jsonData.data.summary.createTxHash}`);",
+                  "    console.log(`Close TX: https://sepolia.basescan.org/tx/${jsonData.data.summary.closeTxHash}`);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/yellow/demo/happy-path",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "demo",
+                "happy-path"
+              ]
+            },
+            "description": "🚀 Demo end-to-end completo:\n\n1. Crea canal on-chain (INITIALIZE)\n2. Ejecuta payouts off-chain (OPERATE)\n3. Cierra canal on-chain (FINALIZE)\n\nUsa las wallets de test configuradas en .env"
+          },
+          "response": []
+        },
+        {
+          "name": "1. Prepare Close (Manual Flow)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Prepare close success\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    const messageToSign = jsonData.data.signIntent.messageToSign;",
+                  "    pm.collectionVariables.set(\"messageToSign\", messageToSign);",
+                  "    ",
+                  "    console.log(\"\\n🔑 MESSAGE TO SIGN:\");",
+                  "    console.log(messageToSign);",
+                  "    console.log(\"\\n📝 How to sign:\");",
+                  "    console.log(\"\\nOption 1 - MetaMask (Browser Console):\");",
+                  "    console.log(`ethereum.request({ method: 'personal_sign', params: ['${messageToSign}', '{{wallet1_address}}'] })`);",
+                  "    console.log(\"\\nOption 2 - Node.js Script:\");",
+                  "    console.log(`node scripts/sign-message.js '${messageToSign}' '{{wallet1_pk}}'`);",
+                  "    console.log(\"\\n⚠️ Copy the signature and paste it in the 'userSig' variable\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chainId\": {{chainId}},\n  \"channelId\": \"{{channelId}}\",\n  \"wallet\": \"{{wallet1_address}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/channel/prepare-close",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "channel",
+                "prepare-close"
+              ]
+            },
+            "description": "⚠️ PREREQUISITE: Necesitas un channelId válido\n\nPara obtener uno, ejecuta primero el 'Happy Path Demo'\n\nEste endpoint devuelve el mensaje que debes firmar"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Close Intent (Manual Flow)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Close intent generated\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.ok).to.be.true;",
+                  "    ",
+                  "    const txIntent = jsonData.data.txIntent;",
+                  "    ",
+                  "    console.log(\"\\n📤 TRANSACTION TO SEND:\");",
+                  "    console.log(`To: ${txIntent.to}`);",
+                  "    console.log(`ChainId: ${txIntent.chainId}`);",
+                  "    console.log(`Data: ${txIntent.data.substring(0, 66)}...`);",
+                  "    ",
+                  "    console.log(\"\\n📝 How to send:\");",
+                  "    console.log(\"\\nOption 1 - MetaMask (Browser Console):\");",
+                  "    console.log(`ethereum.request({`);",
+                  "    console.log(`  method: 'eth_sendTransaction',`);",
+                  "    console.log(`  params: [{`);",
+                  "    console.log(`    from: '{{wallet1_address}}',`);",
+                  "    console.log(`    to: '${txIntent.to}',`);",
+                  "    console.log(`    data: '${txIntent.data}',`);",
+                  "    console.log(`    value: '0x0'`);",
+                  "    console.log(`  }]`);",
+                  "    console.log(`})`);",
+                  "    ",
+                  "    console.log(\"\\nOption 2 - Node.js Script:\");",
+                  "    console.log(`node scripts/send-tx.js '${txIntent.to}' '${txIntent.data}' '{{wallet1_pk}}'`);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chainId\": {{chainId}},\n  \"channelId\": \"{{channelId}}\",\n  \"wallet\": \"{{wallet1_address}}\",\n  \"userSig\": \"{{userSig}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/yellow/channel/close-intent",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "yellow",
+                "channel",
+                "close-intent"
+              ]
+            },
+            "description": "⚠️ PREREQUISITE: Debes haber firmado el mensaje del paso anterior\n\nPega la firma en la variable 'userSig' antes de ejecutar"
+          },
+          "response": []
+        }
+      ],
+      "description": "Flujo de cierre cooperativo de canales"
+    }
+  ],
+  "variable": [
+    {
+      "key": "app_session_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "channelId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "messageToSign",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userSig",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
