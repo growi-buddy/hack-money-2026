@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useWallet } from '@/contexts/wallet-context';
 import { motion } from 'framer-motion';
-import { ChevronDown, Copy, ExternalLink, LogOut, Wallet } from 'lucide-react';
+import { ChevronDown, Copy, LogOut, Wallet } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 export function WalletButton() {
@@ -72,10 +72,10 @@ export function WalletButton() {
           <Copy className="mr-2 h-4 w-4" />
           {copied ? 'Copied!' : 'Copy Address'}
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <ExternalLink className="mr-2 h-4 w-4" />
-          View on Explorer
-        </DropdownMenuItem>
+        {/*<DropdownMenuItem>*/}
+        {/*  <ExternalLink className="mr-2 h-4 w-4" />*/}
+        {/*  View on Explorer*/}
+        {/*</DropdownMenuItem>*/}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={disconnect} className="text-destructive">
           <LogOut className="mr-2 h-4 w-4" />

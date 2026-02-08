@@ -36,6 +36,7 @@ export const SELECTOR_SITE_EVENT_TYPE_LABELS: Record<SelectorEventType, string> 
   [SelectorEventType.ONCLICK]: 'Click',
   [SelectorEventType.HOVER]: 'Hover',
   [SelectorEventType.DOUBLE_CLICK]: 'Double Click',
+  [SelectorEventType.VISIT]: 'Visit',
 };
 
 export const PARTICIPATION_STATUS: Record<ParticipationStatus, string> = {

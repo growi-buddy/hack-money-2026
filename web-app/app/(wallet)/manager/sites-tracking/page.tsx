@@ -60,9 +60,9 @@ export default function RewardEventsPage() {
   const [ deleteSiteEventId, setDeleteSiteEventId ] = useState<string | null>(null);
   const [ isDeletingSiteEvent, setIsDeletingSiteEvent ] = useState(false);
   
-  const [ showScript, setShowScript ] = useState(false);
+  const [ showScriptForSite, setShowScriptForSite ] = useState<string | null>(null);
   const [ copied, setCopied ] = useState(false);
-  const [ displayedScript, setDisplayedScript ] = useState('');
+  const [ displayedScript, setDisplayedScript ] = useState<Record<string, string>>({});
   
   const fetchSites = useCallback(async () => {
     if (!address) {
@@ -152,40 +152,39 @@ export default function RewardEventsPage() {
     }
   };
   
-  const getScriptContent = () => {
+  const getScriptContent = (siteId: string) => {
     return `<script>
   (function() {
     const script = document.createElement('script');
-    script.src = '${API_BASE_URL}/api/scripts/client?v=' + Date.now();
+    script.src = '${API_BASE_URL}/api/scripts/client?siteId=${siteId}&v=' + Date.now();
     script.async = true;
     document.head.appendChild(script);
   })();
 </script>
 `;
   };
-  
-  const generateScript = () => {
-    
-    const script = getScriptContent();
-    
-    setShowScript(true);
-    setDisplayedScript('');
-    
+
+  const generateScript = (siteId: string) => {
+    const script = getScriptContent(siteId);
+
+    setShowScriptForSite(siteId);
+    setDisplayedScript(prev => ({ ...prev, [siteId]: '' }));
+
     let i = 0;
     const interval = setInterval(() => {
       if (i < script.length) {
-        setDisplayedScript(script.slice(0, i + 1));
+        setDisplayedScript(prev => ({ ...prev, [siteId]: script.slice(0, i + 1) }));
         i++;
       } else {
         clearInterval(interval);
       }
     }, 10);
   };
-  
-  const copyScript = async () => {
-    const script = getScriptContent();
+
+  const copyScript = async (siteId: string) => {
+    const script = getScriptContent(siteId);
     if (!script) return;
-    
+
     await navigator.clipboard.writeText(script);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -375,6 +374,100 @@ export default function RewardEventsPage() {
                       </Button>
                     </div>
                   )}
+
+                  {/* Tracking Script Section */}
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Code className="h-4 w-4 text-growi-blue" />
+                      <h3 className="text-sm font-semibold text-foreground">Tracking Script</h3>
+                    </div>
+                    <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                      <Button
+                        onClick={() => generateScript(site.id)}
+                        className="relative w-full overflow-hidden bg-growi-blue text-white hover:bg-growi-blue/90 disabled:opacity-50 h-9"
+                        size="sm"
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-growi-lime/30"
+                          initial={{ x: '-100%' }}
+                          whileHover={{ x: '100%' }}
+                          transition={{ duration: 0.5 }}
+                        />
+                        <Code className="mr-2 h-4 w-4" />
+                        Generate Script
+                      </Button>
+                    </motion.div>
+
+                    <AnimatePresence>
+                      {showScriptForSite === site.id && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-3 mt-3"
+                        >
+                          <div className="relative">
+                            <pre className="max-h-48 overflow-auto rounded-lg bg-slate-950 p-3 text-xs text-slate-100">
+                              <code>{displayedScript[site.id] || ''}</code>
+                            </pre>
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="absolute right-2 top-2"
+                            >
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => copyScript(site.id)}
+                                className="bg-slate-800 text-slate-100 hover:bg-slate-700 h-7 text-xs"
+                              >
+                                <AnimatePresence mode="wait">
+                                  {copied ? (
+                                    <motion.div
+                                      key="check"
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      exit={{ scale: 0 }}
+                                      className="flex items-center gap-1"
+                                    >
+                                      <Check className="h-3 w-3 text-growi-success" />
+                                      Copied!
+                                    </motion.div>
+                                  ) : (
+                                    <motion.div
+                                      key="copy"
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      exit={{ scale: 0 }}
+                                      className="flex items-center gap-1"
+                                    >
+                                      <Copy className="h-3 w-3" />
+                                      Copy
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </Button>
+                            </motion.div>
+                          </div>
+
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className="rounded-lg border border-growi-yellow/30 bg-growi-yellow/10 p-3"
+                          >
+                            <p className="text-xs text-foreground">
+                              <strong>Instructions:</strong> Paste this script before the closing{' '}
+                              <code className="rounded bg-secondary px-1 py-0.5 font-mono text-growi-blue text-xs">
+                                {'</head>'}
+                              </code>{' '}
+                              tag in your website.
+                            </p>
+                          </motion.div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -382,7 +475,6 @@ export default function RewardEventsPage() {
         </motion.div>
       )}
       
-      {/* Empty State */}
       {!loading && sites.length === 0 && (
         <motion.div variants={scaleIn} initial="hidden" animate="visible">
           <Card className="border-2 border-dashed border-growi-blue/30 bg-growi-blue/5">
@@ -412,117 +504,7 @@ export default function RewardEventsPage() {
           </Card>
         </motion.div>
       )}
-      
-      {/* Generate Tracking Script Section */}
-      {!loading && (
-        <motion.div
-          variants={scaleIn}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.2 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground">
-                <Code className="h-5 w-5 text-growi-blue" />
-                Generate Tracking Script
-              </CardTitle>
-              <CardDescription>
-                Select a campaign and generate your custom tracking script to add to your website
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <motion.div
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-              >
-                <Button
-                  onClick={generateScript}
-                  className="relative w-full overflow-hidden bg-growi-blue text-white hover:bg-growi-blue/90 disabled:opacity-50"
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-growi-lime/30"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.5 }}
-                  />
-                  <Code className="mr-2 h-4 w-4" />
-                  Generate Tracking Script
-                </Button>
-              </motion.div>
-              
-              <AnimatePresence>
-                {showScript && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-4"
-                  >
-                    <div className="relative">
-                      <pre className="max-h-64 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100">
-                        <code>{displayedScript}</code>
-                      </pre>
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="absolute right-2 top-2"
-                      >
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={copyScript}
-                          className="bg-slate-800 text-slate-100 hover:bg-slate-700"
-                        >
-                          <AnimatePresence mode="wait">
-                            {copied ? (
-                              <motion.div
-                                key="check"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                exit={{ scale: 0 }}
-                                className="flex items-center gap-1"
-                              >
-                                <Check className="h-4 w-4 text-growi-success" />
-                                Copied!
-                              </motion.div>
-                            ) : (
-                              <motion.div
-                                key="copy"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                exit={{ scale: 0 }}
-                                className="flex items-center gap-1"
-                              >
-                                <Copy className="h-4 w-4" />
-                                Copy
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </Button>
-                      </motion.div>
-                    </div>
-                    
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                      className="rounded-lg border border-growi-yellow/30 bg-growi-yellow/10 p-4"
-                    >
-                      <p className="text-sm text-foreground">
-                        <strong>Instructions:</strong> Paste this script before the closing{' '}
-                        <code className="rounded bg-secondary px-1 py-0.5 font-mono text-growi-blue">{'</head>'}</code>{' '}
-                        tag in your website.
-                      </p>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-      
+
       {!!upsertSite && (
         <UpsertSite
           siteId={upsertSite.id}
