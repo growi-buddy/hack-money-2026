@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useWallet } from '@/contexts/wallet-context';
 import { CampaignStatus } from '@/lib/db/enums';
+import { sendFunds } from '@/lib/web3';
 import { CampaignResponseDTO } from '@/types';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, Edit, Loader2, Rocket } from 'lucide-react';
@@ -30,27 +31,27 @@ export default function CampaignDashboardPage() {
   const [ error, setError ] = useState<string | null>(null);
   const [ showPublishModal, setShowPublishModal ] = useState(false);
   const [ isPublishing, setIsPublishing ] = useState(false);
-  
-  useEffect(() => {
-    const fetchCampaign = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`);
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.error?.message || 'Failed to fetch campaign');
-        }
-        
-        setCampaign(data.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
+
+  const fetchCampaign = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Failed to fetch campaign');
       }
-    };
-    
+
+      setCampaign(data.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (campaignId) {
       void fetchCampaign();
     }
@@ -59,21 +60,34 @@ export default function CampaignDashboardPage() {
   const handlePublishCampaign = async () => {
     try {
       setIsPublishing(true);
-      const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: CampaignStatus.PUBLISHED }),
-      });
       
-      const data = await response.json();
+      const {
+        success,
+        error,
+        txHash,
+      } = await sendFunds('0x75a26Ca9e3Ef85d8e118Ec2b260c143f8738BA19', '0.01');
       
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'Failed to publish campaign');
+      if (success) {
+        console.log('Transacción exitosa en Base Sepolia:', txHash);
+        const response = await fetch(`/api/campaigns/${campaignId}?walletAddress=${address}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: CampaignStatus.PUBLISHED }),
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error?.message || 'Failed to publish campaign');
+        }
+        
+        // Update local state
+        setCampaign(prev => prev ? { ...prev, status: CampaignStatus.PUBLISHED } : null);
+        setShowPublishModal(false);
+      } else {
+        console.error('Error:', error);
+        setError(error);
       }
-      
-      // Update local state
-      setCampaign(prev => prev ? { ...prev, status: CampaignStatus.PUBLISHED } : null);
-      setShowPublishModal(false);
     } catch (err) {
       console.error('Failed to publish campaign:', err);
       alert(err instanceof Error ? err.message : 'Failed to publish campaign');
@@ -174,7 +188,7 @@ export default function CampaignDashboardPage() {
       )}
       
       {(campaign.status === CampaignStatus.PUBLISHED || campaign.status === CampaignStatus.ACTIVE) && (
-        <CampaignInfluencersCard campaign={campaign} />
+        <CampaignInfluencersCard campaign={campaign} onUpdate={fetchCampaign} />
       )}
       
       {campaign.status === CampaignStatus.ACTIVE && <CampaignLiveEventsCard campaign={campaign} />}

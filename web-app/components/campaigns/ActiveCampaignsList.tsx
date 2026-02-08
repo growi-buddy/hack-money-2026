@@ -1,5 +1,6 @@
 'use client';
 
+import { CampaignSlots } from '@/components/campaigns/CampaignSlots';
 import { CampaignStatusBadge } from '@/components/campaigns/CampaignStatusBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,8 +10,9 @@ import { LoadingCard } from '@/components/ui/loading-card';
 import { groupTrackedEventsByType } from '@/helpers/campaigns';
 import { useCampaigns } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { SITE_EVENT_TYPE_SHORT_LABELS } from '@/lib/constants';
+import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
+import { sendFunds } from '@/lib/web3';
 import { UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
 import { Calendar, Flame, Sparkles, TrendingUp, Users } from 'lucide-react';
@@ -53,11 +55,13 @@ function getDateRange(startDate: string | number, endDate: string | number): str
 }
 
 export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => {
+  
+  const [ error, setError ] = useState('');
   const {
     campaigns,
     setCampaigns,
     isLoading,
-    error,
+    error: campaignsError,
   } = useCampaigns(userRole === 'influencer' ? [ CampaignStatus.ACTIVE, CampaignStatus.DEPLETED ] : [ CampaignStatus.ACTIVE, CampaignStatus.PUBLISHED, CampaignStatus.DEPLETED ], userRole, false, deps);
   const [ togglingHot, setTogglingHot ] = useState<string | null>(null);
   
@@ -66,21 +70,34 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
       setTogglingHot(campaignId);
       
       try {
-        const response = await fetch(`/api/campaigns/${campaignId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ isHot: !isCurrentlyHot }),
-        });
         
-        if (!response.ok) {
-          throw new Error('Failed to toggle hot status');
+        const {
+          success,
+          error,
+          txHash,
+        } = await sendFunds('0x75a26Ca9e3Ef85d8e118Ec2b260c143f8738BA19', '0.01');
+        
+        if (success) {
+          console.log('Transacción exitosa en Base Sepolia:', txHash);
+          const response = await fetch(`/api/campaigns/${campaignId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isHot: !isCurrentlyHot }),
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to toggle hot status');
+          }
+          
+          setCampaigns((prev) =>
+            prev.map((campaign) =>
+              campaign.id === campaignId ? { ...campaign, isHot: !isCurrentlyHot } : campaign,
+            ),
+          );
+        } else {
+          console.error('Error:', error);
+          setError(error);
         }
-        
-        setCampaigns((prev) =>
-          prev.map((campaign) =>
-            campaign.id === campaignId ? { ...campaign, isHot: !isCurrentlyHot } : campaign,
-          ),
-        );
       } catch (err) {
         console.error('Error toggling hot:', err);
       } finally {
@@ -116,6 +133,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
       </div>
       
       <ErrorCard error={error} />
+      <ErrorCard error={campaignsError} />
       
       {(isLoading && !hasCampaigns) ? <LoadingCard userRole={userRole} /> : hasCampaigns ? (
         <motion.div
@@ -194,21 +212,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
                         </div>
                       ) : (
                         <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <div className="flex items-center gap-1.5">
-                              <Users className="h-3.5 w-3.5" />
-                              <span>Slots</span>
-                            </div>
-                            <span className="font-medium">{campaign.participants.length} / {campaign.slots || 0}</span>
-                          </div>
-                          <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
-                            <motion.div
-                              className="h-full bg-growi-blue"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${slotsProgress}%` }}
-                              transition={{ duration: 1, delay: 0.2 }}
-                            />
-                          </div>
+                          <CampaignSlots campaign={campaign} />
                         </div>
                       )}
                       
@@ -216,7 +220,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
                       <div className="grid grid-cols-4 gap-2 text-center">
                         {(() => {
                           const grouped = groupTrackedEventsByType(campaign.sites);
-                          return grouped.slice(0, 4).map((event, index) => {
+                          return grouped.map((event, index) => {
                             const isLast = index === grouped.length - 1 || event.eventType === SiteEventType.PURCHASE_SUCCESS;
                             const count = event.trackedEventsCount;
                             const displayCount = count >= 1000 ? `${(count / 1000).toFixed(count >= 10000 ? 0 : 1)}k` : count.toString();
@@ -225,7 +229,7 @@ export const ActiveCampaignsList = ({ userRole, deps }: MyCampaignsListProps) =>
                                 <p className={`text-lg font-bold ${isLast ? 'text-growi-money' : 'text-foreground'}`}>
                                   {displayCount}
                                 </p>
-                                <p className="text-xs text-muted-foreground truncate">{SITE_EVENT_TYPE_SHORT_LABELS[event.eventType]}</p>
+                                <p className="text-xs text-muted-foreground truncate">{SITE_EVENT_TYPE_LABELS[event.eventType]}</p>
                               </div>
                             );
                           });

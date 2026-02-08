@@ -18,7 +18,6 @@ export function WalletButton() {
   const { address, displayName, isConnected, connect, disconnect } = useWallet();
   const [ isHovered, setIsHovered ] = useState(false);
   const [ copied, setCopied ] = useState(false);
-  console.log({ address, displayName, isConnected, connect, disconnect });
   const copyAddress = useCallback(async () => {
     if (!address) return;
     try {

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { InterestTag } from '@/components/ui/interest-tag';
 import { Label } from '@/components/ui/label';
 import { LoadingCard } from '@/components/ui/loading-card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TargetAudienceTag } from '@/components/ui/target-audience-tag';
 import { useWallet } from '@/contexts/wallet-context';
 import { mapCampaignFormToAPI, validateCampaignForm } from '@/helpers/campaign-mapper';
@@ -117,7 +117,6 @@ export default function CreateCampaignPage() {
           }
           
           if (newData && Object.keys(newData).length > 0) {
-            console.log({ newData });
             setCampaignData((prev) => ({
               ...prev,
               name: newData?.name || prev.name,
@@ -596,7 +595,7 @@ export default function CreateCampaignPage() {
                   <div className="space-y-4">
                     <div className="space-y-3">
                       <Label className="text-sm font-medium">Select Site</Label>
-                      <RadioGroup
+                      <Select
                         value={selectedSiteId}
                         onValueChange={(siteId) => {
                           setSelectedSiteId(siteId);
@@ -613,18 +612,17 @@ export default function CreateCampaignPage() {
                           }
                         }}
                       >
-                        {sites.map((site) => (
-                          <div key={site.id} className="flex items-center space-x-2">
-                            <RadioGroupItem value={site.id} id={site.id} />
-                            <Label htmlFor={site.id} className="flex items-center gap-2 cursor-pointer">
-                              {site.name}
-                              <span className="text-xs text-muted-foreground">
-                                ({site.events.length} event{site.events.length !== 1 ? 's' : ''})
-                              </span>
-                            </Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose a site..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sites.map((site) => (
+                            <SelectItem key={site.id} value={site.id}>
+                              {site.name} ({site.events.length} event{site.events.length !== 1 ? 's' : ''})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     
                     {/* Show events from selected site */}

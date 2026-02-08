@@ -1,5 +1,6 @@
 'use client';
 
+import { CampaignInfoCard } from '@/app/(wallet)/manager/campaigns/[id]/CampaignInfoCard';
 import { BackButton } from '@/components/ui/back-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,13 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ErrorCard } from '@/components/ui/error-card';
 import { useWallet } from '@/contexts/wallet-context';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
-import { SiteEventType } from '@/lib/db/enums';
+import { PARTICIPATION_STATUS, SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
+import { ParticipationStatus, SiteEventType } from '@/lib/db/enums';
 import { CampaignResponseDTO, TrackedSiteEventSummaryResponseDTO } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowRight,
-  Calendar,
   Check,
   CreditCard,
   DollarSign,
@@ -132,8 +132,7 @@ export default function CampaignDetailsPage() {
   
   if (!campaign) return null;
   
-  const slotsProgress = campaign.slots > 0 ? Math.round((campaign.participants.length / campaign.slots) * 100) : 0;
-  const isParticipant = campaign.participants.some(({ walletAddress }) => walletAddress === address);
+  const participant = campaign.participants.find(({ walletAddress }) => walletAddress === address);
   
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -151,10 +150,11 @@ export default function CampaignDetailsPage() {
             HOT
           </Badge>
         )}
-        {isParticipant && (
+        
+        {participant && (
           <Badge className="bg-growi-success/20 text-growi-success">
             <Check className="mr-1 h-3 w-3" />
-            Participating
+            {PARTICIPATION_STATUS[participant.status]}
           </Badge>
         )}
       </motion.div>
@@ -186,69 +186,8 @@ export default function CampaignDetailsPage() {
           </CardHeader>
           <CardContent className="p-6">
             <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-6">
-              {/* Campaign Info */}
-              <motion.div variants={staggerItem} className="grid gap-4 md:grid-cols-4">
-                <div className="rounded-lg bg-secondary/50 p-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    Start Date
-                  </div>
-                  <p className="mt-1 font-semibold text-foreground">{formatDate(campaign.startDate)}</p>
-                </div>
-                <div className="rounded-lg bg-secondary/50 p-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    End Date
-                  </div>
-                  <p className="mt-1 font-semibold text-foreground">{formatDate(campaign.endDate)}</p>
-                </div>
-                <div className="rounded-lg bg-secondary/50 p-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <DollarSign className="h-3 w-3" />
-                    Total Budget
-                  </div>
-                  <p className="mt-1 font-semibold text-growi-money">${campaign.budgetTotal.toLocaleString()}</p>
-                </div>
-                <div className="rounded-lg bg-secondary/50 p-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Users className="h-3 w-3" />
-                    Slots
-                  </div>
-                  <p className="mt-1 font-semibold text-foreground">
-                    {campaign.participants.length}/{campaign.slots}
-                  </p>
-                </div>
-              </motion.div>
               
-              {/* Slots Progress */}
-              <motion.div variants={staggerItem}>
-                <div className="mb-2 flex justify-between text-sm">
-                  <span className="text-muted-foreground">Slots filled</span>
-                  <span className="text-foreground">{slotsProgress}%</span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-secondary">
-                  <motion.div
-                    className="h-full bg-growi-blue"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${slotsProgress}%` }}
-                    transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.5 }}
-                  />
-                </div>
-              </motion.div>
-              
-              {/* Interests */}
-              {campaign.interests.length > 0 && (
-                <motion.div variants={staggerItem}>
-                  <h3 className="mb-3 font-semibold text-foreground">Interests</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {campaign.interests.map((interest) => (
-                      <Badge key={interest} variant="secondary">
-                        {interest}
-                      </Badge>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
+              <CampaignInfoCard campaign={campaign} withoutTitle />
               
               <motion.div variants={staggerItem}>
                 <h3 className="mb-3 font-semibold text-foreground">Available Bounties</h3>
@@ -264,9 +203,14 @@ export default function CampaignDetailsPage() {
                         <div className="flex-1">
                           <p className="font-medium text-foreground">{SITE_EVENT_TYPE_LABELS[event.siteEventType]}</p>
                         </div>
-                        <p className="text-sm font-semibold text-growi-money">
-                          ${event.amount.toFixed(3)}/event
-                        </p>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-growi-money">
+                            ${event.amount.toFixed(3)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            per {event.volumeStep} {event.volumeStep === 1 ? 'event' : 'events'}
+                          </p>
+                        </div>
                       </div>
                     );
                   })}
@@ -274,16 +218,7 @@ export default function CampaignDetailsPage() {
               </motion.div>
               
               <motion.div variants={staggerItem}>
-                {isParticipant ? (
-                  <Button
-                    onClick={() => router.push(`/influencer/campaign/${campaignId}/active`)}
-                    className="w-full bg-growi-success text-white hover:bg-growi-success/90"
-                  >
-                    <Check className="mr-2 h-4 w-4" />
-                    View Active Campaign
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                ) : campaign.participants.length >= campaign.slots ? (
+                {participant ? null : (campaign.participants.filter(({ status }) => status === ParticipationStatus.ACCEPTED)).length >= campaign.slots ? (
                   <Button disabled className="w-full">
                     <Users className="mr-2 h-4 w-4" />
                     Campaign Full

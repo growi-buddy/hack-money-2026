@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import { initWaaP } from '@human.tech/waap-sdk';
+import { useEffect } from 'react';
 
 export function WaaPProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -9,8 +9,8 @@ export function WaaPProvider({ children }: { children: React.ReactNode }) {
     
     initWaaP({
       config: {
-        authenticationMethods: ['social', 'wallet', 'email'],
-        allowedSocials: ['google'],
+        authenticationMethods: [ 'social', 'wallet', 'email' ],
+        allowedSocials: [ 'google' ],
         styles: {
           darkMode: false,
         },
@@ -20,6 +20,6 @@ export function WaaPProvider({ children }: { children: React.ReactNode }) {
       useStaging: false,
     });
   }, []);
-
+  
   return <>{children}</>;
 }

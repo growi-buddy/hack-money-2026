@@ -10,7 +10,7 @@ import { TargetAudienceTag } from '@/components/ui/target-audience-tag';
 import { groupTrackedEventsByType } from '@/helpers/campaigns';
 import { useCampaigns } from '@/hooks/use-campaigns';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { SITE_EVENT_TYPE_SHORT_LABELS } from '@/lib/constants';
+import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignStatus } from '@/lib/db/enums';
 import { UserRoleType } from '@/types';
 import { motion } from 'framer-motion';
@@ -124,7 +124,6 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
                         <div className="flex items-center gap-1">
                           <Users className="h-3.5 w-3.5" />
                           <span>Slots:</span>
-                          aaaa
                           <span className="font-medium text-foreground">{campaign.slots}</span>
                         </div>
                         
@@ -135,13 +134,13 @@ export const DraftCampaignsList = ({ userRole, deps }: MyCampaignsListProps) => 
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-4 gap-2 text-center">
+                      <div className="grid grid-cols-5 gap-2 text-center">
                         {(() => {
                           const grouped = groupTrackedEventsByType(campaign.sites);
-                          return grouped.slice(0, 4).map((event, index) => {
+                          return grouped.map((event, index) => {
                             return (
                               <div key={event.eventType}>
-                                <p className="text-xs text-muted-foreground truncate">{SITE_EVENT_TYPE_SHORT_LABELS[event.eventType]}</p>
+                                <p className="text-xs text-muted-foreground truncate">{SITE_EVENT_TYPE_LABELS[event.eventType]}</p>
                               </div>
                             );
                           });

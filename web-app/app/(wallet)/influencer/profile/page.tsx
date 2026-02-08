@@ -69,7 +69,6 @@ export default function ProfilePage() {
   const [ verificationSuccess, setVerificationSuccess ] = useState(false);
   const searchParams = useSearchParams();
   const welcome = searchParams.get('welcome');
-  console.log({ welcome, showWelcomeModal });
   const [ formData, setFormData ] = useState({
     name: '',
     email: '',

@@ -151,8 +151,6 @@ export default function InfluencersPage() {
     }
   };
   
-  console.log({ users, filteredInfluencers });
-  
   return (
     <div className="space-y-6">
       <div>
@@ -244,7 +242,7 @@ export default function InfluencersPage() {
                   </div>
                 </div>
               </CardHeader>
-
+              
               <CardContent className="flex flex-col flex-1 space-y-4">
                 {/* Bio */}
                 {influencer.bio && (

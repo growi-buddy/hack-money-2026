@@ -204,8 +204,6 @@ export default function InboxPage() {
     );
   }
   
-  console.log({ address });
-  
   return (
     <div className="space-y-6">
       {/* Header */}

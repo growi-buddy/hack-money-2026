@@ -1,65 +1,125 @@
-import { Badge } from '@/components/ui/badge';
+import { CampaignSlots } from '@/components/campaigns/CampaignSlots';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CountryTag } from '@/components/ui/country-tag';
+import { InterestTag } from '@/components/ui/interest-tag';
+import { RegionTag } from '@/components/ui/region-tag';
+import { TargetAudienceTag } from '@/components/ui/target-audience-tag';
+import { staggerItem } from '@/lib/animations';
+import { SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignResponseDTO } from '@/types';
-import { Calendar, DollarSign, Tag, Users } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Calendar, DollarSign, Globe, Tag, Users, Zap } from 'lucide-react';
 
-export const CampaignInfoCard = ({ campaign }: { campaign: CampaignResponseDTO }) => {
+const formatDate = (dateStr: string | number | null) => {
+  if (!dateStr) return 'TBD';
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
+export const CampaignInfoCard = ({ campaign, withoutTitle }: {
+  campaign: CampaignResponseDTO,
+  withoutTitle: boolean
+}) => {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-foreground">Campaign Details</CardTitle>
-      </CardHeader>
+      {!withoutTitle && (
+        <CardHeader>
+          <CardTitle className="text-foreground">Campaign Details</CardTitle>
+        </CardHeader>
+      )}
       <CardContent>
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Description */}
-          {campaign.description && (
+          {!withoutTitle && campaign.description && (
             <div className="md:col-span-2">
               <h4 className="text-sm font-medium text-muted-foreground mb-2">Description</h4>
               <p className="text-foreground text-sm leading-relaxed">{campaign.description}</p>
             </div>
           )}
           
-          {/* Duration */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Calendar className="h-4 w-4 text-growi-blue" />
-              <h4 className="text-sm font-medium text-muted-foreground">Duration</h4>
+          <motion.div variants={staggerItem} className="md:col-span-2 grid gap-4 md:grid-cols-4">
+            <div className="rounded-lg bg-secondary/50 p-4">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                Start Date
+              </div>
+              <p className="mt-1 font-semibold text-foreground">{formatDate(campaign.startDate)}</p>
             </div>
-            <div className="text-sm text-foreground">
-              {campaign.startDate && campaign.endDate ? (
-                <>
-                  <p>{new Date(campaign.startDate).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })} → {new Date(campaign.endDate).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {Math.ceil((new Date(campaign.endDate).getTime() - new Date(campaign.startDate).getTime()) / (1000 * 60 * 60 * 24))} days
-                  </p>
-                </>
-              ) : (
-                <p className="text-muted-foreground">Not specified</p>
-              )}
+            <div className="rounded-lg bg-secondary/50 p-4">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                End Date
+              </div>
+              <p className="mt-1 font-semibold text-foreground">{formatDate(campaign.endDate)}</p>
             </div>
-          </div>
+            <div className="rounded-lg bg-secondary/50 p-4">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <DollarSign className="h-3 w-3" />
+                Total Budget
+              </div>
+              <p className="mt-1 font-semibold text-growi-money">${campaign.budgetTotal.toLocaleString()}</p>
+            </div>
+            <div className="rounded-lg bg-secondary/50 p-4">
+              <CampaignSlots campaign={campaign} />
+            </div>
+          </motion.div>
           
-          {/* Budget & Slots */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <DollarSign className="h-4 w-4 text-growi-money" />
-              <h4 className="text-sm font-medium text-muted-foreground">Budget & Slots</h4>
+          {/* Site Events */}
+          {campaign.sites && campaign.sites.length > 0 && (
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-2 mb-2">
+                <Globe className="h-4 w-4 text-growi-blue" />
+                <h4 className="text-sm font-medium text-muted-foreground">Site Events</h4>
+              </div>
+              <div className="space-y-3">
+                {campaign.sites.map((site) => (
+                  <div key={site.id} className="border border-border rounded-lg p-3 bg-secondary/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="text-sm font-semibold text-foreground">{site.name}</h5>
+                      <a
+                        href={site.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-growi-blue hover:underline"
+                      >
+                        {new URL(site.url).hostname}
+                      </a>
+                    </div>
+                    {site.description && (
+                      <p className="text-xs text-muted-foreground mb-2">{site.description}</p>
+                    )}
+                    <div className="space-y-1.5">
+                      {site.trackedSiteEventsGroupedByType.map((event) => (
+                        <div
+                          key={event.siteEventType}
+                          className="flex items-center justify-between rounded bg-background/50 px-2.5 py-1.5 border border-border/50"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Zap className="h-3.5 w-3.5 text-growi-blue" />
+                            <span className="text-xs font-medium text-foreground">
+                              {SITE_EVENT_TYPE_LABELS[event.siteEventType]}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-semibold text-growi-money">
+                              ${event.amount.toFixed(3)}
+                            </span>
+                            <span className="text-xs text-muted-foreground">per</span>
+                            <span className="text-xs font-semibold text-foreground">
+                              {event.volumeStep} {event.volumeStep === 1 ? 'event' : 'events'}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="text-sm text-foreground space-y-1">
-              <p>Budget: <span className="font-semibold">${campaign.budgetTotal.toLocaleString()}</span></p>
-              <p>Slots: <span className="font-semibold">{campaign.slots}</span></p>
-            </div>
-          </div>
+          )}
           
-          {/* Interests */}
           {campaign.interests.length > 0 && (
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-2">
@@ -68,18 +128,12 @@ export const CampaignInfoCard = ({ campaign }: { campaign: CampaignResponseDTO }
               </div>
               <div className="flex flex-wrap gap-2">
                 {campaign.interests.map((interest) => (
-                  <Badge
-                    key={interest}
-                    className="bg-growi-blue/10 text-growi-blue hover:bg-growi-blue/20"
-                  >
-                    {interest}
-                  </Badge>
+                  <InterestTag key={interest} label={interest} />
                 ))}
               </div>
             </div>
           )}
           
-          {/* Target Demographics */}
           {campaign.demographics.length > 0 && (
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-2">
@@ -88,18 +142,12 @@ export const CampaignInfoCard = ({ campaign }: { campaign: CampaignResponseDTO }
               </div>
               <div className="flex flex-wrap gap-2">
                 {campaign.demographics.map((demographic) => (
-                  <Badge
-                    key={demographic}
-                    className="bg-growi-blue/10 text-growi-blue hover:bg-growi-blue/20"
-                  >
-                    {demographic}
-                  </Badge>
+                  <TargetAudienceTag key={demographic} label={demographic} />
                 ))}
               </div>
             </div>
           )}
           
-          {/* Geographic */}
           {(campaign.regions.length > 0 || campaign.countries.length > 0) && (
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-2">
@@ -112,12 +160,7 @@ export const CampaignInfoCard = ({ campaign }: { campaign: CampaignResponseDTO }
                     <p className="text-xs text-muted-foreground mb-1">Regions</p>
                     <div className="flex flex-wrap gap-2">
                       {campaign.regions.map((region) => (
-                        <Badge
-                          key={region}
-                          className="bg-growi-blue/10 text-growi-blue hover:bg-growi-blue/20"
-                        >
-                          {region}
-                        </Badge>
+                        <RegionTag key={region} label={region} />
                       ))}
                     </div>
                   </div>
@@ -127,12 +170,7 @@ export const CampaignInfoCard = ({ campaign }: { campaign: CampaignResponseDTO }
                     <p className="text-xs text-muted-foreground mb-1">Countries</p>
                     <div className="flex flex-wrap gap-2">
                       {campaign.countries.map((country) => (
-                        <Badge
-                          key={country}
-                          className="bg-growi-blue/10 text-growi-blue hover:bg-growi-blue/20"
-                        >
-                          {country}
-                        </Badge>
+                        <CountryTag key={country} label={country} />
                       ))}
                     </div>
                   </div>
