@@ -1,13 +1,13 @@
 'use client';
 
+import { BackButton } from '@/components/ui/back-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWallet } from '@/contexts/wallet-context';
 import { mapCampaignFormToAPI, validateCampaignForm } from '@/helpers/campaign-mapper';
+import { useSites } from '@/hooks';
 import { float, scaleIn } from '@/lib/animations';
-import { AUDIENCE_DEMOGRAPHIC_OPTIONS, INTEREST_OPTIONS } from '@/lib/constants/tags';
-import { EventType } from '@/lib/db/prisma/generated';
-import { RewardEventDTO } from '@/types';
+import { AUDIENCE_DEMOGRAPHIC_OPTIONS, INTEREST_OPTIONS, SITE_EVENT_TYPE_LABELS } from '@/lib/constants';
 import { CampaignFormData } from '@/types/campaign-form';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
@@ -15,7 +15,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
   AlertTriangle,
-  ArrowLeft,
   Bot,
   Calendar,
   CheckCircle2,
@@ -30,33 +29,23 @@ import {
   Zap,
 } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-
-const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  [EventType.LANDING_PAGE_VIEW]: 'Landing Page View',
-  [EventType.VIEW_ITEM]: 'View Item',
-  [EventType.ADD_TO_CART]: 'Add to Cart',
-  [EventType.CHECKOUT]: 'Checkout',
-  [EventType.PURCHASE_SUCCESS]: 'Purchase Success',
-};
+import ReactMarkdown from 'react-markdown';
 
 const INITIAL_CAMPAIGN_DATA: CampaignFormData = {
   name: '',
   description: '',
   startDate: '',
   endDate: '',
-  targetAudience: {
-    demographics: [],
-  },
+  demographics: [],
   geographic: {
     regions: [],
     countries: [],
   },
   interests: [],
   budget: undefined,
-  slots: 10,
+  slots: 0,
   selectedRewardEvents: [],
 };
 
@@ -83,6 +72,8 @@ const QUICK_PROMPTS = [
   },
 ];
 
+const MOCK_INPUT = 'I need your help building a 1-month campaign for Growi, my finance-themed plushies! We’re launching this Monday in Latin America for finance fans of all ages. Can you come up with a catchy name, a cool description, and a plan to make the most of my $370 USD budget? I’m looking to work with 3 influencers, so help me figure out how to pick them and what they should do each week to boost sales. Keep it friendly, creative, and tailored to the LATAM market!';
+
 export default function CreateCampaignPage() {
   const router = useRouter();
   const { address } = useWallet();
@@ -94,37 +85,9 @@ export default function CreateCampaignPage() {
   const [ showSuccess, setShowSuccess ] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  // Reward Events state
-  const [ rewardEvents, setRewardEvents ] = useState<RewardEventDTO[]>([]);
-  const [ loadingRewardEvents, setLoadingRewardEvents ] = useState(false);
+  const { sites, hasSiteEvents, isLoading } = useSites();
   
-  // Fetch reward events
-  useEffect(() => {
-    const fetchRewardEvents = async () => {
-      if (!address) {
-        setRewardEvents([]);
-        return;
-      }
-      
-      try {
-        setLoadingRewardEvents(true);
-        const response = await fetch(`/api/reward-events?walletAddress=${address}`);
-        const data = await response.json();
-        
-        if (response.ok) {
-          setRewardEvents(data.data);
-        }
-      } catch (err) {
-        console.error('Error fetching reward events:', err);
-      } finally {
-        setLoadingRewardEvents(false);
-      }
-    };
-    
-    fetchRewardEvents();
-  }, [ address ]);
-  
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage } = useChat({
     transport: new DefaultChatTransport({
       api: '/api/chat/campaign-creator',
       body: () => ({ campaignData }),
@@ -148,6 +111,7 @@ export default function CreateCampaignPage() {
           }
           
           if (newData && Object.keys(newData).length > 0) {
+            console.log({ newData });
             setCampaignData((prev) => ({
               ...prev,
               name: newData?.name || prev.name,
@@ -155,14 +119,11 @@ export default function CreateCampaignPage() {
               startDate: newData?.startDate || prev.startDate,
               endDate: newData?.endDate || prev.endDate,
               geographic: {
-                ...prev.geographic,
-                ...newData.geographic,
+                regions: newData?.geographic?.regions || prev.geographic?.regions,
+                countries: newData?.geographic?.countries || prev.geographic?.countries,
               },
-              interests: newData?.interests || prev.interests,
-              targetAudience: {
-                ...prev.targetAudience,
-                ...newData.targetAudience,
-              },
+              interests: newData?.interests?.map(interest => interest.replace(/\b\w/g, l => l.toUpperCase())) || prev.interests,
+              demographics: newData?.demographics || prev.demographics,
               budget: newData?.budget || prev.budget,
               slots: newData?.slots || prev.slots,
             }));
@@ -193,17 +154,19 @@ export default function CreateCampaignPage() {
     },
   });
   
-  const isLoading = status === 'streaming' || status === 'submitted';
-  
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [ messages ]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
     
-    const userMessage = input;
+    const userMessage = input.trim() || MOCK_INPUT;
+    
+    if (!userMessage || isLoading) {
+      return;
+    }
+    
     setInput('');
     
     await sendMessage({
@@ -220,9 +183,9 @@ export default function CreateCampaignPage() {
     if (campaignData.description) filled++;
     if (campaignData.startDate) filled++;
     if (campaignData.endDate) filled++;
-    if (campaignData.geographic?.regions?.length) filled++;
+    if (campaignData.geographic?.regions?.length || campaignData.geographic?.countries?.length) filled++;
     if (campaignData.interests?.length) filled++;
-    if (campaignData.targetAudience?.demographics?.length) filled++;
+    if (campaignData.demographics?.length) filled++;
     if (campaignData.interests?.length) filled++;
     if (campaignData.budget) filled++;
     if (campaignData.slots) filled++;
@@ -253,9 +216,9 @@ export default function CreateCampaignPage() {
     setIsCreating(true);
     
     try {
-      const campaignInput = mapCampaignFormToAPI(campaignData, address);
+      const campaignInput = mapCampaignFormToAPI(campaignData);
       
-      const response = await fetch('/api/campaigns', {
+      const response = await fetch(`/api/campaigns?walletAddress=${address}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -285,24 +248,17 @@ export default function CreateCampaignPage() {
   
   return (
     <div className="relative mx-auto max-w-7xl space-y-6">
-      <div>
-        <div className="flex items-center gap-3">
-          <Link href="/manager/campaigns">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">AI Campaign Creator</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Tell our AI about your campaign goals and let it create the perfect structure for you
-            </p>
-          </div>
+      <BackButton href="/manager/campaigns" />
+      <div className="flex items-center gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">AI Campaign Creator</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Tell our AI about your campaign goals and let it create the perfect structure for you
+          </p>
         </div>
       </div>
       
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 items-stretch">
-        {/* Chat Panel */}
         <motion.div variants={scaleIn} initial="hidden" animate="visible">
           <Card className="flex h-[calc(100vh-220px)] flex-col overflow-hidden p-0 gap-0">
             <CardHeader className="border-b border-border bg-secondary/30 pt-5 min-h-[100px]">
@@ -385,8 +341,13 @@ export default function CreateCampaignPage() {
                       }`}
                     >
                       {messageText && (
-                        <div className="whitespace-pre-wrap text-sm">{messageText}</div>
-                      )}
+                        message.role === 'user' ? <div className="whitespace-pre-wrap text-sm">{messageText}</div> : (
+                          <div className="prose prose-sm max-w-none text-sm">
+                            <ReactMarkdown>
+                              {messageText}
+                            </ReactMarkdown>
+                          </div>
+                        ))}
                       
                       {toolParts.length > 0 && (
                         <div className="mt-2 flex items-center gap-1 text-xs opacity-75">
@@ -432,7 +393,7 @@ export default function CreateCampaignPage() {
                 />
                 <Button
                   type="submit"
-                  disabled={isLoading || !input.trim()}
+                  // disabled={isLoading || !input.trim()} // MOCKED
                   className="bg-growi-blue text-white hover:bg-growi-blue/90"
                 >
                   <Send className="h-4 w-4" />
@@ -507,7 +468,6 @@ export default function CreateCampaignPage() {
                 </div>
               </InfoCard>
               
-              
               <InfoCard icon={<Globe className="h-4 w-4" />} title="Geographic" color="indigo">
                 <Field
                   label="Regions"
@@ -525,6 +485,22 @@ export default function CreateCampaignPage() {
                     }))
                   }
                 />
+                <Field
+                  label="Countries"
+                  value={campaignData.geographic?.countries?.join(', ')}
+                  onChange={(value) =>
+                    setCampaignData((prev) => ({
+                      ...prev,
+                      geographic: {
+                        ...prev.geographic,
+                        countries: value
+                          .split(',')
+                          .map((r) => r.trim())
+                          .filter(Boolean),
+                      },
+                    }))
+                  }
+                />
               </InfoCard>
               
               <InfoCard icon={<Target className="h-4 w-4" />} title="Interests & Audience" color="pink">
@@ -532,7 +508,7 @@ export default function CreateCampaignPage() {
                   <div>
                     <label className="text-xs font-medium text-muted-foreground mb-2 block">Interests</label>
                     <div className="flex flex-wrap gap-1.5">
-                      {INTEREST_OPTIONS.map((interest) => (
+                      {[ ...new Set([ ...INTEREST_OPTIONS, ...(campaignData?.interests || []) ]) ].map((interest) => (
                         <button
                           key={interest}
                           onClick={() =>
@@ -558,21 +534,18 @@ export default function CreateCampaignPage() {
                   <div>
                     <label className="text-xs font-medium text-muted-foreground mb-2 block">Target Audience</label>
                     <div className="flex flex-wrap gap-1.5">
-                      {AUDIENCE_DEMOGRAPHIC_OPTIONS.map((demo) => (
+                      {[ ...new Set([ ...AUDIENCE_DEMOGRAPHIC_OPTIONS, ...(campaignData.demographics || []) ]) ].map((demo) => (
                         <button
                           key={demo}
                           onClick={() => {
-                            const current = campaignData.targetAudience?.demographics || [];
+                            const current = campaignData.demographics || [];
                             setCampaignData((prev) => ({
                               ...prev,
-                              targetAudience: {
-                                ...prev.targetAudience,
-                                demographics: current.includes(demo) ? current.filter((d) => d !== demo) : [ ...current, demo ],
-                              },
+                              demographics: current.includes(demo) ? current.filter((d) => d !== demo) : [ ...current, demo ],
                             }));
                           }}
                           className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
-                            campaignData.targetAudience?.demographics?.includes(demo)
+                            campaignData.demographics?.includes(demo)
                               ? 'bg-purple-500/20 text-purple-600 border border-purple-500/30'
                               : 'bg-secondary text-muted-foreground hover:bg-secondary/80 border border-border'
                           }`}
@@ -611,70 +584,82 @@ export default function CreateCampaignPage() {
               </InfoCard>
               
               <InfoCard icon={<Zap className="h-4 w-4" />} title="Reward Events" color="amber">
-                {loadingRewardEvents ? (
+                {isLoading ? (
                   <div className="flex items-center justify-center py-4">
                     <Loader2 className="h-5 w-5 animate-spin text-growi-blue" />
                   </div>
-                ) : rewardEvents.length === 0 ? (
+                ) : !hasSiteEvents ? (
                   <div className="text-center py-4">
                     <p className="text-sm text-muted-foreground mb-2">
-                      No tienes eventos de recompensa configurados
+                      You don&apos;t have any reward events configured
                     </p>
                     <a
                       href="/manager/sites-tracking"
                       className="text-sm text-growi-blue hover:underline"
                     >
-                      Configurar eventos →
+                      Configure events →
                     </a>
                   </div>
                 ) : (
-                  <div className="space-y-2">
-                    {rewardEvents.map((event) => {
-                      const isSelected = campaignData.selectedRewardEvents?.some(
-                        (e) => e.rewardEventId === event.id,
-                      );
-                      const selectedEvent = campaignData.selectedRewardEvents?.find(
-                        (e) => e.rewardEventId === event.id,
-                      );
-                      
-                      return (
-                        <RewardEventField
-                          key={event.id}
-                          label={event.name}
-                          eventType={EVENT_TYPE_LABELS[event.eventType]}
-                          enabled={isSelected}
-                          amount={selectedEvent?.amount}
-                          onToggle={(enabled) => {
-                            setCampaignData((prev) => {
-                              if (enabled) {
-                                return {
+                  <div className="space-y-4">
+                    {sites.map((site) => (
+                      <div key={site.id} className="space-y-2">
+                        <div className="flex items-center gap-2 pb-1 border-b border-border/50">
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                            {site.name}
+                          </h4>
+                          <span className="text-xs text-muted-foreground/60">
+                            ({site.events.length} event{site.events.length !== 1 ? 's' : ''})
+                          </span>
+                        </div>
+                        {site.events.map((event) => {
+                          const isSelected = campaignData.selectedRewardEvents?.some(
+                            (e) => e.rewardEventId === event.id,
+                          );
+                          const selectedEvent = campaignData.selectedRewardEvents?.find(
+                            (e) => e.rewardEventId === event.id,
+                          );
+                          
+                          return (
+                            <RewardEventField
+                              key={event.id}
+                              label={event.name}
+                              eventType={SITE_EVENT_TYPE_LABELS[event.eventType]}
+                              enabled={isSelected}
+                              amount={selectedEvent?.amount}
+                              onToggle={(enabled) => {
+                                setCampaignData((prev) => {
+                                  if (enabled) {
+                                    return {
+                                      ...prev,
+                                      selectedRewardEvents: [
+                                        ...(prev.selectedRewardEvents || []),
+                                        { rewardEventId: event.id!, amount: 0.01, volumeStep: 1 },
+                                      ],
+                                    };
+                                  } else {
+                                    return {
+                                      ...prev,
+                                      selectedRewardEvents: (prev.selectedRewardEvents || []).filter(
+                                        (e) => e.rewardEventId !== event.id,
+                                      ),
+                                    };
+                                  }
+                                });
+                              }}
+                              onAmountChange={(amount) => {
+                                setCampaignData((prev) => ({
                                   ...prev,
-                                  selectedRewardEvents: [
-                                    ...(prev.selectedRewardEvents || []),
-                                    { rewardEventId: event.id!, amount: 0.01, volumeStep: 1 },
-                                  ],
-                                };
-                              } else {
-                                return {
-                                  ...prev,
-                                  selectedRewardEvents: (prev.selectedRewardEvents || []).filter(
-                                    (e) => e.rewardEventId !== event.id,
+                                  selectedRewardEvents: (prev.selectedRewardEvents || []).map((e) =>
+                                    e.rewardEventId === event.id ? { ...e, amount } : e,
                                   ),
-                                };
-                              }
-                            });
-                          }}
-                          onAmountChange={(amount) => {
-                            setCampaignData((prev) => ({
-                              ...prev,
-                              selectedRewardEvents: (prev.selectedRewardEvents || []).map((e) =>
-                                e.rewardEventId === event.id ? { ...e, amount } : e,
-                              ),
-                            }));
-                          }}
-                        />
-                      );
-                    })}
+                                }));
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    ))}
                   </div>
                 )}
               </InfoCard>
@@ -766,7 +751,7 @@ export default function CreateCampaignPage() {
       
       {/* No Reward Events Modal - covers only content area */}
       <AnimatePresence>
-        {!loadingRewardEvents && rewardEvents.length === 0 && address && (
+        {!isLoading && !hasSiteEvents && address && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -789,19 +774,19 @@ export default function CreateCampaignPage() {
                   >
                     <AlertTriangle className="h-8 w-8 text-amber-500" />
                   </motion.div>
-                  <h3 className="text-xl font-bold text-foreground">Configuración Requerida</h3>
+                  <h3 className="text-xl font-bold text-foreground">Configuration Required</h3>
                   <p className="mt-3 text-sm text-muted-foreground">
-                    Para crear una campaña, primero necesitas configurar los eventos de tracking en tu sitio web.
+                    To create a campaign, you first need to configure tracking events on your website.
                   </p>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Esto te permitirá definir qué acciones de los usuarios quieres recompensar.
+                    This will allow you to define which user actions you want to reward.
                   </p>
                   <Button
                     onClick={() => router.push('/manager/sites-tracking')}
                     className="mt-6 w-full bg-growi-blue text-white hover:bg-growi-blue/90"
                   >
                     <Settings className="mr-2 h-4 w-4" />
-                    Configurar Events Tracking
+                    Configure Events Tracking
                   </Button>
                 </CardContent>
               </Card>

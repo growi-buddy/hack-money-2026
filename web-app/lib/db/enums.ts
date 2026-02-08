@@ -1,6 +1,6 @@
 // Client-safe enums - these mirror Prisma enums but can be imported in client components
 
-export const EventType = {
+export const SiteEventType = {
   LANDING_PAGE_VIEW: 'LANDING_PAGE_VIEW',
   VIEW_ITEM: 'VIEW_ITEM',
   ADD_TO_CART: 'ADD_TO_CART',
@@ -8,7 +8,7 @@ export const EventType = {
   PURCHASE_SUCCESS: 'PURCHASE_SUCCESS',
 } as const;
 
-export type EventType = (typeof EventType)[keyof typeof EventType];
+export type SiteEventType = (typeof SiteEventType)[keyof typeof SiteEventType];
 
 export const SelectorEventType = {
   ONCLICK: 'ONCLICK',
@@ -20,11 +20,12 @@ export type SelectorEventType = (typeof SelectorEventType)[keyof typeof Selector
 
 export const CampaignStatus = {
   DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
   ACTIVE: 'ACTIVE',
   PAUSED: 'PAUSED',
   DEPLETED: 'DEPLETED',
+  EXPIRED: 'EXPIRED',
   COMPLETED: 'COMPLETED',
-  DELETED: 'DELETED',
 } as const;
 
 export type CampaignStatus = (typeof CampaignStatus)[keyof typeof CampaignStatus];

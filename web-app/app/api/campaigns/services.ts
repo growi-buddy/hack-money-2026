@@ -1,114 +1,97 @@
 import { prisma } from '@/lib/db';
-import { CampaignStatus, EventType } from '@/lib/db/enums';
+import { CampaignStatus, SiteEventType } from '@/lib/db/enums';
+import { CampaignResponseDTO, CampaignUserRole } from '@/types';
 
 // Type for influencer campaign detail view
-export type InfluencerCampaignView = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: CampaignStatus;
-  budgetTotal: number;
-  isHot: boolean;
-  slots: number;
-  filledSlots: number;
-  interests: string[];
-  demographics: string[];
-  regions: string[];
-  countries: string[];
-  startDate: string | null;
-  endDate: string | null;
-  owner: {
-    id: string;
-    name: string | null;
-    walletAddress: string;
-    avatar: string | null;
-  };
-  rewardEvents: {
-    id: string;
-    name: string;
-    eventType: EventType;
-    amount: number;
-    volumeStep: number;
-  }[];
-  createdAt: string;
-  updatedAt: string;
-};
+// export type InfluencerCampaignView = {
+//   id: string;
+//   title: string;
+//   description: string | null;
+//   status: CampaignStatus;
+//   budgetTotal: number;
+//   isHot: boolean;
+//   slots: number;
+//   filledSlots: number;
+//   interests: string[];
+//   demographics: string[];
+//   regions: string[];
+//   countries: string[];
+//   startDate: string | null;
+//   endDate: string | null;
+//   owner: {
+//     id: string;
+//     name: string | null;
+//     walletAddress: string;
+//     avatar: string | null;
+//   };
+//   rewardEvents: {
+//     id: string;
+//     name: string;
+//     eventType: SiteEventType;
+//     amount: number;
+//     volumeStep: number;
+//   }[];
+//   createdAt: string;
+//   updatedAt: string;
+// };
 
-export const getCampaignForInfluencer = async (campaignId: string): Promise<InfluencerCampaignView | null> => {
-  const campaign = await prisma.campaign.findUnique({
-    where: {
-      id: campaignId,
-      status: { not: CampaignStatus.DELETED },
-    },
-    include: {
-      owner: {
-        select: {
-          id: true,
-          name: true,
-          walletAddress: true,
-          avatar: true,
-        },
-      },
-      rewardEvents: {
-        include: {
-          rewardEvent: true,
-        },
-      },
-      _count: {
-        select: {
-          participations: true,
-        },
-      },
-    },
-  });
-
-  if (!campaign) return null;
-
-  return {
-    id: campaign.id,
-    title: campaign.title,
-    description: campaign.description,
-    status: campaign.status,
-    budgetTotal: Number(campaign.budgetTotal),
-    isHot: campaign.isHot,
-    slots: campaign.slots,
-    filledSlots: campaign._count.participations,
-    interests: campaign.interests,
-    demographics: campaign.demographics,
-    regions: campaign.regions,
-    countries: campaign.countries,
-    startDate: campaign.startDate?.toISOString() ?? null,
-    endDate: campaign.endDate?.toISOString() ?? null,
-    owner: campaign.owner,
-    rewardEvents: campaign.rewardEvents.map((cre) => ({
-      id: cre.id,
-      name: cre.rewardEvent.name,
-      eventType: cre.rewardEvent.eventType,
-      amount: Number(cre.amount),
-      volumeStep: cre.volumeStep,
-    })),
-    createdAt: campaign.createdAt.toISOString(),
-    updatedAt: campaign.updatedAt.toISOString(),
-  };
-};
-
-export const getCampaignById = (campaignId: string) => {
-  return prisma.campaign.findUnique({
-    where: {
-      id: campaignId,
-      status: { not: CampaignStatus.DELETED },
-    },
-    include: {
-      rewardEvents: {
-        include: {
-          rewardEvent: {
-            include: { selectors: true },
-          },
-        },
-      },
-    },
-  });
-};
+// export const getCampaignForInfluencer = async (campaignId: string): Promise<InfluencerCampaignView | null> => {
+//   const campaign = await prisma.campaign.findUnique({
+//     where: {
+//       id: campaignId,
+//       status: { not: CampaignStatus.DELETED },
+//     },
+//     include: {
+//       owner: {
+//         select: {
+//           id: true,
+//           name: true,
+//           walletAddress: true,
+//           avatar: true,
+//         },
+//       },
+//       rewardEvents: {
+//         include: {
+//           rewardEvent: true,
+//         },
+//       },
+//       _count: {
+//         select: {
+//           participations: true,
+//         },
+//       },
+//     },
+//   });
+//
+//   if (!campaign) return null;
+//
+//   return {
+//     id: campaign.id,
+//     title: campaign.title,
+//     description: campaign.description,
+//     status: campaign.status,
+//     budgetTotal: Number(campaign.budgetTotal),
+//     isHot: campaign.isHot,
+//     slots: campaign.slots,
+//     filledSlots: campaign._count.participations,
+//     interests: campaign.interests,
+//     demographics: campaign.demographics,
+//     regions: campaign.regions,
+//     countries: campaign.countries,
+//     startDate: campaign.startDate?.toISOString() ?? null,
+//     endDate: campaign.endDate?.toISOString() ?? null,
+//     owner: campaign.owner,
+//     rewardEvents: campaign.rewardEvents.map((cre) => ({
+//       id: cre.id,
+//       name: cre.rewardEvent.name,
+//       eventType: cre.rewardEvent.eventType,
+//       amount: Number(cre.amount),
+//       volumeStep: cre.volumeStep,
+//     })),
+//     createdAt: campaign.createdAt.toISOString(),
+//     updatedAt: campaign.updatedAt.toISOString(),
+//   };
+// };
 
 export type CampaignDashboardData = {
   id: string;
@@ -127,7 +110,7 @@ export type CampaignDashboardData = {
   rewardEvents: {
     id: string;
     name: string;
-    eventType: EventType;
+    eventType: SiteEventType;
     amount: number;
     volumeStep: number;
     trackedEventsCount: number;
@@ -142,7 +125,7 @@ export type CampaignDashboardData = {
     currentBalance: number;
     totalEvents: number;
     events: {
-      type: EventType;
+      type: SiteEventType;
       count: number;
     }[];
   }[];
@@ -150,18 +133,36 @@ export type CampaignDashboardData = {
   updatedAt: string;
 };
 
-export const getCampaignDashboard = async (campaignId: string): Promise<CampaignDashboardData | null> => {
+export const getCampaignResponseDTO = async (
+  campaignId: string,
+  userWalletAddress: string,
+): Promise<CampaignResponseDTO | null> => {
   const campaign = await prisma.campaign.findUnique({
     where: {
       id: campaignId,
-      status: { not: CampaignStatus.DELETED },
+      deletedAt: null,
     },
     include: {
-      rewardEvents: {
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          walletAddress: true,
+          avatar: true,
+        },
+      },
+      siteEvents: {
         include: {
-          rewardEvent: true,
-          _count: {
-            select: { trackedEvents: true },
+          siteEvent: {
+            include: {
+              site: true,
+              trackedSiteEvents: {
+                select: {
+                  id: true,
+                  participationId: true,
+                },
+              },
+            },
           },
         },
       },
@@ -172,12 +173,7 @@ export const getCampaignDashboard = async (campaignId: string): Promise<Campaign
               id: true,
               name: true,
               walletAddress: true,
-            },
-          },
-          events: {
-            select: {
-              type: true,
-              payoutGenerated: true,
+              avatar: true,
             },
           },
         },
@@ -187,63 +183,109 @@ export const getCampaignDashboard = async (campaignId: string): Promise<Campaign
   
   if (!campaign) return null;
   
-  // Calculate budget spent
-  const budgetSpent = campaign.rewardEvents.reduce((total, cre) => {
-    const eventsCount = cre._count.trackedEvents;
-    const amountPerEvent = Number(cre.amount);
-    return total + (eventsCount * amountPerEvent);
-  }, 0);
+  // Determine user role
+  let userRole: CampaignUserRole = 'guest';
+  if (userWalletAddress) {
+    if (campaign.owner.walletAddress === userWalletAddress) {
+      userRole = 'manager';
+    } else if (campaign.participations.some(p => p.influencer.walletAddress === userWalletAddress)) {
+      userRole = 'influencer';
+    }
+  }
   
-  // Map reward events with tracked counts
-  const rewardEvents = campaign.rewardEvents.map((cre) => ({
-    id: cre.id,
-    name: cre.rewardEvent.name,
-    eventType: cre.rewardEvent.eventType,
-    amount: Number(cre.amount),
-    volumeStep: cre.volumeStep,
-    trackedEventsCount: cre._count.trackedEvents,
+  // Calculate budget spent by summing tracked events
+  let budgetSpent = 0;
+  const siteMap = new Map<string, {
+    id: string;
+    name: string;
+    url: string;
+    description: string;
+    events: Map<SiteEventType, { amount: number; volumeStep: number; count: number }>;
+  }>();
+  
+  // Group site events by site and calculate budget spent
+  campaign.siteEvents.forEach((cse) => {
+    const site = cse.siteEvent.site;
+    const eventType = cse.siteEvent.eventType;
+    const amount = Number(cse.amount);
+    const trackedCount = cse.siteEvent.trackedSiteEvents.length;
+    
+    budgetSpent += trackedCount * amount;
+    
+    if (!siteMap.has(site.id)) {
+      siteMap.set(site.id, {
+        id: site.id,
+        name: site.name,
+        url: site.url,
+        description: site.description,
+        events: new Map(),
+      });
+    }
+    
+    const siteData = siteMap.get(site.id)!;
+    if (!siteData.events.has(eventType)) {
+      siteData.events.set(eventType, {
+        amount,
+        volumeStep: cse.volumeStep,
+        count: 0,
+      });
+    }
+    
+    const eventData = siteData.events.get(eventType)!;
+    eventData.count += trackedCount;
+  });
+  
+  // Convert site map to array format for response
+  const sites = Array.from(siteMap.values()).map((site) => ({
+    id: site.id,
+    name: site.name,
+    url: site.url,
+    description: site.description,
+    trackedSiteEventsGroupedByType: Array.from(site.events.entries()).map(([ eventType, data ]) => ({
+      siteEventType: eventType,
+      amount: data.amount,
+      volumeStep: data.volumeStep,
+      trackedEventsCount: data.count,
+    })),
   }));
   
-  // Map participations with aggregated event counts
-  const participations = campaign.participations.map((p) => {
-    // Group events by type
-    const eventsByType = p.events.reduce((acc, event) => {
-      if (!acc[event.type]) {
-        acc[event.type] = 0;
-      }
-      acc[event.type]++;
-      return acc;
-    }, {} as Record<EventType, number>);
-    
-    return {
-      id: p.id,
-      influencer: p.influencer,
-      currentBalance: Number(p.currentBalance),
-      totalEvents: p.events.length,
-      events: Object.entries(eventsByType).map(([ type, count ]) => ({
-        type: type as EventType,
-        count,
-      })),
-    };
-  });
+  // Map participants
+  const participants = campaign.participations.map((p) => ({
+    id: p.influencer.id,
+    name: p.influencer.name ?? '',
+    walletAddress: p.influencer.walletAddress,
+    avatar: p.influencer.avatar ?? '',
+  }));
+  
+  const startDate = new Date(campaign.startDate || 0).getTime();
+  const endDate = new Date(campaign.endDate || 0).getTime();
   
   return {
     id: campaign.id,
     title: campaign.title,
-    description: campaign.description,
+    description: campaign.description ?? '',
     status: campaign.status,
     budgetTotal: Number(campaign.budgetTotal),
     budgetSpent,
+    isHot: campaign.isHot,
     slots: campaign.slots,
     interests: campaign.interests,
     demographics: campaign.demographics,
     regions: campaign.regions,
     countries: campaign.countries,
-    startDate: campaign.startDate?.toISOString() ?? null,
-    endDate: campaign.endDate?.toISOString() ?? null,
-    rewardEvents,
-    participations,
-    createdAt: campaign.createdAt.toISOString(),
-    updatedAt: campaign.updatedAt.toISOString(),
+    startDate,
+    endDate,
+    sites,
+    participants,
+    owner: {
+      id: campaign.owner.id,
+      name: campaign.owner.name ?? '',
+      walletAddress: campaign.owner.walletAddress,
+      avatar: campaign.owner.avatar ?? '',
+    },
+    userRole,
+    createdAt: campaign.createdAt.getTime(),
+    updatedAt: campaign.updatedAt.getTime(),
+    isDeleted: !!campaign.deletedAt,
   };
 };

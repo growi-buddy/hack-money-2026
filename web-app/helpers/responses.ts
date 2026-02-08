@@ -1,4 +1,6 @@
-import { ApiDataResponse, ApiErrorResponse, ApiListResponse } from '@/types';
+import { toUserResponseDTO } from '@/helpers/users';
+import { prisma } from '@/lib/db';
+import { ApiDataResponse, ApiErrorResponse, ApiListResponse, UserResponseDTO } from '@/types';
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import { Prisma } from '../lib/db/prisma/generated/client';
@@ -17,7 +19,7 @@ export function responseError(error: unknown) {
   } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === 'P2002') {
       response.error.code = 'CONFLICT';
-      response.error.message = 'A user with this wallet or email already exists';
+      response.error.message = error.message;
     } else {
       response.error.code = `PRISMA_${error.code}`;
       response.error.message = error.message;
@@ -25,17 +27,59 @@ export function responseError(error: unknown) {
   }
   
   return NextResponse.json(response, { status: 400 });
-};
+}
 
-export async function safeRoute(cb: () => Promise<{
+type Response = {
   response: ApiDataResponse<unknown> | ApiListResponse<unknown> | ApiErrorResponse,
   status?: number
-}>) {
+};
+
+type CB = () => Promise<Response>;
+
+export const safeRouteWithWalletAddress = async (req: Request, cb: (user: UserResponseDTO) => Promise<Response>) => {
+  try {
+    const { searchParams } = new URL(req.url);
+    const walletAddress = searchParams.get('walletAddress');
+    if (!walletAddress) {
+      const response: ApiErrorResponse = {
+        success: false,
+        error: {
+          code: 'MISSING_WALLET',
+          message: 'Wallet address is required',
+        },
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
+    
+    // Validate user
+    const user = await prisma.user.upsert({
+      where: { walletAddress },
+      update: {},
+      create: {
+        walletAddress,
+      },
+      include: {
+        socialMedias: true,
+      },
+    });
+
+    const userResponseDTO: UserResponseDTO = toUserResponseDTO(user);
+    
+    const { response, status } = await cb(userResponseDTO);
+    return NextResponse.json(response, { status });
+    
+  } catch (error) {
+    console.error(error);
+    return responseError(error);
+  }
+};
+
+export async function safeRoute(cb: CB) {
   try {
     const { response, status } = await cb();
     return NextResponse.json(response, { status });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return responseError(error);
   }
 }

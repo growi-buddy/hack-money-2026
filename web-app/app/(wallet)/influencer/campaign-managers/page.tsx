@@ -114,8 +114,8 @@ export default function CampaignManagersPage() {
       
       {/* Loading State */}
       {loading && (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
       

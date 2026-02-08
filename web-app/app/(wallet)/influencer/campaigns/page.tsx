@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Textarea } from '@/components/ui/textarea';
 import { useWallet } from '@/contexts/wallet-context';
 import { scaleIn } from '@/lib/animations';
-import { InfluencerCampaignSummary } from '@/types';
+import { InfluencerCampaignSummaryResponseDTO } from '@/types';
 import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
 import { MessageSquare, RefreshCw, Sparkles, Star, Wallet } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -40,7 +40,7 @@ export default function InfluencerCampaigns() {
   const { address } = useWallet();
   const [ lastUpdated, setLastUpdated ] = useState<Date>(new Date());
   const [ showRatingModal, setShowRatingModal ] = useState(false);
-  const [ selectedCampaign, setSelectedCampaign ] = useState<InfluencerCampaignSummary | null>(null);
+  const [ selectedCampaign, setSelectedCampaign ] = useState<InfluencerCampaignSummaryResponseDTO | null>(null);
   const [ rating, setRating ] = useState(0);
   const [ hoverRating, setHoverRating ] = useState(0);
   const [ review, setReview ] = useState('');
@@ -65,7 +65,7 @@ export default function InfluencerCampaigns() {
   // [ ...activeCampaigns, ...completedCampaigns, ...archivedCampaigns ]
   //   .reduce((sum, p) => sum + p.currentBalance, 0);
   
-  const handleRateCampaign = (item: InfluencerCampaignSummary) => {
+  const handleRateCampaign = (item: InfluencerCampaignSummaryResponseDTO) => {
     setSelectedCampaign(item);
     setShowRatingModal(true);
     setRating(0);
@@ -147,9 +147,13 @@ export default function InfluencerCampaigns() {
       
       <ActiveCampaignsList userRole="influencer" deps={[ lastUpdated ]} />
       
-      <CompletedCampaignsList userRole="influencer" deps={[ lastUpdated ]} />
+      <CompletedCampaignsList
+        userRole="influencer"
+        deps={[ lastUpdated ]}
+        onReload={() => setLastUpdated(new Date())}
+      />
       
-      <ArchivedCampaignsList userRole="influencer" deps={[ lastUpdated ]} />
+      <ArchivedCampaignsList userRole="influencer" deps={[ lastUpdated ]} onReload={() => setLastUpdated(new Date())} />
       
       <Dialog open={showRatingModal} onOpenChange={setShowRatingModal}>
         <DialogContent className="sm:max-w-md">

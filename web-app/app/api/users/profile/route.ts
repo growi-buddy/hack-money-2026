@@ -8,7 +8,7 @@ const SocialMediaSchema = z.object({
   id: z.string().optional(),
   platform: z.nativeEnum(SocialMediaPlatform),
   username: z.string().min(1),
-  followers: z.string().optional(),
+  followers: z.number().optional(),
   url: z.string().optional(),
 });
 
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
   return safeRoute(async () => {
     const { searchParams } = new URL(req.url);
     const walletAddress = searchParams.get('walletAddress');
-
+    
     if (!walletAddress) {
       const response: ApiErrorResponse = {
         success: false,
@@ -37,7 +37,7 @@ export async function GET(req: Request) {
       };
       return { response, status: 400 };
     }
-
+    
     const user = await prisma.user.findUnique({
       where: { walletAddress },
       include: {
@@ -56,7 +56,7 @@ export async function GET(req: Request) {
         },
       },
     });
-
+    
     if (!user) {
       // Create user if not exists
       const newUser = await prisma.user.create({
@@ -77,10 +77,10 @@ export async function GET(req: Request) {
           },
         },
       });
-
+      
       // Calculate budget spent
       const budgetSpent = 0; // New user has no budget spent
-
+      
       const response: ApiDataResponse<typeof newUser & { budgetSpent: number }> = {
         success: true,
         data: {
@@ -90,12 +90,12 @@ export async function GET(req: Request) {
       };
       return { response, status: 201 };
     }
-
+    
     // Calculate total budget spent across all campaigns
     const budgetSpent = user.campaignsCreated.reduce((total, campaign) => {
       return total + Number(campaign.budgetTotal);
     }, 0);
-
+    
     const response: ApiDataResponse<typeof user & { budgetSpent: number }> = {
       success: true,
       data: {
@@ -112,7 +112,7 @@ export async function PUT(req: Request) {
   return safeRoute(async () => {
     const { searchParams } = new URL(req.url);
     const walletAddress = searchParams.get('walletAddress');
-
+    
     if (!walletAddress) {
       const response: ApiErrorResponse = {
         success: false,
@@ -120,25 +120,25 @@ export async function PUT(req: Request) {
       };
       return { response, status: 400 };
     }
-
+    
     const body = await req.json();
     const data = UpdateProfileSchema.parse(body);
-
+    
     // Find user
     let user = await prisma.user.findUnique({
       where: { walletAddress },
     });
-
+    
     if (!user) {
       // Create user if not exists
       user = await prisma.user.create({
         data: { walletAddress },
       });
     }
-
+    
     // Update user profile
     const { socialMedias, ...profileData } = data;
-
+    
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
@@ -148,14 +148,14 @@ export async function PUT(req: Request) {
         socialMedias: true,
       },
     });
-
+    
     // Handle social media updates if provided
     if (socialMedias) {
       // Delete existing social medias
       await prisma.socialMedia.deleteMany({
         where: { userId: user.id },
       });
-
+      
       // Create new social medias
       if (socialMedias.length > 0) {
         await prisma.socialMedia.createMany({
@@ -169,7 +169,7 @@ export async function PUT(req: Request) {
         });
       }
     }
-
+    
     // Fetch updated user with social medias and campaign stats
     const finalUser = await prisma.user.findUnique({
       where: { id: user.id },
@@ -189,7 +189,7 @@ export async function PUT(req: Request) {
         },
       },
     });
-
+    
     if (!finalUser) {
       const response: ApiErrorResponse = {
         success: false,
@@ -197,12 +197,12 @@ export async function PUT(req: Request) {
       };
       return { response, status: 404 };
     }
-
+    
     // Calculate budget spent
     const budgetSpent = finalUser.campaignsCreated.reduce((total, campaign) => {
       return total + Number(campaign.budgetTotal);
     }, 0);
-
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response: ApiDataResponse<any> = {
       success: true,

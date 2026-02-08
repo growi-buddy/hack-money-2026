@@ -1,5 +1,6 @@
 'use client';
 
+import Loading from '@/app/(wallet)/manager/search/loading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,54 +8,23 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWallet } from '@/contexts/wallet-context';
+import { useUsers } from '@/hooks/use-users';
 import { staggerContainer, staggerItem } from '@/lib/animations';
+import { CampaignStatus } from '@/lib/db/enums';
+import { ApiListResponse, CampaignResponseDTO } from '@/types';
 import { motion } from 'framer-motion';
-import { Building2, Flame, Loader2, Search, TrendingUp, X } from 'lucide-react';
+import { Building2, Flame, Search, TrendingUp, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-
-interface Campaign {
-  id: string;
-  title: string;
-  description?: string;
-  status: string;
-  isHot: boolean;
-  interests: string[];
-  demographics: string[];
-  regions: string[];
-  countries: string[];
-  budget: number;
-  slots: number;
-  filledSlots: number;
-  progress: number;
-  rate: number;
-  startDate?: string;
-  endDate?: string;
-  owner: {
-    id: string;
-    name?: string;
-    walletAddress: string;
-    avatar?: string;
-  };
-  createdAt: string;
-}
-
-interface Manager {
-  id: string;
-  name?: string;
-  walletAddress: string;
-}
 
 export default function CampaignsPage() {
   const searchParams = useSearchParams();
   const managerFromUrl = searchParams.get('manager');
   const { address } = useWallet();
   
-  const [ campaigns, setCampaigns ] = useState<Campaign[]>([]);
-  const [ managers, setManagers ] = useState<Manager[]>([]);
-  const [ allInterests, setAllInterests ] = useState<string[]>([]);
+  const [ campaigns, setCampaigns ] = useState<CampaignResponseDTO[]>([]);
   const [ loading, setLoading ] = useState(true);
   const [ searchQuery, setSearchQuery ] = useState('');
   const [ selectedInterest, setSelectedInterest ] = useState<string | null>(null);
@@ -67,20 +37,13 @@ export default function CampaignsPage() {
       if (searchQuery) params.set('search', searchQuery);
       if (selectedInterest) params.set('interest', selectedInterest);
       if (selectedManager) params.set('managerId', selectedManager);
-      // Exclude campaigns created by the current user
       if (address) params.set('walletAddress', address);
       
-      const response = await fetch(`/api/campaigns/available?${params.toString()}`);
-      const data = await response.json();
+      const response = await fetch(`/api/campaigns/all?status=${CampaignStatus.ACTIVE}&${params.toString()}`);
+      const data: ApiListResponse<CampaignResponseDTO> = await response.json();
       
       if (data.success) {
         setCampaigns(data.data);
-        if (data.meta?.interests) {
-          setAllInterests(data.meta.interests);
-        }
-        if (data.meta?.managers) {
-          setManagers(data.meta.managers);
-        }
       }
     } catch (error) {
       console.error('Error fetching campaigns:', error);
@@ -90,7 +53,7 @@ export default function CampaignsPage() {
   }, [ searchQuery, selectedInterest, selectedManager, address ]);
   
   useEffect(() => {
-    fetchCampaigns();
+    void fetchCampaigns();
   }, [ fetchCampaigns ]);
   
   useEffect(() => {
@@ -99,11 +62,13 @@ export default function CampaignsPage() {
     }
   }, [ managerFromUrl ]);
   
+  const { users } = useUsers('manager');
   const selectedManagerName = selectedManager
-    ? managers.find((m) => m.id === selectedManager)?.name ||
-    managers.find((m) => m.id === selectedManager)?.walletAddress?.slice(0, 8)
+    ? users.find((m) => m.id === selectedManager)?.name ||
+    users.find((m) => m.id === selectedManager)?.walletAddress?.slice(0, 8)
     : null;
   
+  const allInterests: string[] = [];
   const hotCampaigns = campaigns.filter((c) => c.isHot);
   
   return (
@@ -121,7 +86,6 @@ export default function CampaignsPage() {
         </p>
       </div>
       
-      {/* Manager Filter Banner */}
       {selectedManagerName && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -140,7 +104,6 @@ export default function CampaignsPage() {
         </motion.div>
       )}
       
-      {/* Search & Filter */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -167,9 +130,9 @@ export default function CampaignsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Managers</SelectItem>
-              {managers.map((manager) => (
-                <SelectItem key={manager.id} value={manager.id}>
-                  {manager.name || manager.walletAddress.slice(0, 8) + '...'}
+              {users.map((user) => (
+                <SelectItem key={user.id} value={user.id}>
+                  {user.name || user.walletAddress.slice(0, 8) + '...'}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -198,12 +161,7 @@ export default function CampaignsPage() {
         </div>
       </motion.div>
       
-      {/* Loading State */}
-      {loading && (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-growi-blue" />
-        </div>
-      )}
+      {loading && <Loading />}
       
       {/* Campaigns Tabs */}
       {!loading && (
@@ -262,17 +220,18 @@ export default function CampaignsPage() {
   );
 }
 
-function CampaignCard({ campaign }: { campaign: Campaign }) {
-  const formatDate = (startDate?: string, endDate?: string) => {
-    if (!startDate && !endDate) return 'Ongoing';
-    const start = startDate ? new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
-    const end = endDate ? new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
-    if (start && end) return `${start} - ${end}`;
-    if (start) return `From ${start}`;
-    if (end) return `Until ${end}`;
-    return 'Ongoing';
-  };
+const formatDate = (startDate?: string | number, endDate?: string | number) => {
+  if (!startDate && !endDate) return 'Ongoing';
+  const start = startDate ? new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+  const end = endDate ? new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+  if (start && end) return `${start} - ${end}`;
+  if (start) return `From ${start}`;
+  if (end) return `Until ${end}`;
+  return 'Ongoing';
+};
 
+function CampaignCard({ campaign }: { campaign: CampaignResponseDTO }) {
+  
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -283,7 +242,11 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
         return 'bg-gray-500/20 text-gray-500 border-gray-500/50';
     }
   };
-
+  
+  const slotsProgress = campaign.slots && campaign.slots > 0
+    ? Math.round((campaign.participants.length / campaign.slots) * 100)
+    : 0;
+  
   return (
     <motion.div
       variants={staggerItem}
@@ -330,7 +293,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
               by {campaign.owner.name || campaign.owner.walletAddress.slice(0, 8) + '...'}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">{formatDate(campaign.startDate, campaign.endDate)}</p>
-
+            
             {/* Interests */}
             {campaign.interests.length > 0 && (
               <div className="mt-2">
@@ -349,7 +312,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
                 </div>
               </div>
             )}
-
+            
             {/* Demographics */}
             {campaign.demographics.length > 0 && (
               <div className="mt-2">
@@ -368,7 +331,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
                 </div>
               </div>
             )}
-
+            
             {/* Geographic */}
             {(campaign.regions.length > 0 || campaign.countries.length > 0) && (
               <div className="mt-2">
@@ -392,24 +355,24 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
                 </div>
               </div>
             )}
-
+            
             <div className="mt-auto pt-3 space-y-3">
               <div className="flex items-center justify-between">
-                <p className="font-medium text-growi-money">${campaign.rate.toFixed(3)}/event</p>
-                <p className="text-xs text-muted-foreground">${campaign.budget.toLocaleString()}</p>
+                {/*<p className="font-medium text-growi-money">${campaign.rate.toFixed(3)}/event</p>*/}
+                <p className="text-xs text-muted-foreground">${campaign.budgetTotal.toLocaleString()}</p>
               </div>
               <div>
                 <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                   <span>
-                    Slots filled ({campaign.filledSlots}/{campaign.slots})
+                    Slots filled ({campaign.participants.length}/{campaign.slots})
                   </span>
-                  <span>{campaign.progress}%</span>
+                  <span>{slotsProgress}%</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-secondary">
                   <motion.div
                     className="h-full bg-growi-blue"
                     initial={{ width: 0 }}
-                    animate={{ width: `${campaign.progress}%` }}
+                    animate={{ width: `${slotsProgress}%` }}
                     transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.3 }}
                   />
                 </div>

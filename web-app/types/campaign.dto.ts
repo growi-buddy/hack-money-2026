@@ -1,7 +1,9 @@
-import { CampaignStatus, EventType, SelectorEventType } from '@/lib/db/enums';
+import { CampaignStatus, SelectorEventType, SiteEventType } from '@/lib/db/enums';
+import { CampaignUserRole } from '@/types/user';
+import { BasicUserResponseDTO } from '@/types/user.dto';
 import { z } from 'zod';
 
-export const EventTypeEnum = z.nativeEnum(EventType);
+export const EventTypeEnum = z.nativeEnum(SiteEventType);
 
 export const SelectorEventTypeEnum = z.nativeEnum(SelectorEventType);
 
@@ -35,7 +37,7 @@ export type RewardEventInput = z.infer<typeof RewardEventSchema>;
 // Schema for linking RewardEvent to Campaign with amount and volumeStep
 export const CampaignRewardEventSchema = z.object({
   id: z.string().cuid().optional(),
-  rewardEventId: z.string().cuid('Invalid reward event ID'),
+  siteEventId: z.string().cuid('Invalid site event ID'),
   amount: z.number().positive('Amount must be greater than 0'),
   volumeStep: z.number().int().positive().optional().default(1),
 });
@@ -43,7 +45,6 @@ export const CampaignRewardEventSchema = z.object({
 export type CampaignRewardEventInput = z.infer<typeof CampaignRewardEventSchema>;
 
 export const CreateCampaignDTO = z.object({
-  walletAddress: z.string(),
   title: z.string(),
   description: z.string().optional(),
   budgetTotal: z.string().or(z.number()),
@@ -52,9 +53,9 @@ export const CreateCampaignDTO = z.object({
   demographics: z.array(z.string()).optional().default([]),
   regions: z.array(z.string()).optional().default([]),
   countries: z.array(z.string()).optional().default([]),
-  startDate: z.string().datetime().optional().nullable(),
-  endDate: z.string().datetime().optional().nullable(),
-  rewardEvents: z.array(CampaignRewardEventSchema),
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+  siteEvents: z.array(CampaignRewardEventSchema),
 });
 
 export type CreateCampaignInput = z.infer<typeof CreateCampaignDTO>;
@@ -72,7 +73,7 @@ export const UpdateCampaignDTO = CreateCampaignDTO.partial().extend({
 
 export type UpdateCampaignInput = z.infer<typeof UpdateCampaignDTO>;
 
-export type SelectorDTO = z.infer<typeof SelectorSchema>;
+export type  SelectorDTO = z.infer<typeof SelectorSchema>;
 
 export type RewardEventDTO = z.infer<typeof RewardEventSchema>;
 
@@ -92,61 +93,54 @@ export const CampaignRewardEventsSchema = z.object({
 
 export type CampaignRewardEventsDTO = z.infer<typeof CampaignRewardEventsSchema>;
 
-// Schema for reward event summary with tracked events count
-export const RewardEventSummarySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  eventType: EventTypeEnum,
-  amount: z.number(),
-  volumeStep: z.number(),
-  trackedEventsCount: z.number(),
-});
+export interface TrackedSiteEventSummaryResponseDTO {
+  siteEventType: SiteEventType,
+  amount: number,
+  volumeStep: number,
+  trackedEventsCount: number,
+}
 
-export type RewardEventSummary = z.infer<typeof RewardEventSummarySchema>;
+export interface SiteWithEventsResponseDTO {
+  id: string,
+  name: string,
+  url: string,
+  description: string,
+  trackedSiteEventsGroupedByType: TrackedSiteEventSummaryResponseDTO[],
+}
 
-export const CampaignOwnerSchema = z.object({
-  id: z.string(),
-  name: z.string().nullable(),
-  walletAddress: z.string(),
-});
+export interface OwnerResponseDTO extends BasicUserResponseDTO {
 
-export type CampaignOwner = z.infer<typeof CampaignOwnerSchema>;
+}
 
-// Schema for campaign summary (used in dashboard)
-export const CampaignResponseSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string().default(''),
-  status: z.nativeEnum(CampaignStatus),
-  budgetTotal: z.number(),
-  budgetSpent: z.number(),
-  isHot: z.boolean().optional(),
-  slots: z.number().optional(),
-  interests: z.array(z.string()).default([]),
-  demographics: z.array(z.string()).default([]),
-  regions: z.array(z.string()).default([]),
-  countries: z.array(z.string()).default([]),
-  startDate: z.string(),
-  endDate: z.string(),
-  rewardEvents: z.array(RewardEventSummarySchema),
-  participationsCount: z.number(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  owner: CampaignOwnerSchema.optional(),
-  userRole: z.enum([ 'manager', 'influencer' ]),
-});
+export interface CampaignParticipantResponseDTO extends BasicUserResponseDTO {
 
-export type CampaignResponse = z.infer<typeof CampaignResponseSchema>;
+}
 
-export const UserCampaignsResponseSchema = z.object({
-  campaigns: z.array(CampaignResponseSchema),
-  total: z.number(),
-});
+export interface CampaignResponseDTO {
+  title: string;
+  description: string;
+  status: CampaignStatus;
+  budgetTotal: number;
+  budgetSpent: number;
+  isHot: boolean;
+  slots: number;
+  interests: string[];
+  demographics: string[];
+  regions: string[];
+  countries: string[];
+  startDate: number,
+  endDate: number,
+  sites: SiteWithEventsResponseDTO[];
+  participants: CampaignParticipantResponseDTO[];
+  owner: OwnerResponseDTO;
+  userRole: CampaignUserRole,
+  
+  id: string;
+  createdAt: number,
+  updatedAt: number,
+  isDeleted: boolean,
+}
 
-export type UserCampaignsResponse = z.infer<typeof UserCampaignsResponseSchema>;
-
-export const InfluencerCampaignSummarySchema = CampaignResponseSchema.extend({
-  participationId: z.string(),
-});
-
-export type InfluencerCampaignSummary = z.infer<typeof InfluencerCampaignSummarySchema>;
+export interface InfluencerCampaignSummaryResponseDTO extends CampaignResponseDTO {
+  participationId: string,
+}
